@@ -1,0 +1,25 @@
+# ---- Xcode ----
+build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+.swiftpm/
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# ---- Secretos y perfiles ----
+.env
+.env.*
+firebase-service-account.json
+AuthKey_*.p8
+*.p12
+*.mobileprovision
+*.cer
+
+# ---- Sistema ----
+.DS_Store
+Thumbs.db
+desktop.ini

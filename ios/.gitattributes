@@ -1,0 +1,13 @@
+* text=auto
+
+*.swift text
+*.plist text
+*.yml text
+*.json text
+*.md text
+*.storyboard text
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary

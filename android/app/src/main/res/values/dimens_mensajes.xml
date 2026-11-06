@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Diálogos -->
+    <dimen name="msg_dialog_margin_horizontal">24dp</dimen>
+    <dimen name="msg_dialog_padding">20dp</dimen>
+    <dimen name="msg_dialog_icon_size">48dp</dimen>
+    <dimen name="msg_dialog_title_text_size">18sp</dimen>
+    <dimen name="msg_dialog_message_text_size">14sp</dimen>
+    <dimen name="msg_dialog_button_min_height">48dp</dimen>
+    <dimen name="msg_dialog_button_corner_radius">12dp</dimen>
+    <dimen name="msg_dialog_divider_height">1dp</dimen>
+
+    <!-- Carga -->
+    <dimen name="msg_loading_size">56dp</dimen>
+
+    <!-- Snackbar -->
+    <dimen name="msg_snackbar_corner_radius">12dp</dimen>
+
+    <!-- Toast personalizado -->
+    <dimen name="msg_toast_corner_radius">12dp</dimen>
+    <dimen name="msg_toast_padding_horizontal">16dp</dimen>
+    <dimen name="msg_toast_padding_vertical">12dp</dimen>
+    <dimen name="msg_toast_icon_size">24dp</dimen>
+    <dimen name="msg_toast_text_size">14sp</dimen>
+</resources>

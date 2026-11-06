@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/msg_dialog_margin_horizontal"
+    android:background="@color/blanco"
+    android:padding="@dimen/msg_dialog_padding">
+
+    <ImageView
+        android:id="@+id/dialog_icon"
+        android:layout_width="@dimen/msg_dialog_icon_size"
+        android:layout_height="@dimen/msg_dialog_icon_size"
+        android:contentDescription="@string/icono_del_mensaje"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:textAlignment="center"
+        android:textColor="@color/texto_principal"
+        android:textSize="@dimen/msg_dialog_title_text_size"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/dialog_icon" />
+
+    <TextView
+        android:id="@+id/dialog_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="20dp"
+        android:textAlignment="center"
+        android:textColor="@color/gris_texto"
+        android:textSize="@dimen/msg_dialog_message_text_size"
+        app:layout_constraintTop_toBottomOf="@id/dialog_title" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/msg_dialog_divider_height"
+        android:background="@color/g_doradoc"
+        app:layout_constraintTop_toBottomOf="@id/dialog_message" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/divider">
+
+        <Button
+            android:id="@+id/dialog_button_negative"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/msg_dialog_button_min_height"
+            android:layout_weight="1"
+            android:background="@color/blanco"
+            android:textColor="@color/gris_texto"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:theme="@style/Theme.Gestion" />
+
+        <Button
+            android:id="@+id/dialog_button_positive"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/msg_dialog_button_min_height"
+            android:layout_weight="1"
+            android:backgroundTint="@color/g_verde"
+            android:textColor="@color/g_white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:theme="@style/Theme.Gestion" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

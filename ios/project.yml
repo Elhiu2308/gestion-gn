@@ -1,0 +1,86 @@
+# XcodeGen specification for GestióN (iOS)
+#
+# Genera GestiónIOS.xcodeproj con:
+#     xcodegen
+#
+# Requiere una ruta de ejecución de Swift 5.9+.
+
+name: GestiónIOS
+options:
+  bundleIdPrefix: com.gn
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    INFOPLIST_FILE: App/Info.plist
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    ENABLE_PREVIEWS: true
+
+packages:
+  SocketIO:
+    url: https://github.com/socketio/Socket.IO-Client-Swift
+    from: 16.0.0
+
+targets:
+  GestiónIOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Models
+      - path: Services
+      - path: Repositories
+      - path: ViewModels
+      - path: Components
+      - path: Views
+      - path: Utilities
+      - path: Assets.xcassets
+    dependencies:
+      - package: SocketIO
+        product: SocketIO
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gn.gestion.ios
+        PRODUCT_NAME: GestiónIOS
+        # Nombre del módulo Swift en ASCII: evita el conflicto de normalización
+        # Unicode (NFC/NFD) de la "ó" que impide `@testable import` en las pruebas.
+        PRODUCT_MODULE_NAME: GestionIOS
+        ORGANIZATION_NAME: Guardia Nacional
+        DEVELOPMENT_TEAM: "U6V9T5P39J"
+        GENERATE_INFOPLIST_FILE: false
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    scheme:
+      testTargets:
+        - GestiónIOSTests
+        - GestiónIOSUITests
+      gatherCoverageData: true
+
+  GestiónIOSTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: GestiónIOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gn.gestion.ios.tests
+        GENERATE_INFOPLIST_FILE: true
+        DEVELOPMENT_TEAM: "U6V9T5P39J"
+
+  GestiónIOSUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    dependencies:
+      - target: GestiónIOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gn.gestion.ios.uitests
+        GENERATE_INFOPLIST_FILE: true
+        TEST_TARGET_NAME: GestiónIOS
+        DEVELOPMENT_TEAM: "U6V9T5P39J"

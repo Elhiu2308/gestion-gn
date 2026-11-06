@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Base clara con transición verde institucional -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="#EAF3EE"
+                android:centerColor="#F5F7F4"
+                android:endColor="#F8F9F7"
+                android:type="linear" />
+        </shape>
+    </item>
+
+    <!-- Mancha verde suave en la esquina superior derecha -->
+    <item
+        android:width="300dp"
+        android:height="300dp"
+        android:gravity="top|end"
+        android:right="-88dp"
+        android:top="-112dp">
+        <shape android:shape="oval">
+            <solid android:color="#1F0B5D3B" />
+        </shape>
+    </item>
+
+    <!-- Acento dorado discreto -->
+    <item
+        android:width="220dp"
+        android:height="220dp"
+        android:gravity="bottom|start"
+        android:left="-90dp"
+        android:bottom="-96dp">
+        <shape android:shape="oval">
+            <solid android:color="#20C6A24A" />
+        </shape>
+    </item>
+
+    <!-- Segundo círculo verde para dar profundidad sin distraer del formulario -->
+    <item
+        android:width="150dp"
+        android:height="150dp"
+        android:gravity="top|start"
+        android:left="-90dp"
+        android:top="100dp">
+        <shape android:shape="oval">
+            <solid android:color="#100B5D3B" />
+        </shape>
+    </item>
+
+</layer-list>

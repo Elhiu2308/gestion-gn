@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fondo"
+    android:fillViewport="true"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- ENCABEZADO -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/gestion_documental_header"
+            android:textColor="@color/g_verde"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/servidor_de_conexion"
+            android:textColor="@color/texto_principal"
+            android:textSize="27sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/servidor_subtitulo"
+            android:textColor="@color/gris_texto"
+            android:textSize="14sp"
+            android:lineSpacingExtra="3dp" />
+
+        <!-- TARJETA DE CONFIGURACIÓN -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            app:cardBackgroundColor="@color/blanco"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="1dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- IDENTIFICACIÓN -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/direccion_del_servidor"
+                    android:textColor="@color/texto_principal"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:text="@string/servidor_instruccion"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp" />
+
+                <!-- EJEMPLO DE DIRECCIÓN -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="#F1F7F4"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ejemplo_de_direccion"
+                        android:textColor="@color/g_verde"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/ejemplo_url_servidor"
+                        android:textColor="@color/texto_principal"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- CAMPO IP -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:hint="@string/hint_url_servidor"
+                    app:boxStrokeColor="@color/g_verde"
+                    app:hintTextColor="@color/g_verde">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/input_servidor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textUri"
+                        android:singleLine="true"
+                        android:imeOptions="actionDone"
+                        android:autofillHints="url"
+                        android:textSize="14sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- ESTADO DE CONEXIÓN -->
+                <TextView
+                    android:id="@+id/lbl_estado"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:textColor="@color/texto_principal"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="2dp" />
+
+                <!-- PROBAR CONEXIÓN -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_probar"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="18dp"
+                    android:text="@string/probar_conexion"
+                    android:textAllCaps="false"
+                    android:textColor="@color/g_verde"
+                    app:cornerRadius="14dp"
+                    app:iconTint="@color/g_verde"
+                    app:strokeColor="@color/g_verde"
+                    app:strokeWidth="1dp" />
+
+                <!-- BUSCAR SERVIDOR -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_buscar"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="9dp"
+                    android:text="@string/buscar_servidor_red"
+                    android:textAllCaps="false"
+                    android:textColor="@color/g_verde"
+                    app:cornerRadius="14dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1dp" />
+
+                <!-- GUARDAR CONFIGURACIÓN -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_guardar"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="@color/g_verde"
+                    android:text="@string/guardar_usar_servidor"
+                    android:textAllCaps="false"
+                    android:textColor="@color/blanco"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="14dp" />
+
+                <!-- RESTABLECER -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_restablecer"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/volver_servidor_instalado"
+                    android:textAllCaps="false"
+                    android:textColor="@color/g_verde" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- PIE INSTITUCIONAL -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            android:text="@string/gestion_documental_footer"
+            android:textColor="@color/gris_texto"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+</ScrollView>

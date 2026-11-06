@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="NavDrawerItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:paddingBottom">14dp</item>
+    </style>
+
+    <style name="NavDrawerIcon">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:contentDescription">@string/app_name</item>
+    </style>
+
+    <style name="NavDrawerLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">20dp</item>
+        <item name="android:textColor">@color/texto_principal</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+</resources>

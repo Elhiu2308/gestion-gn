@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fondo">
+
+    <!-- TOOLBAR SUPERIOR -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        app:contentInsetEnd="0dp"
+        app:contentInsetStart="0dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp">
+
+            <!-- IZQUIERDA: Botón de Notificaciones con Badge (solo en Inicio) -->
+            <FrameLayout
+                android:id="@+id/container_notif"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true">
+
+                <ImageButton
+                    android:id="@+id/btn_notificaciones"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/notificaciones"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_notif_bell"
+                    app:tint="@color/g_white" />
+
+                <TextView
+                    android:id="@+id/badge_notificaciones"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/bg_badge"
+                    android:gravity="center"
+                    android:textColor="@color/blanco"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+            <!-- IZQUIERDA: Botón Regresar a la pantalla anterior (en las demás pantallas) -->
+            <ImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/regresar"
+                android:padding="12dp"
+                android:src="@drawable/ic_arrow_back"
+                android:visibility="gone"
+                app:tint="@color/g_white" />
+
+            <!-- CENTRO: Título de la app siempre "GestióN" -->
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:text="@string/app_name"
+                android:textColor="@color/g_white"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- DERECHA: Botón de Menú Contextual (3 Puntos ⋮) en Detalle -->
+            <ImageButton
+                android:id="@+id/btn_menu_opciones"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/opciones_del_documento"
+                android:padding="12dp"
+                android:src="@drawable/ic_more_vert"
+                android:visibility="gone"
+                app:tint="@color/g_white" />
+
+            <!-- DERECHA: Botón de Cerrar Sesión (Solo en Inicio / Dashboard) -->
+            <ImageButton
+                android:id="@+id/btn_logout"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cerrar_sesion"
+                android:padding="12dp"
+                android:src="@drawable/ic_logout"
+                app:tint="@color/g_white" />
+
+        </RelativeLayout>
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <!-- CONTENEDOR DE FRAGMENTS DE NAVEGACIÓN -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
+        android:layout_above="@id/bottom_navigation"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph" />
+
+    <!-- BARRA DE NAVEGACIÓN INFERIOR (BOTTOM NAVIGATION) -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/blanco"
+        android:elevation="8dp"
+        app:itemIconTint="@color/bottom_nav_item"
+        app:itemTextColor="@color/bottom_nav_item"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu" />
+
+</RelativeLayout>

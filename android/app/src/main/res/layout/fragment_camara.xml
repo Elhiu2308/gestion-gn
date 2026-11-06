@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/negro">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/preview_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:implementationMode="compatible"
+        app:scaleType="fitCenter" />
+
+    <com.gn.gestion.scanner.ScanOverlayView
+        android:id="@+id/scan_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageButton
+        android:id="@+id/btn_cerrar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|start"
+        android:layout_margin="16dp"
+        android:background="@drawable/bg_circle"
+        android:backgroundTint="#66FFFFFF"
+        android:contentDescription="@string/cerrar_camara"
+        android:padding="12dp"
+        android:src="@drawable/ic_arrow_back" />
+
+    <ImageButton
+        android:id="@+id/btn_flash"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:background="@drawable/bg_circle"
+        android:backgroundTint="#66FFFFFF"
+        android:contentDescription="@string/flash"
+        android:padding="12dp"
+        android:src="@drawable/ic_flash" />
+
+    <ImageButton
+        android:id="@+id/btn_galeria"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/bg_circle"
+        android:backgroundTint="#66FFFFFF"
+        android:contentDescription="@string/importar_de_la_galeria"
+        android:padding="12dp"
+        android:src="@drawable/ic_galeria" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="28dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/lbl_estado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="@string/apuntando_documento"
+            android:textColor="#CCFFFFFF"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switch_auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/auto"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_capturar"
+                android:layout_width="78dp"
+                android:layout_height="78dp"
+                android:layout_marginStart="18dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/scan"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                app:cornerRadius="39dp"
+                app:iconPadding="0dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

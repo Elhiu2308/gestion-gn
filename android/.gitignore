@@ -1,0 +1,31 @@
+# ---- Gradle / Android ----
+.gradle/
+build/
+app/build/
+.kotlin/
+local.properties
+gn.properties
+captures/
+.externalNativeBuild/
+.cxx/
+*.hprof
+
+# ---- IDE ----
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# ---- Secretos y credenciales ----
+.env
+.env.*
+firebase-service-account.json
+*.jks
+*.keystore
+keystore.properties
+
+# ---- Sistema ----
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Gestion" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorOnPrimary">@color/g_white</item>
+        <item name="colorPrimaryContainer">@color/g_background1</item>
+        <item name="colorOnPrimaryContainer">@color/g_verde</item>
+        <item name="colorSecondary">@color/g_dorado</item>
+        <item name="colorOnSecondary">@color/g_white</item>
+        <item name="colorSecondaryContainer">@color/g_doradoc</item>
+        <item name="colorOnSecondaryContainer">@color/g_black</item>
+        <item name="colorError">@color/rojo_urgencia</item>
+        <item name="android:windowBackground">@color/g_background</item>
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:navigationBarColor">@color/blanco</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+    <!-- Pantalla de arranque: fondo institucional con el logotipo, visible
+         mientras se crea la actividad. La actividad cambia a Theme.Gestion
+         dentro de onCreate para mostrar el contenido real. -->
+    <style name="Theme.Gestion.Splash" parent="Theme.Gestion">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:statusBarColor">@color/g_verde</item>
+        <item name="android:navigationBarColor">@color/blanco</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+    <style name="TextoFiltro">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:textColor">@color/gris_texto</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <!-- Estilo base para diálogos institucionales -->
+    <style name="GestioN_Dialog_Base" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/g_verde</item>
+        <item name="colorOnSurface">@color/texto_principal</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <!-- Estilo para diálogo de carga -->
+    <style name="GestioN_Dialog_Carga" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="colorPrimary">@color/g_verde</item>
+    </style>
+
+    <!-- Botón secundario (Cancelar) -->
+    <style name="GestioN_Button_Dialog_Negative" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@color/gris_texto</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Botón primario (Confirmar / Aceptar) -->
+    <style name="GestioN_Button_Dialog_Positive" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@color/g_white</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="backgroundTint">@color/g_verde</item>
+    </style>
+
+    <!-- Botón destructivo (Eliminar) -->
+    <style name="GestioN_Button_Dialog_Destructive" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@color/g_white</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="backgroundTint">@color/rojo_urgencia</item>
+    </style>
+
+    <!-- Snackbar institucional -->
+    <style name="GestioN_Snackbar" parent="Widget.Material3.Snackbar">
+        <item name="backgroundTint">@color/texto_principal</item>
+        <item name="android:textColor">@color/blanco</item>
+    </style>
+
+    <!-- Error de TextInputLayout -->
+    <style name="GestioN_TextInput_Error" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeErrorColor">@color/rojo_urgencia</item>
+        <item name="errorTextColor">@color/rojo_urgencia</item>
+    </style>
+</resources>

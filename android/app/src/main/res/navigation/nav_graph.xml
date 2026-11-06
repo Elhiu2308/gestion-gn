@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/login">
+
+    <fragment
+        android:id="@+id/login"
+        android:name="com.gn.gestion.views.login.LoginFragment"
+        android:label="Iniciar sesión">
+        <action
+            android:id="@+id/action_login_to_dashboard"
+            app:destination="@id/dashboard"
+            app:popUpTo="@id/login"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_login_to_servidor"
+            app:destination="@id/servidor" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/servidor"
+        android:name="com.gn.gestion.views.servidor.ServidorFragment"
+        android:label="Servidor" />
+
+    <fragment
+        android:id="@+id/dashboard"
+        android:name="com.gn.gestion.views.dashboard.DashboardFragment"
+        android:label="Inicio">
+        <action
+            android:id="@+id/action_dashboard_to_documentos"
+            app:destination="@id/documentos" />
+        <action
+            android:id="@+id/action_dashboard_to_nuevo"
+            app:destination="@id/nuevo" />
+        <action
+            android:id="@+id/action_dashboard_to_expedientes"
+            app:destination="@id/expedientes" />
+        <action
+            android:id="@+id/action_dashboard_to_notificaciones"
+            app:destination="@id/notificaciones" />
+        <action
+            android:id="@+id/action_dashboard_to_busqueda"
+            app:destination="@id/busqueda_global" />
+        <action
+            android:id="@+id/action_dashboard_to_archivo"
+            app:destination="@id/archivo_virtual" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/busqueda_global"
+        android:name="com.gn.gestion.views.busqueda.BusquedaGlobalFragment"
+        android:label="Búsqueda global" />
+
+    <fragment
+        android:id="@+id/archivo_virtual"
+        android:name="com.gn.gestion.views.archivo.ArchivoVirtualFragment"
+        android:label="Archivo virtual">
+        <argument
+            android:name="titulo"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="anio"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="clasificacion"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="tipo"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="q"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/notificaciones"
+        android:name="com.gn.gestion.views.notificaciones.NotificacionesFragment"
+        android:label="Notificaciones" />
+
+    <fragment
+        android:id="@+id/expedientes"
+        android:name="com.gn.gestion.views.expedientes.ExpedientesFragment"
+        android:label="Expedientes" />
+
+    <fragment
+        android:id="@+id/documentos"
+        android:name="com.gn.gestion.views.documentos.DocumentosFragment"
+        android:label="Documentos">
+        <action
+            android:id="@+id/action_documentos_to_detalle"
+            app:destination="@id/detalle" />
+        <action
+            android:id="@+id/action_documentos_to_buscar"
+            app:destination="@id/busqueda_global" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nuevo"
+        android:name="com.gn.gestion.views.formulario.FormularioFragment"
+        android:label="Nuevo Documento">
+        <argument
+            android:name="folio"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="pdfPath"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="textoOcr"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editar"
+        android:name="com.gn.gestion.views.formulario.FormularioFragment"
+        android:label="Editar Documento">
+        <argument
+            android:name="id"
+            app:argType="long" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/detalle"
+        android:name="com.gn.gestion.views.detalle.DetalleFragment"
+        android:label="Detalle">
+        <argument
+            android:name="id"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_detalle_to_editar"
+            app:destination="@id/editar" />
+        <action
+            android:id="@+id/action_detalle_to_pdf_viewer"
+            app:destination="@id/pdf_viewer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pdf_viewer"
+        android:name="com.gn.gestion.views.pdf.PdfViewerFragment"
+        android:label="Vista previa PDF">
+        <argument
+            android:name="pdfPath"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/escanner"
+        android:name="com.gn.gestion.views.escaner.EscanerFragment"
+        android:label="Ingresar documento">
+        <action
+            android:id="@+id/action_escanner_to_camara"
+            app:destination="@id/camara" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/camara"
+        android:name="com.gn.gestion.views.camara.CamaraFragment"
+        android:label="Cámara" />
+
+    <fragment
+        android:id="@+id/recepcion"
+        android:name="com.gn.gestion.views.recepcion.RecepcionFragment"
+        android:label="Recepción de documentos">
+        <action
+            android:id="@+id/action_recepcion_to_detalle"
+            app:destination="@id/detalle" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/perfil"
+        android:name="com.gn.gestion.views.perfil.PerfilFragment"
+        android:label="Mi Perfil y Firma QR" />
+
+</navigation>

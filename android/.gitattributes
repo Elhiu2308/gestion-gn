@@ -1,0 +1,19 @@
+* text=auto
+
+# El wrapper debe conservar finales de línea LF para funcionar en macOS/Linux.
+gradlew text eol=lf
+*.bat text eol=crlf
+*.sh text eol=lf
+
+*.kt text
+*.kts text
+*.xml text
+*.json text
+*.md text
+*.properties text
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.jar binary

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#611232</color>
+
+    <color name="guinda">#611232</color>
+    <color name="guinda_claro">#8A1B45</color>
+    <color name="guinda_oscuro">#3E0B1F</color>
+    <color name="guinda_menta">#F1E8EC</color>
+    <color name="dorado">#A57F2D</color>
+    <color name="dorado_claro">#D8B25C</color>
+
+    <color name="verde">#235B4E</color>
+    <color name="verde_claro">#2E8B6D</color>
+    <color name="verde_oscuro">#0B3A33</color>
+    <color name="verde_menta">#9BE8C8</color>
+    <color name="ambar">#F5A623</color>
+    <color name="rojo_urgencia">#E53935</color>
+    <color name="azul">#1E88E5</color>
+    <color name="rojo">#E53935</color>
+    <color name="azul_noche">#0E1B2A</color>
+    <color name="azul_cards">#16283C</color>
+
+    <color name="fondo">#F4F3F6</color>
+    <color name="fondo_pdf">#D6DBD8</color>
+    <color name="texto_principal">#1B1F1D</color>
+    <color name="gris_texto">#7A8680</color>
+    <color name="texto_secundario">#7A8680</color>
+    <color name="gris_sutil">#8E8E93</color>
+    <color name="borde_suave">#E2E8F0</color>
+    <color name="surface_variant">#E6E1E7</color>
+    <color name="on_surface">#1B1F1D</color>
+
+    <color name="estado_pendiente">#F5A623</color>
+    <color name="estado_contestado">#2E8B6D</color>
+    <color name="estado_pasado">#5C6BC0</color>
+
+    <color name="tipo_mensaje">#1E88E5</color>
+    <color name="tipo_oficio">#8E24AA</color>
+    <color name="tipo_swear">#F5A623</color>
+    <color name="tipo_otro">#546E7A</color>
+
+    <color name="blanco">#FFFFFF</color>
+    <color name="negro">#000000</color>
+
+    <!-- Paleta institucional -->
+    <color name="g_grisc">#C8C8C8</color>
+    <color name="g_dorado">#B38E5D</color>
+    <color name="g_doradoc">#D4C19C</color>
+    <color name="g_background1">#fff4e4</color>
+    <color name="g_background">#efebdf</color>
+    <color name="g_verde">#285C4D</color>
+    <color name="g_black">#000000</color>
+    <color name="g_white">#ffffff</color>
+
+    <color name="colorText">#FF2E2D2D</color>
+
+    <color name="colorPrimary">#285C4D</color>
+    <color name="colorPrimaryDark">#285C4D</color>
+    <color name="colorAccent">#d4c19c</color>
+
+    <!-- Tarjetas 2x2 Grid (soft pastel backgrounds) -->
+    <color name="card_bg_documentos">#FEF8EC</color>
+    <color name="card_stroke_documentos">#F3E5C8</color>
+
+    <color name="card_bg_proyectos">#EBF7F2</color>
+    <color name="card_stroke_proyectos">#C7E8DB</color>
+
+    <color name="card_bg_compartidos">#FDF2F4</color>
+    <color name="card_stroke_compartidos">#F4D3D9</color>
+
+    <color name="card_bg_subir">#EEF5FC</color>
+    <color name="card_stroke_subir">#CBDFF5</color>
+
+    <color name="fondo_dashboard">#F5F6F8</color>
+    <color name="fondo_claro">#E8F1EC</color>
+    <color name="texto_accion">#006B3F</color>
+</resources>

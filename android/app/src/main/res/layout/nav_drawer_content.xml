@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_view"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:background="@color/blanco"
+    android:fillViewport="true"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="20dp">
+
+        <!-- ENCABEZADO INSTITUCIONAL -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:letterSpacing="0.14"
+                android:text="@string/guardia_nacional"
+                android:textColor="@color/g_white"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="42dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/g_dorado" />
+
+        </LinearLayout>
+
+        <!-- IDENTIDAD DE LA APLICACIÓN -->
+        <ImageView
+            android:layout_width="86dp"
+            android:layout_height="86dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/logo_app"
+            android:contentDescription="@string/app_name"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text="@string/gestion_documental_titulo"
+            android:textColor="@color/g_verde"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textColor="@color/gris_texto"
+            android:textSize="13sp" />
+
+        <!-- ACCESO AL PERFIL -->
+        <LinearLayout
+            android:id="@+id/drawer_perfil"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="14dp">
+
+            <View
+                android:layout_width="4dp"
+                android:layout_height="42dp"
+                android:background="@color/g_verde" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_nav_user_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/usuario"
+                    android:textColor="@color/texto_principal"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:maxLines="2"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="@string/mi_perfil"
+                    android:textColor="@color/g_verde"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/flecha_derecha"
+                android:textColor="@color/g_verde"
+                android:textSize="28sp" />
+
+        </LinearLayout>
+
+        <!-- SEPARADOR -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="20dp"
+            android:background="#E2E8F0" />
+
+        <!-- NAVEGACIÓN PRINCIPAL -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/menu_principal"
+            android:textColor="@color/gris_texto"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12" />
+
+        <LinearLayout
+            android:id="@+id/drawer_inicio"
+            style="@style/NavDrawerItem">
+
+            <ImageView
+                style="@style/NavDrawerIcon"
+                android:src="@drawable/ic_inicio"
+                android:contentDescription="@string/inicio"
+                app:tint="@color/g_verde" />
+
+            <TextView
+                style="@style/NavDrawerLabel"
+                android:text="@string/inicio" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/drawer_expedientes"
+            style="@style/NavDrawerItem">
+
+            <ImageView
+                style="@style/NavDrawerIcon"
+                android:src="@drawable/ic_nav_expedientes"
+                android:contentDescription="@string/expedientes"
+                app:tint="@color/g_verde" />
+
+            <TextView
+                style="@style/NavDrawerLabel"
+                android:text="@string/expedientes" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/drawer_archivo"
+            style="@style/NavDrawerItem">
+
+            <ImageView
+                style="@style/NavDrawerIcon"
+                android:src="@drawable/ic_archivo"
+                android:contentDescription="@string/archivo"
+                app:tint="@color/g_verde" />
+
+            <TextView
+                style="@style/NavDrawerLabel"
+                android:text="@string/archivo" />
+
+        </LinearLayout>
+
+        <!-- SEPARADOR -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="20dp"
+            android:background="#E2E8F0" />
+
+        <!-- CONFIGURACIÓN -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/sistema"
+            android:textColor="@color/gris_texto"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12" />
+
+        <LinearLayout
+            android:id="@+id/drawer_servidor"
+            style="@style/NavDrawerItem">
+
+            <ImageView
+                style="@style/NavDrawerIcon"
+                android:src="@drawable/ic_config_servidor"
+                android:contentDescription="@string/servidor_ip"
+                app:tint="@color/g_verde" />
+
+            <TextView
+                style="@style/NavDrawerLabel"
+                android:text="@string/servidor_ip" />
+
+        </LinearLayout>
+
+        <!-- CERRAR SESIÓN -->
+        <LinearLayout
+            android:id="@+id/drawer_cerrar_sesion"
+            style="@style/NavDrawerItem">
+
+            <ImageView
+                style="@style/NavDrawerIcon"
+                android:src="@drawable/ic_logout"
+                android:contentDescription="@string/cerrar_sesion"
+                app:tint="@color/rojo_urgencia" />
+
+            <TextView
+                style="@style/NavDrawerLabel"
+                android:text="@string/cerrar_sesion"
+                android:textColor="@color/rojo_urgencia" />
+
+        </LinearLayout>
+
+        <!-- PIE -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="@string/gestion_guardia_nacional"
+            android:textColor="@color/gris_texto"
+            android:textSize="11sp" />
+
+    </LinearLayout>
+
+</ScrollView>
