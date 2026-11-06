@@ -81,7 +81,8 @@ cd android
 
 - macOS con Xcode 15+ (recomendado 16), Swift 5.9+.
 - iOS 17.0 o superior para la configuración actual del proyecto.
-- `ios/GoogleService-Info.plist` y perfil de aprovisionamiento con Push Notifications.
+- `ios/GoogleService-Info.plist`, App ID con **Push Notifications** y perfil de aprovisionamiento
+  con `aps-environment`.
 
 ```bash
 cd ios

@@ -45,6 +45,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.gn.gestion.ios
         PRODUCT_NAME: GestiónIOS
+        # Habilita APNs; el perfil de aprovisionamiento debe incluir Push Notifications.
+        CODE_SIGN_ENTITLEMENTS: App/GestionIOS.entitlements
         # Nombre del módulo Swift en ASCII: evita el conflicto de normalización
         # Unicode (NFC/NFD) de la "ó" que impide `@testable import` en las pruebas.
         PRODUCT_MODULE_NAME: GestionIOS

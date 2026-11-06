@@ -52,7 +52,7 @@ Capacidades principales:
 Arquitectura **MVVM** por capas, con inyección de dependencias simple:
 
 - **App (`App/`)**: punto de entrada (`@main`), `AppDelegate` para APNs, `Info.plist`,
-  `LaunchScreen` y `DIContainer`.
+  `GestionIOS.entitlements` (APNs), `LaunchScreen` y `DIContainer`.
 - **Vistas (`Views/`)**: pantallas SwiftUI agrupadas por módulo.
 - **ViewModels (`ViewModels/`)**: estado y lógica de presentación.
 - **Repositorios (`Repositories/`)**: acceso tipado a la API REST.
@@ -120,8 +120,9 @@ Authorization: Bearer <JWT>
 ```
 
 - El registro se habilita después de iniciar sesión y se bloquea al cerrar sesión.
-- Requiere `GoogleService-Info.plist`, el entitlement de APNs y el modo de fondo
-  `remote-notification` (configurado en `Info.plist`).
+- Requiere `GoogleService-Info.plist`, el entitlement `aps-environment`
+  (`App/GestionIOS.entitlements`, declarado como `CODE_SIGN_ENTITLEMENTS`) y el modo de fondo
+  `remote-notification` en `Info.plist`.
 - Con la app abierta se muestra un aviso propio con acciones; al tocar una notificación del
   sistema se abre el documento relacionado.
 
@@ -159,8 +160,9 @@ backend; el contador se refresca al recibir un nuevo aviso o al reconectar.
 - Swift 5.9+.
 - Dispositivo o simulador con **iOS 17.0** o superior para esta configuración; la ficha
   técnica establece iOS 16 como mínimo funcional.
-- Cuenta de desarrollador Apple y perfil de aprovisionamiento con **Push Notifications**
-  para probar APNs en dispositivo físico.
+- Cuenta de desarrollador Apple, App ID con la capacidad **Push Notifications** habilitada y
+  perfil de aprovisionamiento que incluya `aps-environment` para probar APNs en dispositivo
+  físico.
 - `GoogleService-Info.plist` del proyecto Firebase correspondiente.
 - Conexión de red hacia el backend institucional.
 
@@ -223,7 +225,7 @@ contraseña; se solicitan al área de desarrollo.
 
 ```text
 ios/
-├── App/                        Entrada, DI, Info.plist, LaunchScreen
+├── App/                        Entrada, DI, Info.plist, entitlements, LaunchScreen
 ├── Models/                     Entidades y DTOs
 ├── Services/                   REST, FCM, Socket.IO, QR, biometría
 ├── Repositories/               Acceso HTTP tipado
@@ -245,7 +247,7 @@ ios/
 |---|---|
 | Revisión estática del registro FCM iOS (`/api/fcm/token`, `plataforma: ios`) | Correcta |
 | Revisión estática del cliente Socket.IO (`/rt`, `join`, `notification`) | Correcta |
-| Configuración APNs/FCM en `Info.plist` y `GoogleService-Info.plist` | Presente |
+| Configuración APNs/FCM (`Info.plist`, `aps-environment` en `GestionIOS.entitlements` y `GoogleService-Info.plist`) | Presente |
 | Autenticación contra el backend desplegado (cuenta de prueba) | Correcta (HTTP 200) |
 | Conexión Socket.IO y `join` a la sala privada (cliente de prueba) | Correcta (`room: user:3`) |
 | Recepción de push en dispositivo físico | Requiere iPhone con la app instalada, sesión iniciada y perfil APNs válido |
