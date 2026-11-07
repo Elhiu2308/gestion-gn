@@ -26,12 +26,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-/**
- * Pantalla de ingreso de un documento nuevo: se puede escanear con la cámara,
- * subir una imagen de la galería o subir un archivo/PDF del dispositivo.
- * Una vez obtenido, se genera el PDF y se pasa directo al formulario
- * "Nuevo Documento" (sin vista previa ni pantalla intermedia).
- */
 class EscanerFragment : Fragment(R.layout.fragment_escaner) {
 
     private val scanVM: EscaneoViewModel by activityViewModels()
@@ -48,13 +42,11 @@ class EscanerFragment : Fragment(R.layout.fragment_escaner) {
         view?.findViewById<View>(R.id.btn_documento)?.isEnabled = !activo
     }
 
-    /** Galería: imágenes. */
     private val galleryLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri != null) cargarImagen(uri)
         }
 
-    /** Documentos: imágenes o PDF. */
     private val documentoLauncher =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             if (uri == null) return@registerForActivityResult
@@ -66,7 +58,6 @@ class EscanerFragment : Fragment(R.layout.fragment_escaner) {
             }
         }
 
-    /** Escáner de Google. */
     private val scannerLauncher =
         registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
             if (result.resultCode != Activity.RESULT_OK || result.data == null) return@registerForActivityResult
@@ -111,7 +102,6 @@ class EscanerFragment : Fragment(R.layout.fragment_escaner) {
         }
     }
 
-    /** Copia el archivo (p. ej. un PDF) al almacenamiento de la app y abre el formulario. */
     private fun cargarArchivo(uri: Uri) {
         viewLifecycleOwner.lifecycleScope.launch {
             mostrarProcesando(true)
@@ -141,7 +131,6 @@ class EscanerFragment : Fragment(R.layout.fragment_escaner) {
         }
     }
 
-    /** Genera el PDF con OCR y abre directamente el formulario "Nuevo Documento". */
     private suspend fun generarYContinuar(bitmaps: List<Bitmap>) {
         try {
             val args = prepararNuevoDocumento(requireContext(), scanVM, bitmaps)
@@ -154,10 +143,6 @@ class EscanerFragment : Fragment(R.layout.fragment_escaner) {
         }
     }
 
-    /**
-     * Abre el escáner de Google directamente. Si el módulo no está disponible,
-     * cae a la cámara propia.
-     */
     private fun escanear() {
         val options = GmsDocumentScannerOptions.Builder()
             .setGalleryImportAllowed(true)

@@ -1,17 +1,7 @@
 import SwiftUI
 
-/// Componentes visuales reutilizables más allá del tema.
-///
-/// - Tarjetas con títulos y contenidos.
-/// - Cabeceras de sección.
-/// - Botones reutilizables con el estilo institucional.
-/// - Avisos de error y de éxito.
-/// - Las confirmaciones destructivas se construyen en las vistas con `.alert`.
 enum ComponentesUI {
 
-    // MARK: Tarjetas
-
-    /// Tarjeta blanca con esquinas redondeadas, como se usa en todas las pantallas.
     static func tarjeta<Contenido: View>(cabecera: String? = nil, @ViewBuilder contenido: () -> Contenido) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             if let cabecera {
@@ -28,16 +18,12 @@ enum ComponentesUI {
         .shadow(radius: 6, y: 3)
     }
 
-    // MARK: Cabeceras de sección
-
     static func cabeceraSeccion(_ titulo: String) -> some View {
         Text(titulo)
             .font(.title3.weight(.semibold))
             .foregroundColor(EstiloInstitucional.verdePrincipal)
             .frame(maxWidth: 760, alignment: .leading)
     }
-
-    // MARK: Botones
 
     static func botonPrincipal(etiqueta: String, accion: @escaping () -> Void) -> some View {
         Button(action: accion) {
@@ -65,9 +51,6 @@ enum ComponentesUI {
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
-    // MARK: Avisos
-
-    /// Mensaje de error con icono y color institucional.
     static func avisoError(mensaje: String) -> some View {
         Label(mensaje, systemImage: "exclamationmark.triangle.fill")
             .font(.footnote)

@@ -15,9 +15,6 @@ object GestioNDialogFactory {
 
     private var dialogoCarga: Dialog? = null
 
-    /**
-     * Muestra un diálogo de confirmación con diseño institucional.
-     */
     fun mostrarConfirmacion(
         context: Context,
         titulo: String,
@@ -61,9 +58,6 @@ object GestioNDialogFactory {
         dialog.show()
     }
 
-    /**
-     * Muestra un diálogo de carga con spinner.
-     */
     fun mostrarCarga(context: Context) {
         if (dialogoCarga?.isShowing == true) return
         dialogoCarga = Dialog(context, R.style.GestioN_Dialog_Carga)
@@ -72,15 +66,11 @@ object GestioNDialogFactory {
         dialogoCarga?.show()
     }
 
-    /** Oculta el diálogo de carga si está visible. */
     fun ocultarCarga() {
         dialogoCarga?.dismiss()
         dialogoCarga = null
     }
 
-    /**
-     * Muestra un diálogo de error con botón "Cerrar" u opcional "Reintentar".
-     */
     fun mostrarError(
         context: Context,
         mensaje: String,
@@ -96,9 +86,6 @@ object GestioNDialogFactory {
         )
     }
 
-    /**
-     * Muestra un diálogo de éxito con botón "Aceptar".
-     */
     fun mostrarExito(
         context: Context,
         mensaje: String,

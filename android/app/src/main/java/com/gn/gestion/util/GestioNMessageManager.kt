@@ -22,7 +22,6 @@ object GestioNMessageManager {
 
     private var toastActivo: Toast? = null
 
-    /** Muestra un Toast personalizado con diseño institucional */
     fun mostrarToast(
         context: Context,
         mensaje: String,
@@ -47,7 +46,6 @@ object GestioNMessageManager {
 
     fun setGravity(gravity: Int, xOffset: Int) {}
 
-    /** Muestra un Snackbar con diseño institucional */
     fun mostrarSnackbar(
         vista: View,
         mensaje: String,
@@ -64,7 +62,6 @@ object GestioNMessageManager {
             }
     }
 
-    /** Cancela cualquier Toast visible */
     fun cancelarToast() {
         toastActivo?.cancel()
         toastActivo = null

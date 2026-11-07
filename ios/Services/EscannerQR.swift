@@ -2,14 +2,8 @@ import AVFoundation
 import SwiftUI
 import VisionKit
 
-/// Escáner de códigos QR con la cámara (VisionKit `DataScannerViewController`).
-///
-/// Equivalente al escaneo ZXing de la app Android, pero con detección nativa
-/// de Apple: reconoce el QR dentro del "marco" de la cámara y resalta el código
-/// detectado.
 struct EscannerQRVista: UIViewControllerRepresentable {
 
-    /// Indica si el dispositivo soporta el escáner de datos.
     static var esCompatible: Bool {
         if #available(iOS 16.0, *) {
             return DataScannerViewController.isSupported
@@ -17,9 +11,8 @@ struct EscannerQRVista: UIViewControllerRepresentable {
         return false
     }
 
-    /// Se invoca con el contenido del primer código QR detectado.
     var alEscanear: (String) -> Void
-    /// Se invoca si no se puede iniciar el escáner.
+
     var alFallar: (String) -> Void
 
     func makeCoordinator() -> Coordinador {
@@ -80,20 +73,12 @@ struct EscannerQRVista: UIViewControllerRepresentable {
     }
 }
 
-// MARK: - Escáner continuo (recepción)
-
-/// Escáner QR que permanece activo hasta que el documento se identifica.
-///
-/// A diferencia de `EscannerQRVista`, permite pausar y reanudar el escaneo
-/// desde la pantalla de recepción (por ejemplo, al mostrar la ficha del
-/// documento encontrado o al reintentar una búsqueda).
 struct EscanerQRContinuo: UIViewControllerRepresentable {
 
-    /// `true` mientras la cámara debe estar analizando códigos.
     @Binding var activo: Bool
-    /// Se invoca con el contenido del primer QR detectado.
+
     var alEscanear: (String) -> Void
-    /// Se invoca si no se puede iniciar el escáner.
+
     var alFallar: (String) -> Void
 
     func makeCoordinator() -> Coordinador {
@@ -178,7 +163,6 @@ struct EscanerQRContinuo: UIViewControllerRepresentable {
     }
 }
 
-/// Enciende o apaga la linterna trasera del dispositivo.
 enum ServicioLinterna {
 
     static var disponible: Bool {
@@ -200,7 +184,6 @@ enum ServicioLinterna {
     }
 }
 
-/// Pantalla completa del escáner QR con marco guía y botón de cierre.
 struct PantallaEscanerQR: View {
 
     @Environment(\.dismiss) private var dismiss
@@ -260,7 +243,6 @@ struct PantallaEscanerQR: View {
     }
 }
 
-/// Marco guía con esquinas doradas para el escáner QR.
 private struct MarcoEscaneoQR: View {
 
     var body: some View {
@@ -281,29 +263,24 @@ private struct MarcoEscaneoQR: View {
     }
 }
 
-/// Dibuja solo las cuatro esquinas del marco.
 private struct EsquinasMarco: Shape {
 
     func path(in rect: CGRect) -> Path {
         let largo = rect.width * 0.18
         var camino = Path()
 
-        // Superior izquierda
         camino.move(to: CGPoint(x: rect.minX, y: rect.minY + largo))
         camino.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
         camino.addLine(to: CGPoint(x: rect.minX + largo, y: rect.minY))
 
-        // Superior derecha
         camino.move(to: CGPoint(x: rect.maxX - largo, y: rect.minY))
         camino.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
         camino.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + largo))
 
-        // Inferior derecha
         camino.move(to: CGPoint(x: rect.maxX, y: rect.maxY - largo))
         camino.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
         camino.addLine(to: CGPoint(x: rect.maxX - largo, y: rect.maxY))
 
-        // Inferior izquierda
         camino.move(to: CGPoint(x: rect.minX + largo, y: rect.maxY))
         camino.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
         camino.addLine(to: CGPoint(x: rect.minX, y: rect.maxY - largo))

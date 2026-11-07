@@ -1,14 +1,7 @@
 import Foundation
 
-/// Estructura organizacional usada por el selector de turnado
-/// ("1. Área → 2. Subdirección → 3. Persona").
-///
-/// La app Android toma esta estructura del backend. Mientras se expone el
-/// endpoint correspondiente, aquí se mantiene un catálogo local con las áreas
-/// institucionales y se enriquece con los datos del usuario en sesión.
 enum CatalogoOrganizacional {
 
-    /// Áreas institucionales disponibles para turnar un documento.
     static let areas: [String] = [
         "Innovación Tecnológica",
         "GN Carreteras",
@@ -20,8 +13,6 @@ enum CatalogoOrganizacional {
         "Inspección Fiscal"
     ]
 
-    /// Subdirecciones por área. Si un área no tiene subdirecciones declaradas
-    /// se usa la subdirección del propio usuario como valor por defecto.
     private static let subdireccionesPorArea: [String: [String]] = [
         "Innovación Tecnológica": [
             "Subdirección de Desarrollo de Aplicaciones Móviles",
@@ -54,7 +45,6 @@ enum CatalogoOrganizacional {
         ]
     ]
 
-    /// Personas por subdirección (responsables a los que se puede turnar).
     private static let personasPorSubdireccion: [String: [String]] = [
         "Subdirección de Desarrollo de Aplicaciones Móviles": [
             "Christian Elhiu Espindola Muñoz",
@@ -74,7 +64,6 @@ enum CatalogoOrganizacional {
         ]
     ]
 
-    /// Subdirecciones disponibles para un área dada.
     static func subdirecciones(area: String) -> [String] {
         let lista = subdireccionesPorArea[area] ?? []
         let actual = UserDefaults.standard.string(forKey: "subdireccion") ?? ""
@@ -84,7 +73,6 @@ enum CatalogoOrganizacional {
         return lista
     }
 
-    /// Personas disponibles para una subdirección dada.
     static func personas(subdireccion: String) -> [String] {
         let lista = personasPorSubdireccion[subdireccion] ?? []
         let actual = UserDefaults.standard.string(forKey: "nombre_completo") ?? ""
@@ -94,7 +82,6 @@ enum CatalogoOrganizacional {
         return lista
     }
 
-    /// Opciones de clasificación de la información.
     static let clasificaciones: [String] = [
         "Público",
         "Interno",
@@ -102,14 +89,12 @@ enum CatalogoOrganizacional {
         "Reservado"
     ]
 
-    /// Niveles de urgencia (coinciden con los del backend Android).
     static let nivelesUrgencia: [String] = [
         "Ordinario",
         "Urgente",
         "Extraurgente"
     ]
 
-    /// Traduce el nivel de urgencia mostrado al valor que espera el backend.
     static func urgenciaBackend(_ etiqueta: String) -> String {
         switch etiqueta {
         case "Urgente": return "URGENTE"
@@ -118,7 +103,6 @@ enum CatalogoOrganizacional {
         }
     }
 
-    /// Traduce la clasificación mostrada al valor que espera el backend.
     static func clasificacionBackend(_ etiqueta: String) -> String {
         etiqueta.uppercased()
     }

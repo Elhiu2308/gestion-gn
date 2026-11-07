@@ -24,11 +24,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * Estado compartido del escáner entre los Fragments
- * (menú de captura, cámara, vista previa y opciones).
- * Conserva la imagen cruda y la rectificada automáticamente.
- */
 class EscaneoViewModel : ViewModel() {
 
     private val _raw = MutableStateFlow<Bitmap?>(null)
@@ -67,7 +62,6 @@ class EscaneoViewModel : ViewModel() {
     private val _ocrBusy = MutableStateFlow(false)
     val ocrBusy: StateFlow<Boolean> = _ocrBusy
 
-    /** Imagen rectificada + filtro + ajustes, lista para previsualizar. */
     val procesada = combine(
         _base, _filter, _brightness, _contrast, _rotation
     ) { base, f, b, c, r ->
@@ -77,11 +71,9 @@ class EscaneoViewModel : ViewModel() {
         }
     }.distinctUntilChanged().flowOn(Dispatchers.Default)
 
-    /** Carga una imagen cruda (cámara o galería) y aplica el recorte automáticamente. */
     fun empezarConImagen(bmp: Bitmap, sugerirEsquinas: List<PointF>? = null) {
         _raw.value = bmp
-        // Muestra la imagen de inmediato para que la vista previa nunca quede vacía,
-        // y luego la sustituye por el recorte rectificado cuando la detección termina.
+
         _base.value = bmp
         _corners.value = sugerirEsquinas
         _filter.value = ScanFilter.MAGIC
@@ -121,14 +113,13 @@ class EscaneoViewModel : ViewModel() {
         }
     }
 
-    /** Detecta el documento en la imagen cruda y aplica corrección de perspectiva. */
     fun autoDetectar() {
         val src = _raw.value ?: return
         viewModelScope.launch {
             _busyDetecting.value = true
             val resultado = withContext(Dispatchers.IO) {
                 try {
-                    // OpenCV primero; si no está disponible, el detector Kotlin.
+
                     val corners = OpenCvDetector.detectCorners(src)
                         ?: DocumentDetector.detectCorners(src)
                     if (corners != null && corners.size == 4) {
@@ -146,7 +137,6 @@ class EscaneoViewModel : ViewModel() {
         }
     }
 
-    /** Ejecuta OCR sobre la imagen final procesada y guarda el texto extraído. */
     fun reconocerTexto(context: Context) {
         val bmp = _base.value ?: return
         viewModelScope.launch {
@@ -157,7 +147,6 @@ class EscaneoViewModel : ViewModel() {
         }
     }
 
-    /** OCR suspendible; devuelve el texto y lo guarda en [textoOcr]. */
     suspend fun extraerTexto(context: Context, bmp: Bitmap): String = withContext(Dispatchers.Default) {
         try {
             val procesado = ImageProcessor.applyFilter(bmp, _filter.value, _brightness.value, _contrast.value)
@@ -172,10 +161,6 @@ class EscaneoViewModel : ViewModel() {
         }
     }
 
-    /**
-     * OCR en una sola pasada que devuelve el texto y las cajas de cada línea,
-     * necesario para generar un PDF buscable. Guarda el texto en [textoOcr].
-     */
     suspend fun analizarOcr(context: Context, bmp: Bitmap): ResultadoOcr =
         withContext(Dispatchers.Default) {
             try {
@@ -193,10 +178,6 @@ class EscaneoViewModel : ViewModel() {
             }
         }
 
-    /**
-     * OCR SIN aplicar el filtro (imagen original), útil cuando el filtro
-     * binariza y borra texto fino del encabezado.
-     */
     suspend fun analizarOcrOriginal(context: Context, bmp: Bitmap): ResultadoOcr =
         withContext(Dispatchers.Default) {
             try {
@@ -254,7 +235,6 @@ class EscaneoViewModel : ViewModel() {
         _busyDetecting.value = false
     }
 
-    /** Reinicia todos los datos del escáner (imagen y páginas agregadas). */
     fun limpiarTodo() {
         limpiarImagen()
         _pages.value = emptyList()
@@ -263,10 +243,6 @@ class EscaneoViewModel : ViewModel() {
     }
 }
 
-/**
- * Genera el PDF y devuelve la ruta. Si se pasan los resultados de OCR se añade
- * la capa de texto invisible para que el PDF sea buscable.
- */
 suspend fun guardarPdf(
     context: Context,
     bitmaps: List<Bitmap>,

@@ -1,9 +1,5 @@
 import SwiftUI
 
-/// Pantalla "Servidor de conexión": configura la dirección del backend.
-///
-/// Réplica de la pantalla Android "Servidor": ejemplo de dirección, URL,
-/// probar conexión, buscar en la red, guardar y volver al servidor instalado.
 struct ConfiguracionView: View {
 
     @Environment(\.dismiss) private var dismiss
@@ -61,8 +57,6 @@ struct ConfiguracionView: View {
         }
     }
 
-    // MARK: - Encabezado
-
     private var encabezado: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
@@ -83,8 +77,6 @@ struct ConfiguracionView: View {
                 .lineSpacing(2)
         }
     }
-
-    // MARK: - Dirección
 
     private var seccionDireccion: some View {
         SeccionDocumento(titulo: "Dirección del servidor") {
@@ -138,8 +130,6 @@ struct ConfiguracionView: View {
         }
     }
 
-    // MARK: - Acciones
-
     private var acciones: some View {
         VStack(spacing: 12) {
             BotonServidor(
@@ -192,8 +182,6 @@ struct ConfiguracionView: View {
         .buttonStyle(PlainButtonStyle())
     }
 
-    // MARK: - Acciones de red
-
     private func probarConexion() async {
         estaCargando = true
         defer { estaCargando = false }
@@ -230,7 +218,6 @@ struct ConfiguracionView: View {
     }
 }
 
-/// Botón secundario de la pantalla de servidor.
 private struct BotonServidor: View {
 
     let titulo: String

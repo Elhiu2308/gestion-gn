@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Gestion.Splash" parent="Theme.Gestion">
+        <item name="android:windowSplashScreenBackground">@color/g_verde</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/logo_gn</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/g_verde</item>
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:statusBarColor">@color/g_verde</item>
+        <item name="android:navigationBarColor">@color/blanco</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>

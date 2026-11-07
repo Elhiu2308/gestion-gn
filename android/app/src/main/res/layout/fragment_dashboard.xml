@@ -16,13 +16,11 @@
         android:paddingEnd="18dp"
         android:paddingBottom="28dp">
 
-        <!-- ENCABEZADO: ÁREA Y SALUDO DEL USUARIO -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Nombre completo del usuario autenticado -->
             <TextView
                 android:id="@+id/dash_saludo"
                 android:layout_width="match_parent"
@@ -38,7 +36,6 @@
                 android:ellipsize="end"
                 android:includeFontPadding="false" />
 
-            <!-- Subdirección / adscripción institucional, debajo del usuario -->
             <TextView
                 android:id="@+id/dash_area_chip"
                 android:layout_width="match_parent"
@@ -61,19 +58,6 @@
 
         </LinearLayout>
 
-        <!-- MENSAJE DE BIENVENIDA
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:gravity="center"
-            android:layout_marginBottom="18dp"
-            android:text="@string/admin_documentos_subtitulo"
-            android:textColor="@color/gris_texto"
-            android:textSize="14sp"
-            android:lineSpacingExtra="3dp" />-->
-
-        <!-- ACCIÓN PRINCIPAL: NUEVO DOCUMENTO -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_escanear"
             android:layout_width="match_parent"
@@ -153,7 +137,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- SECCIÓN 1: TUS DOCUMENTOS -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -163,7 +146,6 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <!-- MIS DOCUMENTOS -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_mis_documentos"
             android:layout_width="match_parent"
@@ -239,7 +221,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- BUSCAR DOCUMENTO -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_buscar_documento"
             android:layout_width="match_parent"
@@ -315,7 +296,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- SECCIÓN 2: RESUMEN DE EXPEDIENTES -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -325,7 +305,6 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <!-- GRID DE TARJETAS DE CONTEO (2x2) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -338,7 +317,6 @@
                 android:orientation="horizontal"
                 android:layout_marginBottom="10dp">
 
-                <!-- TOTAL -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_stat_total"
                     android:layout_width="0dp"
@@ -398,7 +376,6 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- PENDIENTES -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_stat_pendientes"
                     android:layout_width="0dp"
@@ -465,7 +442,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!-- EN PROCESO -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_stat_proceso"
                     android:layout_width="0dp"
@@ -525,7 +501,6 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- FINALIZADOS -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_stat_finalizados"
                     android:layout_width="0dp"
@@ -589,7 +564,6 @@
 
         </LinearLayout>
 
-        <!-- SECCIÓN 3: MOVIMIENTOS RECIENTES -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -621,7 +595,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- IDENTIDAD DEL SISTEMA -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

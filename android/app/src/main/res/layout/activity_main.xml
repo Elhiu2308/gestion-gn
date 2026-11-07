@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:background="@color/fondo">
 
-    <!-- TOOLBAR SUPERIOR -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -22,7 +21,6 @@
             android:paddingStart="6dp"
             android:paddingEnd="6dp">
 
-            <!-- IZQUIERDA: Botón de Notificaciones con Badge (solo en Inicio) -->
             <FrameLayout
                 android:id="@+id/container_notif"
                 android:layout_width="48dp"
@@ -56,7 +54,6 @@
 
             </FrameLayout>
 
-            <!-- IZQUIERDA: Botón Regresar a la pantalla anterior (en las demás pantallas) -->
             <ImageButton
                 android:id="@+id/btn_back"
                 android:layout_width="48dp"
@@ -70,7 +67,6 @@
                 android:visibility="gone"
                 app:tint="@color/g_white" />
 
-            <!-- CENTRO: Título de la app siempre "GestióN" -->
             <TextView
                 android:id="@+id/toolbar_title"
                 android:layout_width="wrap_content"
@@ -82,7 +78,6 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <!-- DERECHA: Botón de Menú Contextual (3 Puntos ⋮) en Detalle -->
             <ImageButton
                 android:id="@+id/btn_menu_opciones"
                 android:layout_width="48dp"
@@ -96,7 +91,6 @@
                 android:visibility="gone"
                 app:tint="@color/g_white" />
 
-            <!-- DERECHA: Botón de Cerrar Sesión (Solo en Inicio / Dashboard) -->
             <ImageButton
                 android:id="@+id/btn_logout"
                 android:layout_width="48dp"
@@ -113,7 +107,6 @@
 
     </com.google.android.material.appbar.MaterialToolbar>
 
-    <!-- CONTENEDOR DE FRAGMENTS DE NAVEGACIÓN -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -124,7 +117,6 @@
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph" />
 
-    <!-- BARRA DE NAVEGACIÓN INFERIOR (BOTTOM NAVIGATION) -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"

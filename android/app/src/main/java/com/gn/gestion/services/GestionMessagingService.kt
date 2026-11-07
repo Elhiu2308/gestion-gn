@@ -6,17 +6,6 @@ import com.gn.gestion.socketio.SocketManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
-/**
- * Servicio receptor de notificaciones Firebase Cloud Messaging.
- *
- * FCM funciona como canal complementario de Socket.IO.
- *
- * La deduplicación se comparte mediante notificacion_id.
- * El ID solo se confirma cuando Android publica correctamente
- * la notificación.
- *
- * El contador de no leídas siempre procede del servidor.
- */
 class GestionMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
@@ -24,7 +13,8 @@ class GestionMessagingService : FirebaseMessagingService() {
 
         Log.i(
             TAG,
-            "[RX] Nuevo token FCM recibido | longitud=${token.length}"
+            "[RX] Nuevo token FCM recibido | huella=${token.take(8)}… | " +
+                    "longitud=${token.length}"
         )
 
         FcmRegistrador.registrarToken(
@@ -50,6 +40,13 @@ class GestionMessagingService : FirebaseMessagingService() {
 
         Log.i(
             TAG,
+            "[RX] Payload FCM | claves=${datos.keys} | " +
+                    "tituloNotif=${message.notification?.title} | " +
+                    "cuerpoNotif=${message.notification?.body}"
+        )
+
+        Log.i(
+            TAG,
             "[RX] PUSH recibido | " +
                     "messageId=${message.messageId} | " +
                     "tipo=$tipo | " +
@@ -58,7 +55,6 @@ class GestionMessagingService : FirebaseMessagingService() {
                     "prioridad=${message.priority}"
         )
 
-        // No mostrar notificaciones de sesiones cerradas.
         if (!TokenProvider.sessionActiva(applicationContext)) {
 
             Log.w(
@@ -69,7 +65,6 @@ class GestionMessagingService : FirebaseMessagingService() {
             return
         }
 
-        // Validar el identificador de la notificación persistida.
         if (notifId <= 0L) {
 
             Log.e(
@@ -80,8 +75,6 @@ class GestionMessagingService : FirebaseMessagingService() {
             return
         }
 
-        // Reservar el ID para evitar publicación simultánea
-        // desde Socket.IO y FCM.
         val reservada = SocketManager.iniciarProcesamiento(notifId)
 
         if (!reservada) {
@@ -96,8 +89,6 @@ class GestionMessagingService : FirebaseMessagingService() {
 
         try {
 
-            // El backend envía titulo y mensaje dentro de data.
-            // Se conservan los campos notification por compatibilidad.
             val cuerpo = datos["mensaje"]
                 ?.takeIf { it.isNotBlank() }
                 ?: message.notification?.body
@@ -131,7 +122,6 @@ class GestionMessagingService : FirebaseMessagingService() {
 
             if (publicada) {
 
-                // Registrar únicamente después de publicar correctamente.
                 SocketManager.confirmarMostrada(notifId)
 
                 Log.i(
@@ -141,7 +131,6 @@ class GestionMessagingService : FirebaseMessagingService() {
 
             } else {
 
-                // Permitir que Socket.IO u otro intento pueda publicarla.
                 SocketManager.cancelarProcesamiento(notifId)
 
                 Log.w(
@@ -152,7 +141,6 @@ class GestionMessagingService : FirebaseMessagingService() {
 
         } catch (e: Exception) {
 
-            // Si ocurre un error, liberar la reserva.
             SocketManager.cancelarProcesamiento(notifId)
 
             Log.e(
@@ -162,8 +150,6 @@ class GestionMessagingService : FirebaseMessagingService() {
             )
         }
 
-        // No incrementar el contador localmente.
-        // El servidor es la fuente oficial de no leídas.
     }
 
     private companion object {

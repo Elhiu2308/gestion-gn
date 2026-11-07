@@ -33,10 +33,8 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
 
     private val vm: GestionViewModel by activityViewModels()
 
-    /** Contenido real del QR emitido por el backend (`/api/usuarios/<id>/qr`). */
     private var qrInstitucional: String? = null
 
-    // ActivityResult Launcher para seleccionar imagen de la galería
     private val seleccionarGaleria = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -45,7 +43,6 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
         }
     }
 
-    // ActivityResult Launcher para tomar fotografía con la cámara
     private val tomarFotoCamara = registerForActivityResult(
         ActivityResultContracts.TakePicturePreview()
     ) { bitmap: Bitmap? ->
@@ -61,7 +58,6 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
         cargarFotoPerfilGuardada()
         sincronizarPerfilWeb(view)
 
-        // Evento al presionar el avatar o el botón flotante de la cámara
         view.findViewById<View>(R.id.container_perfil_avatar)?.setOnClickListener {
             mostrarOpcionesFotoPerfil()
         }
@@ -197,7 +193,6 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
         mostrarQrInstitucional(view)
     }
 
-    /** Muestra únicamente el QR entregado por el servidor; nunca uno fabricado. */
     private fun mostrarQrInstitucional(view: View) {
         val contenido = qrInstitucional
         val imagen = view.findViewById<ImageView>(R.id.img_firma_qr)
@@ -252,7 +247,6 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
                     correo = dto.correo
                 )
 
-                // El QR de firma es institucional y debe provenir del backend.
                 val qr = withContext(Dispatchers.IO) {
                     runCatching {
                         ApiFactory.api(requireContext()).qrUsuario(dto.id)

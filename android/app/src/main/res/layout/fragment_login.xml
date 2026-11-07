@@ -18,7 +18,6 @@
         android:paddingTop="16dp"
         android:paddingBottom="24dp">
 
-        <!-- IDENTIDAD INSTITUCIONAL -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,10 +35,8 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/defensa" />
 
-
         </LinearLayout>
 
-        <!-- PRESENTACIÓN DE LA APLICACIÓN -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -80,7 +77,6 @@
 
         </LinearLayout>
 
-        <!-- TARJETA PRINCIPAL -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -97,7 +93,6 @@
                 android:padding="24dp"
                 android:gravity="center_horizontal">
 
-                <!-- LOGOTIPO DE LA APP -->
                 <ImageView
                     android:id="@+id/img_logo_app"
                     android:layout_width="76dp"
@@ -126,7 +121,6 @@
                     android:textColor="@color/gris_texto"
                     android:textSize="13sp" />
 
-                <!-- ACCESO BIOMÉTRICO ALTERNATIVO -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_biometria"
                     style="@style/Widget.Material3.Button.OutlinedButton"
@@ -166,7 +160,6 @@
                     app:cornerRadius="14dp"
                     app:strokeColor="@color/g_verde" />
 
-                <!-- FORMULARIO -->
                 <LinearLayout
                     android:id="@+id/ll_formulario"
                     android:layout_width="match_parent"
@@ -228,7 +221,6 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- CONFIGURACIÓN BIOMÉTRICA -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -290,7 +282,6 @@
                         android:textColor="@color/gris_texto"
                         android:textSize="12sp" />
 
-                    <!-- ACCIÓN PRINCIPAL -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_ingresar"
                         android:layout_width="match_parent"
@@ -307,7 +298,6 @@
 
                 </LinearLayout>
 
-                <!-- MENSAJES DE VALIDACIÓN -->
                 <TextView
                     android:id="@+id/lbl_error"
                     android:layout_width="match_parent"
@@ -322,7 +312,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- CONFIGURACIÓN DE SERVIDOR -->
         <TextView
             android:id="@+id/lbl_config_servidor"
             android:layout_width="wrap_content"
@@ -338,7 +327,6 @@
             android:clickable="true"
             android:focusable="true" />
 
-        <!-- PIE INSTITUCIONAL -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

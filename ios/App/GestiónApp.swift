@@ -2,16 +2,13 @@
 import SwiftUI
 import UIKit
 
-// MARK: - Delegado de la aplicación
-
-/// Delegado de la aplicación para manejar el registro de APNs.
 final class AppDelegate: NSObject, UIApplicationDelegate {
 
     func application(
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
-        // Entrega el token APNs a Firebase Messaging.
+
         GestorMensajesFirebase.shared.registrarDeviceToken(deviceToken)
     }
 
@@ -23,9 +20,6 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     }
 }
 
-// MARK: - Punto de entrada
-
-/// Punto de entrada de GestióN (iOS).
 @main
 struct GestiónApp: App {
 
@@ -35,17 +29,12 @@ struct GestiónApp: App {
     var body: some Scene {
         WindowGroup("Gestión Documental") {
             RootView(vista: vistaSesion)
-                // La identidad institucional se diseñó en tema claro.
-                // Se ignora el modo oscuro del sistema para mantener la
-                // misma apariencia homologada con Android.
+
                 .preferredColorScheme(.light)
         }
     }
 }
 
-// MARK: - Control de sesión
-
-/// Controla el ciclo de vida de la sesión del usuario.
 @MainActor
 final class VistaSesion: ObservableObject {
 
@@ -54,18 +43,10 @@ final class VistaSesion: ObservableObject {
 
     @Published private(set) var cerrandoSesion = false
 
-    /// Conserva la tarea de registro para poder cancelarla
-    /// y esperar a que termine antes de eliminar el token FCM.
     private var tareaRegistroFCM: Task<Void, Never>?
 
-    /// Evita reanudar dos veces los servicios de una misma sesión.
     private var serviciosIniciados = false
 
-    /// Reanuda Socket.IO y FCM después del primer frame de la aplicación.
-    ///
-    /// Antes se hacía desde `init`, lo que alargaba el arranque en frío porque
-    /// Firebase y la conexión realtime competían con la construcción de la
-    /// interfaz. Ahora la vista raíz lo invoca cuando ya está visible.
     func reanudarServicios() {
 
         guard activa, !cerrandoSesion, !serviciosIniciados else {
@@ -79,16 +60,12 @@ final class VistaSesion: ObservableObject {
         programarRegistroFCM()
     }
 
-    // MARK: - Inicio de sesión
-
-    /// Se ejecuta después de iniciar sesión correctamente.
     func iniciar() {
 
         guard !activa, !cerrandoSesion else {
             return
         }
 
-        // El JWT debe estar guardado antes de ejecutar este método.
         guard ServicioKeychain.tokenAcceso() != nil else {
             print("[Sesión] No se puede iniciar sin un access token.")
             return
@@ -97,27 +74,20 @@ final class VistaSesion: ObservableObject {
         activa = true
         serviciosIniciados = true
 
-        // Si el usuario inicia sesión antes de que la tarea de arranque
-        // configure Firebase, se configura aquí de forma idempotente.
         GestorMensajesFirebase.shared.configurar()
 
-        // Habilita el registro automático de FCM para esta sesión.
         GestorMensajesFirebase.shared.habilitarRegistroAutomatico()
 
         conectarSocket()
         programarRegistroFCM()
     }
 
-    // MARK: - Registro FCM
-
-    /// Programa el registro del token FCM.
     private func programarRegistroFCM() {
 
         guard activa, !cerrandoSesion else {
             return
         }
 
-        // Evita tareas de registro simultáneas.
         tareaRegistroFCM?.cancel()
 
         tareaRegistroFCM = Task { [weak self] in
@@ -130,7 +100,6 @@ final class VistaSesion: ObservableObject {
         }
     }
 
-    /// Registra el token FCM utilizando la sesión autenticada.
     private func registrarTokenFCM() async {
 
         guard activa,
@@ -160,9 +129,6 @@ final class VistaSesion: ObservableObject {
         }
     }
 
-    // MARK: - Cierre de sesión
-
-    /// Cierra la sesión e intenta desactivar el token FCM.
     func cerrar() {
 
         guard !cerrandoSesion else {
@@ -171,7 +137,6 @@ final class VistaSesion: ObservableObject {
 
         cerrandoSesion = true
 
-        // Impide que se programen nuevos registros FCM.
         tareaRegistroFCM?.cancel()
 
         Task { [weak self] in
@@ -180,15 +145,12 @@ final class VistaSesion: ObservableObject {
                 return
             }
 
-            // Espera a que termine cualquier registro FCM pendiente.
             if let tarea = tareaRegistroFCM {
                 await tarea.value
             }
 
             tareaRegistroFCM = nil
 
-            // Primero se elimina el token FCM mientras el JWT
-            // todavía está disponible en Keychain.
             do {
 
                 try await GestorMensajesFirebase.shared
@@ -204,10 +166,8 @@ final class VistaSesion: ObservableObject {
                 )
             }
 
-            // Desconecta Socket.IO antes de eliminar el JWT.
             ServicioNotificaciones().desconectar()
 
-            // Elimina los tokens locales y los datos del perfil.
             let sesionEliminada = ServicioKeychain.cerrarSesion()
 
             if !sesionEliminada {
@@ -217,19 +177,14 @@ final class VistaSesion: ObservableObject {
                 )
             }
 
-            // Limpia cualquier navegación pendiente.
             CentroNavegacion.shared.cerrar()
 
-            // La interfaz vuelve al login.
             activa = false
             cerrandoSesion = false
             serviciosIniciados = false
         }
     }
 
-    // MARK: - Socket.IO
-
-    /// Conecta Socket.IO usando el token de acceso guardado.
     private func conectarSocket() {
 
         guard activa,
@@ -242,9 +197,6 @@ final class VistaSesion: ObservableObject {
     }
 }
 
-// MARK: - Arranque diferido
-
-/// Tareas que no deben bloquear el primer frame de la aplicación.
 @MainActor
 final class ArranqueAplicacion {
 
@@ -263,8 +215,6 @@ final class ArranqueAplicacion {
 
         preparado = true
 
-        // Deja que SwiftUI pinte la pantalla inicial antes de configurar
-        // Firebase, APNs y Socket.IO.
         await Task.yield()
 
         GestorMensajesFirebase.shared.configurar()
@@ -272,8 +222,6 @@ final class ArranqueAplicacion {
         vista.reanudarServicios()
     }
 }
-
-// MARK: - Vista raíz
 
 private enum PestanaPrincipal: Hashable {
     case inicio
@@ -283,7 +231,6 @@ private enum PestanaPrincipal: Hashable {
     case perfil
 }
 
-/// Raíz de la aplicación: muestra las pestañas según la sesión.
 struct RootView: View {
 
     @ObservedObject var vista: VistaSesion

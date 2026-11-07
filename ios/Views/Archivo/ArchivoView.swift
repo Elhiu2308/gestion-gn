@@ -1,9 +1,5 @@
 import SwiftUI
 
-/// Categorías del archivo documental.
-///
-/// "Archivo" no es sólo el histórico: reúne los documentos que me asignaron,
-/// los que respondí, los vencidos y los que ya están archivados.
 enum CategoriaArchivo: String, CaseIterable, Identifiable {
     case todos
     case asignados
@@ -70,11 +66,6 @@ enum CategoriaArchivo: String, CaseIterable, Identifiable {
     }
 }
 
-/// Pantalla de archivo documental (`GET /api/archivo` + documentos propios).
-///
-/// Muestra todos los documentos del usuario agrupados por categoría:
-/// asignados, creados, respondidos, vencidos, por vencer, finalizados y
-/// archivados. También conserva los filtros por año y estado.
 struct ArchivoView: View {
 
     var alRegresar: (() -> Void)? = nil
@@ -154,8 +145,6 @@ struct ArchivoView: View {
         }
     }
 
-    // MARK: - Encabezado
-
     private var encabezado: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
@@ -175,8 +164,6 @@ struct ArchivoView: View {
                 .foregroundColor(EstiloInstitucional.textoSecundario)
         }
     }
-
-    // MARK: - Resumen
 
     private var resumen: some View {
         HStack(spacing: 10) {
@@ -217,8 +204,6 @@ struct ArchivoView: View {
                 .stroke(EstiloInstitucional.bordeSuave, lineWidth: 1)
         )
     }
-
-    // MARK: - Categorías
 
     private var categorias: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -263,8 +248,6 @@ struct ArchivoView: View {
         }
     }
 
-    // MARK: - Filtros
-
     private var filtros: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
@@ -308,8 +291,6 @@ struct ArchivoView: View {
             .font(.system(size: 13, weight: .semibold))
             .foregroundColor(EstiloInstitucional.textoSecundario)
     }
-
-    // MARK: - Listado
 
     private var listado: some View {
         Group {
@@ -361,7 +342,6 @@ struct ArchivoView: View {
     }
 }
 
-/// Tarjeta de un documento del archivo.
 private struct FilaArchivo: View {
 
     let documento: DocumentoArchivo
@@ -467,7 +447,6 @@ private struct FilaArchivo: View {
     }
 }
 
-/// Chip de filtro con menú desplegable.
 private struct ChipFiltro: View {
 
     let titulo: String
@@ -501,8 +480,6 @@ private struct ChipFiltro: View {
         }
     }
 }
-
-// MARK: - ViewModel
 
 @MainActor
 final class ArchivoViewModel: ObservableObject {
@@ -545,9 +522,6 @@ final class ArchivoViewModel: ObservableObject {
 
         var mapa: [Int: DocumentoArchivo] = [:]
 
-        // Documentos visibles para el usuario (incluye los de su área y los que
-        // le turnaron). Se muestran en "Todos", pero sin las etiquetas de
-        // asignado/creado.
         for documento in listaVisibles ?? [] {
             mapa[documento.id] = DocumentoArchivo(documento: documento)
         }
@@ -595,8 +569,6 @@ final class ArchivoViewModel: ObservableObject {
         }
     }
 
-    /// Ejecuta una operación y devuelve `nil` si falla, para que un endpoint
-    /// caído no impida mostrar el resto del archivo.
     private func capturar<T>(_ operacion: @escaping () async throws -> T) async -> T? {
         try? await operacion()
     }

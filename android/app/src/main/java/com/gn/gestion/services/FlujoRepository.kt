@@ -4,7 +4,6 @@ import android.content.Context
 import com.gn.gestion.models.*
 import com.google.gson.JsonObject
 
-/** Invoca las acciones del flujo documental en el servidor. */
 class FlujoRepository(private val api: ApiService) {
 
     private fun body(vararg pares: Pair<String, Any?>): JsonObject =
@@ -26,13 +25,6 @@ class FlujoRepository(private val api: ApiService) {
                 throw IllegalStateException(it.error)
         }
 
-    /**
-     * Entrega el documento a un área o a un usuario concreto.
-     *
-     * `usuarioDestino` es opcional: si se envía, el servidor lo resuelve por ID o por
-     * nombre de usuario, toma su área si falta y deja el documento asignado a esa
-     * persona. Sin él se mantiene la asignación solo por área.
-     */
     suspend fun asignar(
         docId: Long,
         nivel: String,
@@ -52,11 +44,6 @@ class FlujoRepository(private val api: ApiService) {
             )
         )
 
-    /**
-     * Usuarios activos que pueden recibir un documento. Si el rol no tiene
-     * `USUARIOS_CONSULTAR`, el servidor responde 403 y se devuelve una lista vacía:
-     * el llamador degrada a la asignación por área.
-     */
     suspend fun usuariosDestino(): List<UsuarioDto> =
         runCatching { api.listarUsuarios().filter { it.estado.equals("ACTIVO", true) } }
             .getOrDefault(emptyList())
@@ -99,16 +86,8 @@ class FlujoRepository(private val api: ApiService) {
 
     suspend fun anotaciones(docId: Long): List<AnotacionDto> = api.anotaciones(docId)
 
-    // --------------- Turnado jerárquico / acuse / vinculación ---------------
-
-    /** Opciones de turno: solo el nivel inmediatamente inferior del usuario. */
     suspend fun turnadoOpciones(): TurnadoOpcionesDto = api.turnadoOpciones()
 
-    /**
-     * Turna el documento al nivel inmediatamente inferior. `opcionTipo` es
-     * `direccion`/`subdireccion`/`departamento`/`usuario` y `opcionId` la clave
-     * de la estructura organizacional (el servidor valida el salto).
-     */
     suspend fun turnar(
         docId: Long,
         opcionTipo: String,
@@ -128,7 +107,6 @@ class FlujoRepository(private val api: ApiService) {
             )
         )
 
-    /** Marca el documento como leído por el usuario actual (o su acuse de recibo). */
     suspend fun leer(
         docId: Long,
         acuse: Boolean = false,

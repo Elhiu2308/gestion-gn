@@ -7,7 +7,6 @@
     android:background="@color/fondo"
     android:orientation="vertical">
 
-    <!-- ENCABEZADO -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -105,7 +104,6 @@
 
     </LinearLayout>
 
-    <!-- SEPARADOR INSTITUCIONAL -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -113,7 +111,6 @@
         android:layout_marginEnd="20dp"
         android:background="#E2E8F0" />
 
-    <!-- INDICADOR DE CARGA -->
     <ProgressBar
         android:id="@+id/progress"
         android:layout_width="32dp"
@@ -122,7 +119,6 @@
         android:layout_marginTop="20dp"
         android:indeterminateTint="@color/g_verde" />
 
-    <!-- CONTENEDOR DEL LISTADO -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -139,7 +135,6 @@
             android:paddingBottom="20dp"
             android:scrollbars="vertical" />
 
-        <!-- ESTADO VACÍO -->
         <LinearLayout
             android:id="@+id/empty_state"
             android:layout_width="match_parent"

@@ -17,7 +17,6 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- ENCABEZADO DE ARCHIVO -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -45,7 +44,6 @@
                 android:textSize="14sp"
                 android:lineSpacingExtra="2dp" />
 
-            <!-- TARJETAS DE RESUMEN -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,7 +55,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <!-- TARJETA TOTAL -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="120dp"
                         android:layout_height="80dp"
@@ -96,7 +93,6 @@
 
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- TARJETA ASIGNADOS -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="120dp"
                         android:layout_height="80dp"
@@ -135,7 +131,6 @@
 
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- TARJETA VENCIDOS -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="120dp"
                         android:layout_height="80dp"
@@ -177,7 +172,6 @@
 
             </HorizontalScrollView>
 
-            <!-- PANEL DE BÚSQUEDA Y FILTROS AVANZADOS -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -194,7 +188,6 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- BUSCADOR RÁPIDO (FOLIO, ASUNTO, REMITENTE, DESTINATARIO) -->
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
@@ -218,7 +211,6 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- BOTÓN TOGGLE FILTROS AVANZADOS -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_toggle_filtros"
                         style="@style/Widget.Material3.Button.TextButton"
@@ -233,7 +225,6 @@
                         app:iconGravity="textEnd"
                         app:iconTint="@color/g_verde" />
 
-                    <!-- FORMULARIO EXPANDIBLE DE FILTROS AVANZADOS -->
                     <LinearLayout
                         android:id="@+id/container_filtros_avanzados"
                         android:layout_width="match_parent"
@@ -427,7 +418,6 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- CHIPS DINÁMICOS DE AGRUPACIÓN / FILTROS Y CATEGORÍAS -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -452,7 +442,6 @@
                 android:indeterminateTint="@color/g_verde"
                 android:visibility="gone" />
 
-            <!-- LISTA DE DOCUMENTOS ARCHIVADOS -->
             <TextView
                 android:id="@+id/lbl_documentos"
                 android:layout_width="match_parent"
@@ -499,7 +488,6 @@
                 android:textColor="@color/gris_texto"
                 android:visibility="gone" />
 
-            <!-- Pie institucional -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

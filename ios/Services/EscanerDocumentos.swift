@@ -4,47 +4,30 @@ import UIKit
 import Vision
 import VisionKit
 
-// ---------------------------------------------------------------------------
-// Escaneo de documentos (VisionKit) y OCR (Vision)
-// ---------------------------------------------------------------------------
-//
-// Equivalencias con la app Android:
-//   - `ML Kit Document Scanner`  ->  `VNDocumentCameraViewController` (VisionKit)
-//   - `ML Kit Text Recognition`  ->  `VNRecognizeTextRequest` (Vision)
-//
-// El controlador nativo de Apple ya incluye el "marco": detecta los bordes de
-// la hoja, permite **ajustar las esquinas**, **rotar**, **volver a tomar** y
-// **aplicar**, y admite varias páginas por sesión.
-
-/// Página capturada por el escáner de documentos.
 struct PaginaEscaneada: Identifiable {
     let id = UUID()
     let imagen: UIImage
 }
 
-/// Origen del documento que se está registrando en la pantalla "Nuevo Documento".
 enum OrigenDocumento {
-    /// Se abre el formulario sin archivo adjunto.
+
     case ninguno
-    /// Varias páginas capturadas con el escáner de documentos.
+
     case paginas([UIImage])
-    /// Una imagen elegida desde la galería.
+
     case imagen(UIImage)
-    /// Un archivo (PDF/imagen) importado del almacenamiento.
+
     case archivo(URL)
 }
 
-/// Envuelve `VNDocumentCameraViewController` (VisionKit) para usarlo desde SwiftUI.
 struct EscanerDocumentosVista: UIViewControllerRepresentable {
 
-    /// Indica si el dispositivo soporta el escáner de documentos nativo.
     static var esCompatible: Bool {
         VNDocumentCameraViewController.isSupported
     }
 
-    /// Se invoca con las páginas digitalizadas (una o más).
     var alFinalizar: ([UIImage]) -> Void
-    /// Se invoca al cancelar o si el escáner falla.
+
     var alCancelar: () -> Void
 
     func makeCoordinator() -> Coordinador {
@@ -91,9 +74,8 @@ struct EscanerDocumentosVista: UIViewControllerRepresentable {
     }
 }
 
-/// Utilidades del escaneo: guardado local (imágenes y PDF) y OCR con Vision.
 enum ServicioEscaner {
-    /// Carpeta privada donde se guardan los escaneos (`<Documents>/Escaneos`).
+
     static func carpetaEscaneos() -> URL {
         let base = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let carpeta = base.appendingPathComponent("Escaneos", isDirectory: true)
@@ -103,12 +85,10 @@ enum ServicioEscaner {
         return carpeta
     }
 
-    /// Nombre único para un escaneo con la marca de tiempo actual.
     static func nombreUnico(prefijo: String = "documento") -> String {
         "\(prefijo)_\(Int(Date().timeIntervalSince1970 * 1000))"
     }
 
-    /// Guarda una imagen escaneada como JPEG y devuelve su ruta local.
     @discardableResult
     static func guardar(imagen: UIImage, nombre: String) -> URL? {
         guard let datos = imagen.jpegData(compressionQuality: 0.85) else { return nil }
@@ -121,7 +101,6 @@ enum ServicioEscaner {
         }
     }
 
-    /// Genera un PDF con todas las páginas escaneadas y devuelve su ruta local.
     @discardableResult
     static func guardarPDF(paginas: [UIImage], nombre: String) -> URL? {
         guard let primera = paginas.first else { return nil }
@@ -143,7 +122,6 @@ enum ServicioEscaner {
         }
     }
 
-    /// Reconoce el texto de una imagen con el framework Vision (equivalente a ML Kit).
     static func reconocerTexto(en imagen: UIImage) async -> String {
         guard let cgImage = imagen.cgImage else { return "" }
         return await Task.detached(priority: .userInitiated) {
@@ -164,7 +142,6 @@ enum ServicioEscaner {
         }.value
     }
 
-    /// Carga un `UIImage` desde una URL local (archivo importado o foto de galería).
     static func imagen(desde url: URL) -> UIImage? {
         guard let datos = try? Data(contentsOf: url) else { return nil }
         return UIImage(data: datos)

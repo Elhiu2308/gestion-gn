@@ -57,22 +57,9 @@ interface ApiService {
     @GET("api/usuarios")
     suspend fun listarUsuarios(): List<UsuarioDto>
 
-    /** QR de firma institucional emitido para el usuario autenticado. */
     @GET("api/usuarios/{id}/qr")
     suspend fun qrUsuario(@Path("id") id: Long): JsonObject
 
-    // --------------- Estructura organizacional / catálogo de personas ---------------
-    // El selector Remitente/Destinatario es jerárquico (Área → Subdirección →
-    // Persona) y el filtrado SIEMPRE ocurre en el servidor: cada nivel consulta
-    // su propio endpoint y jamás se descarga la lista completa para filtrarla
-    // en el dispositivo.
-
-    /**
-     * Nivel de la estructura (`direcciones-generales`, `direcciones`,
-     * `subdirecciones`, `departamentos`).
-     *
-     * Requiere el permiso `ver_organigrama`.
-     */
     @GET("api/organigrama/{nivel}")
     suspend fun organigrama(
         @Path("nivel") nivel: String,
@@ -83,7 +70,6 @@ interface ApiService {
         @Query("incluir_inactivos") incluirInactivos: String? = null
     ): List<NivelOrgDto>
 
-    /** Catálogo de personas filtrado en base de datos por su ubicación. */
     @GET("api/personas")
     suspend fun listarPersonas(
         @Query("q") q: String? = null,
@@ -92,7 +78,6 @@ interface ApiService {
         @Query("limite") limite: Int = 500
     ): List<PersonaDto>
 
-    /** Detalle de una persona (devuelve también inactivas: no filtra estatus). */
     @GET("api/personas/{personaId}")
     suspend fun persona(@Path("personaId") personaId: Long): PersonaDto
 
@@ -174,13 +159,9 @@ interface ApiService {
     @GET("api/documentos/{docId}/respuestas")
     suspend fun respuestas(@Path("docId") docId: Long): List<RespuestaDto>
 
-    // --------------- Turnado jerárquico / acuse / vinculación ---------------
-
-    /** Opciones de turno: solo el nivel inmediatamente inferior del usuario. */
     @GET("api/turnado/opciones")
     suspend fun turnadoOpciones(): TurnadoOpcionesDto
 
-    /** Marca un documento como leído/acusado por el usuario actual. */
     @POST("api/documentos/{docId}/leer")
     suspend fun leer(
         @Path("docId") docId: Long,
@@ -229,8 +210,6 @@ interface ApiService {
         @Path("docId") docId: Long
     ): retrofit2.Response<JsonObject>
 
-    // --------------- Notificaciones / FCM ---------------
-
     @GET("api/notificaciones")
     suspend fun listarNotificaciones(
         @Query("limite") limite: Int = 50,
@@ -249,8 +228,6 @@ interface ApiService {
     @HTTP(method = "DELETE", path = "api/fcm/token", hasBody = true)
     suspend fun eliminarFcmToken(@Body body: JsonObject): retrofit2.Response<JsonObject>
 
-    // --------------- Archivo virtual / Búsqueda global ---------------
-
     @GET("api/archivo")
     suspend fun archivoVirtual(
         @Query("anio") anio: String? = null,
@@ -259,12 +236,6 @@ interface ApiService {
         @Query("q") q: String? = null
     ): ArchivoDto
 
-    /**
-     * Búsqueda de documentos con filtros combinables.
-     *
-     * Todos los parámetros son opcionales: con `q` basta para la búsqueda rápida y el
-     * resto permite acotar por campos concretos. El servidor ignora los vacíos.
-     */
     @GET("api/buscar")
     suspend fun buscarGlobal(
         @Query("q") q: String? = null,

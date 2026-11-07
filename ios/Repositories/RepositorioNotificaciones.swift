@@ -1,22 +1,11 @@
 
 import Foundation
 
-/// Repositorio de notificaciones del backend Flask.
-///
-/// Contratos:
-/// GET  /api/notificaciones/contador
-/// GET  /api/notificaciones?limite=50
-/// POST /api/notificaciones/leer
-///
-/// Flask es la fuente oficial del historial y del contador.
-
 final class RepositorioNotificaciones {
 
     static let shared = RepositorioNotificaciones()
 
     private init() {}
-
-    // MARK: - Centro de notificaciones
 
     func centro() async throws -> CentroNotificaciones {
 
@@ -34,8 +23,6 @@ final class RepositorioNotificaciones {
             recientes: Array(recientes.prefix(50))
         )
     }
-
-    // MARK: - Historial
 
     func historial(masLeidas: Bool) async throws -> [Notificacion] {
 
@@ -62,8 +49,6 @@ final class RepositorioNotificaciones {
         }
     }
 
-    // MARK: - Marcar como leída
-
     func marcarLeida(id: Int) async throws {
 
         guard id > 0 else {
@@ -81,7 +66,6 @@ final class RepositorioNotificaciones {
         )
     }
 
-    /// Marca todas las notificaciones como leídas.
     func marcarTodasLeidas() async throws {
 
         _ = try await ejecutar(
@@ -90,8 +74,6 @@ final class RepositorioNotificaciones {
             cuerpo: [:]
         )
     }
-
-    // MARK: - Conversión JSON
 
     private static func convertirNotificacion(
         _ objeto: [String: Any]
@@ -130,8 +112,6 @@ final class RepositorioNotificaciones {
         )
     }
 
-    // MARK: - Conversión de números
-
     private static func entero(_ valor: Any?) -> Int? {
 
         guard let valor else {
@@ -149,8 +129,6 @@ final class RepositorioNotificaciones {
         return nil
     }
 
-    // MARK: - Conversión de fechas
-
     private static func convertirFecha(_ valor: Any?) -> Date {
 
         guard let valor, !(valor is NSNull) else {
@@ -161,7 +139,6 @@ final class RepositorioNotificaciones {
 
             var timestamp = numero.doubleValue
 
-            // Admite segundos o milisegundos Unix.
             if abs(timestamp) > 100_000_000_000 {
                 timestamp /= 1000
             }
@@ -211,8 +188,6 @@ final class RepositorioNotificaciones {
 
         return Date()
     }
-
-    // MARK: - Solicitudes HTTP
 
     private func ejecutar(
         peticion: String,
@@ -324,8 +299,6 @@ final class RepositorioNotificaciones {
 
         return (datos, http.statusCode)
     }
-
-    // MARK: - Errores
 
     enum ErrorRepositorio: LocalizedError {
 

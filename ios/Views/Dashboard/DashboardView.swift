@@ -1,15 +1,5 @@
 import SwiftUI
 
-/// Pantalla de inicio (Dashboard) con el diseño institucional de Android (`fragment_dashboard.xml`).
-///
-/// - Saludo con nombre del usuario y chip institucional de Área / Unidad.
-/// - Tarjeta principal verde institucional "Nuevo documento" (acceso a escáner / registro).
-/// - Sección "Tus documentos":
-///   - Tarjeta "Mis documentos"
-///   - Tarjeta "Buscar documento"
-/// - Cuadrícula de métricas institucionales (Total, Pendientes, En proceso, Finalizados).
-/// - Sección de movimientos recientes con diseño de tarjeta.
-/// - Iconos nativos de Apple (SF Symbols).
 struct DashboardView: View {
 
     @StateObject private var vistaModelo = DashboardViewModel()
@@ -35,7 +25,6 @@ struct DashboardView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 18) {
 
-                        // MARK: Identidad del usuario autenticado
                         VStack(alignment: .center, spacing: 6) {
                             Text(nombreCompleto)
                                 .font(.system(size: 24, weight: .bold))
@@ -53,20 +42,12 @@ struct DashboardView: View {
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding(.top, 2)
 
-                            ///Text("Administra tus documentos y da seguimiento a cada expediente.")
-                              ///  .font(.system(size: 14))
-                             ///   .foregroundColor(EstiloInstitucional.textoSecundario)
-                               // .lineSpacing(2)
-                              //  .multilineTextAlignment(.center)
-                               // .frame(maxWidth: .infinity, alignment: .center)
-                              //  .padding(.top, 4)
                         }
                         .frame(maxWidth: .infinity)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 20)
                         .padding(.top, 4)
 
-                        // MARK: Acción Principal (Nuevo Documento)
                         Button {
                             mostrandoIngresar = true
                         } label: {
@@ -110,14 +91,12 @@ struct DashboardView: View {
                         .buttonStyle(PlainButtonStyle())
                         .padding(.horizontal, 20)
 
-                        // MARK: Tus Documentos
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Tus documentos")
                                 .font(.system(size: 19, weight: .bold))
                                 .foregroundColor(EstiloInstitucional.textoPrincipal)
                                 .padding(.horizontal, 20)
 
-                            // Tarjeta: Mis Documentos
                             NavigationLink {
                                 DocumentosView()
                             } label: {
@@ -160,7 +139,6 @@ struct DashboardView: View {
                             .buttonStyle(PlainButtonStyle())
                             .padding(.horizontal, 20)
 
-                            // Tarjeta: Buscar Documento
                             NavigationLink {
                                 BuscarDocumentoView()
                             } label: {
@@ -204,7 +182,6 @@ struct DashboardView: View {
                             .padding(.horizontal, 20)
                         }
 
-                        // MARK: Resumen de Métricas (2x2 Grid)
                         if let resumen = vistaModelo.resumen {
                             VStack(alignment: .leading, spacing: 12) {
                                 Text("Resumen de expedientes")
@@ -273,7 +250,6 @@ struct DashboardView: View {
                             }
                         }
 
-                        // MARK: Movimientos Recientes
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Movimientos recientes")
                                 .font(.system(size: 18, weight: .bold))
@@ -345,7 +321,6 @@ struct DashboardView: View {
                             .padding(.horizontal, 20)
                         }
 
-                        // MARK: Pie Institucional
                         VStack(spacing: 4) {
                             Text("GestióN · Gestión Documental")
                                 .font(.system(size: 11))

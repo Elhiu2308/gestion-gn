@@ -10,10 +10,6 @@ import android.util.AttributeSet
 import android.view.View
 import com.gn.gestion.R
 
-/**
- * Resalta las cajas de texto detectadas por OCR con un borde
- * dorado brillante, estilo "resaltado de texto en pantalla".
- */
 class OcrHighlightView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
@@ -46,7 +42,6 @@ class OcrHighlightView @JvmOverloads constructor(
         return resources.getColor(resId, context.theme)
     }
 
-    /** Define las cajas a resaltar (coordenadas del bitmap) y el tamaño del bitmap. */
     fun mostrarCajas(cajasBitmap: List<Rect>, anchoBmp: Int, altoBmp: Int) {
         if (anchoBmp <= 0 || altoBmp <= 0) {
             this.cajas = emptyList()
@@ -71,7 +66,7 @@ class OcrHighlightView @JvmOverloads constructor(
         cajas.forEach { r ->
             canvas.drawRoundRect(r, 6f * dim, 6f * dim, paintFill)
             canvas.drawRoundRect(r, 6f * dim, 6f * dim, paintBorder)
-            // esquinas decorativas
+
             canvas.drawLine(r.left, r.top, r.left + tick, r.top, paintCorners)
             canvas.drawLine(r.left, r.top, r.left, r.top + tick, paintCorners)
             canvas.drawLine(r.right, r.bottom, r.right - tick, r.bottom, paintCorners)

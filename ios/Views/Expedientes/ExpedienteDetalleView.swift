@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Detalle del expediente: información, documentos vinculados y acciones.
 struct ExpedienteDetalleView: View {
 
     let expedienteId: Int
@@ -93,8 +92,6 @@ private struct SeccionDocumentos: View {
         }
     }
 }
-
-// MARK: - ViewModel
 
 @MainActor
 final class ExpedienteDetalleViewModel: ObservableObject {

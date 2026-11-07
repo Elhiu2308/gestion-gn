@@ -14,7 +14,6 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- ENCABEZADO -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -41,7 +40,6 @@
             android:textColor="@color/gris_texto"
             android:textSize="14sp" />
 
-        <!-- PERFIL DEL USUARIO -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -64,7 +62,6 @@
                     android:gravity="center_vertical"
                     android:orientation="vertical">
 
-                    <!-- FOTOGRAFÍA DE PERFIL CON BOTÓN DE EDICIÓN FLOTANTE -->
                     <FrameLayout
                         android:id="@+id/container_perfil_avatar"
                         android:layout_width="wrap_content"
@@ -85,7 +82,6 @@
                             app:strokeColor="@color/g_verde"
                             app:strokeWidth="3dp" />
 
-                        <!-- Badge de cámara flotante para cambiar la foto -->
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
@@ -163,7 +159,6 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <!-- CARGO -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -189,7 +184,6 @@
 
                 </LinearLayout>
 
-                <!-- GRADO -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -215,7 +209,6 @@
 
                 </LinearLayout>
 
-                <!-- ADSCRIPCIÓN -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -241,7 +234,6 @@
 
                 </LinearLayout>
 
-                <!-- CORREO -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -270,7 +262,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- SEGURIDAD -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -307,7 +298,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- FIRMA DIGITAL QR -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -388,7 +378,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- PIE -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -1,12 +1,6 @@
 
 import SwiftUI
 
-/// Pantalla del centro de notificaciones.
-///
-/// El backend Flask mantiene el historial y el contador oficiales.
-/// Socket.IO actualiza las notificaciones en tiempo real.
-/// Las notificaciones relacionadas con documentos permiten abrirlos.
-
 struct NotificacionesView: View {
 
     @StateObject private var vistaModelo = NotificacionesViewModel()
@@ -62,8 +56,6 @@ struct NotificacionesView: View {
             )
         }
     }
-
-    // MARK: - Encabezado
 
     private var encabezado: some View {
 
@@ -142,8 +134,6 @@ struct NotificacionesView: View {
         }
     }
 
-    // MARK: - Listado
-
     private var listado: some View {
 
         Group {
@@ -194,11 +184,8 @@ struct NotificacionesView: View {
         }
     }
 
-    // MARK: - Seleccionar notificación
-
     private func seleccionar(_ notificacion: Notificacion) {
 
-        // Marcar como leída sin bloquear la navegación.
         if !notificacion.leida {
 
             Task {
@@ -208,7 +195,6 @@ struct NotificacionesView: View {
             }
         }
 
-        // Abrir documento relacionado.
         if let documentoId = notificacion.documentoId,
            documentoId > 0 {
 
@@ -219,13 +205,10 @@ struct NotificacionesView: View {
 
         } else {
 
-            // Notificación general sin documento asociado.
             notificacionSinDocumento = notificacion
         }
     }
 }
-
-// MARK: - Tarjeta de notificación
 
 private struct FilaNotificacion: View {
 
@@ -371,9 +354,6 @@ private struct FilaNotificacion: View {
     }
 }
 
-// MARK: - Aviso emergente en primer plano
-
-/// Tarjeta flotante que aparece sobre la app cuando llega una notificación.
 struct BannerAvisoNotificacion: View {
 
     let aviso: AvisoNotificacion
@@ -512,7 +492,6 @@ struct BannerAvisoNotificacion: View {
     }
 }
 
-/// Ficha rápida con los datos del documento asociado a una notificación.
 struct DatosDocumentoAvisoView: View {
 
     let documentoId: Int

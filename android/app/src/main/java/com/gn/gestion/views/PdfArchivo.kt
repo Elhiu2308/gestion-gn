@@ -8,20 +8,14 @@ import java.io.File
 import java.io.FileOutputStream
 import android.os.Environment
 
-/**
- * Resuelve a un archivo legible la ruta guardada de un PDF o genera
- * un PDF oficial en caso de que aún no exista un archivo escaneado.
- */
 object PdfArchivo {
 
     fun leer(context: Context, ruta: String?): File? {
         if (ruta.isNullOrBlank()) return null
 
-        // 1. Ruta directa / absoluta
         val directo = File(ruta)
         if (directo.exists() && directo.isFile && directo.length() > 0L) return directo
 
-        // 2. Buscar por el nombre del archivo en carpetas conocidas
         val nombre = ruta.substringAfterLast('/')
         val dirs = listOf(
             File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) ?: context.filesDir, "pdfs"),
@@ -38,25 +32,19 @@ object PdfArchivo {
             }
         }
 
-        // 3. MediaStore
         return copiarDeMediaStore(context, ruta)
     }
 
-    /**
-     * Obtiene o genera siempre un archivo PDF válido para un [Documento].
-     */
     fun obtenerOGenerarPdf(context: Context, doc: Documento): File {
-        // A) Buscar por pdfPath si existe
+
         if (!doc.pdfPath.isNullOrBlank()) {
             leer(context, doc.pdfPath)?.let { return it }
         }
 
-        // B) Buscar por pdfNombre si existe
         if (doc.pdfNombre.isNotBlank()) {
             leer(context, doc.pdfNombre)?.let { return it }
         }
 
-        // C) Buscar por folio / uuid
         val folioLimpio = PdfGenerator.sanitizeFileName(doc.folio)
         if (folioLimpio.isNotBlank()) {
             leer(context, "$folioLimpio.pdf")?.let { return it }
@@ -67,7 +55,6 @@ object PdfArchivo {
             leer(context, "$uuidLimpio.pdf")?.let { return it }
         }
 
-        // D) Si no existe ningún archivo físico previo, generar el PDF oficial del documento
         return PdfGenerator.generarPdfDocumento(context, doc)
     }
 

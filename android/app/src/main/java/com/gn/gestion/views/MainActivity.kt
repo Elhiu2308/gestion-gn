@@ -52,7 +52,6 @@ class MainActivity : AppCompatActivity() {
 
     private val vm: GestionViewModel by viewModels()
 
-    /** Acción pendiente de una notificación presionada. */
     private data class PendienteNotificacion(
         val uuid: String,
         val servidorId: Long,
@@ -61,12 +60,13 @@ class MainActivity : AppCompatActivity() {
 
     private var pendiente: PendienteNotificacion? = null
 
-    /** Diálogo del aviso recibido con la app en primer plano. */
     private var dialogoAviso: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        Notificador.crearCanal(this)
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -75,33 +75,25 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
         navController = navHostFragment.navController
 
-        // Configurar Barra de Navegación Inferior con Navigation Component
         bottomNav = findViewById(R.id.bottom_navigation)
         bottomNav.setupWithNavController(navController)
 
-        // Botón de notificaciones (Solo visible en Inicio)
         findViewById<View>(R.id.btn_notificaciones)?.setOnClickListener {
             abrirNotificaciones()
         }
 
-        // Botón de regresar a la pantalla anterior (Visible en pantallas secundarias)
         findViewById<View>(R.id.btn_back)?.setOnClickListener {
             navController.navigateUp()
         }
 
-        // Botón de cerrar sesión (Derecha de la Toolbar)
         findViewById<View>(R.id.btn_logout)?.setOnClickListener {
             confirmarCerrarSesion()
         }
 
-        // ---------------------------------------------------------
-        // NAVEGACIÓN Y COMPORTAMIENTO DE TOOLBAR / BOTTOM NAV
-        // ---------------------------------------------------------
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val enLogin = destination.id == R.id.login
             val enInicio = destination.id == R.id.dashboard
 
-            // Ocultar Toolbar y BottomNavigation en el Login
             toolbar.isVisible = !enLogin
             bottomNav.isVisible = !enLogin
 
@@ -111,10 +103,8 @@ class MainActivity : AppCompatActivity() {
                 supportActionBar?.show()
             }
 
-            // El título SIEMPRE se mantiene como "GestióN" en todas las pantallas
             findViewById<TextView>(R.id.toolbar_title)?.text = "GestióN Documental"
 
-            // Notificaciones solo visibles en Inicio; Botón Regresar en demás pantallas
             findViewById<View>(R.id.container_notif)?.isVisible = enInicio && !enLogin
             findViewById<View>(R.id.btn_back)?.isVisible = !enInicio && !enLogin
 
@@ -124,7 +114,6 @@ class MainActivity : AppCompatActivity() {
         registrarFcmSiProcede()
         cargarContadorInicial()
 
-        // El servicio de sockets se inicia en onStart().
         observeContador()
 
         pedirPermisoNotificaciones()
@@ -139,8 +128,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun procesarIntent(intent: Intent?) {
-        // Notificaciones de Notificador (socket / push en primer plano) o push mostrado por el
-        // sistema con la app en segundo plano: FCM entrega los campos `data` como extras.
+
         val uuid = intent?.getStringExtra(Notificador.EXTRA_DOCUMENTO_UUID).orEmpty()
             .ifBlank { intent?.getStringExtra("documento_uuid").orEmpty() }
         val servidorId = intent?.getLongExtra(Notificador.EXTRA_DOCUMENTO_ID, 0L)?.takeIf { it > 0L }
@@ -309,10 +297,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Recibe los avisos que Notificador entrega cuando la app está visible y
-     * los presenta como mensaje emergente con las acciones Abrir / Ver datos.
-     */
     private fun observarAvisosForeground() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {

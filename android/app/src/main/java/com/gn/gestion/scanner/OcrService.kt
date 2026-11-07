@@ -11,16 +11,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-/** Una línea de texto reconocida junto con su posición en la imagen. */
 data class LineaOcr(val texto: String, val caja: Rect)
 
-/** Texto plano del documento más las líneas con su caja, en una sola pasada del OCR. */
 data class ResultadoOcr(val texto: String, val lineas: List<LineaOcr>)
 
-/**
- * Reconocimiento óptico de caracteres (OCR) con ML Kit.
- * Extrae el texto del documento escaneado y lo guarda en el campo texto_ocr.
- */
 object OcrService {
 
     @Volatile
@@ -36,11 +30,6 @@ object OcrService {
         }
     }
 
-    /**
-     * Analiza el bitmap una sola vez y devuelve el texto completo junto con
-     * cada línea y su caja. Las cajas permiten dibujar después una capa de
-     * texto invisible sobre el PDF para que sea buscable.
-     */
     suspend fun analizar(context: Context, bmp: Bitmap): ResultadoOcr =
         withContext(Dispatchers.Default) {
             if (bmp.isRecycled) return@withContext ResultadoOcr("", emptyList())
@@ -62,11 +51,9 @@ object OcrService {
             }
         }
 
-    /** Procesa el bitmap final (rectificado) y devuelve el texto reconocido. */
     suspend fun reconocer(context: Context, bmp: Bitmap): String =
         analizar(context, bmp).texto
 
-    /** Procesa el bitmap y devuelve las cajas (rectángulos) de cada línea de texto detectada. */
     suspend fun cajasTexto(context: Context, bmp: Bitmap): List<Rect> =
         analizar(context, bmp).lineas.map { it.caja }
 }

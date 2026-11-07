@@ -14,7 +14,6 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- ENCABEZADO -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,7 +41,6 @@
             android:textSize="14sp"
             android:lineSpacingExtra="3dp" />
 
-        <!-- TARJETA DE CONFIGURACIÓN -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -59,7 +57,6 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <!-- IDENTIFICACIÓN -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -77,7 +74,6 @@
                     android:textSize="13sp"
                     android:lineSpacingExtra="3dp" />
 
-                <!-- EJEMPLO DE DIRECCIÓN -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -107,7 +103,6 @@
 
                 </LinearLayout>
 
-                <!-- CAMPO IP -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
@@ -129,7 +124,6 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- ESTADO DE CONEXIÓN -->
                 <TextView
                     android:id="@+id/lbl_estado"
                     android:layout_width="match_parent"
@@ -140,7 +134,6 @@
                     android:textSize="13sp"
                     android:lineSpacingExtra="2dp" />
 
-                <!-- PROBAR CONEXIÓN -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_probar"
                     style="@style/Widget.Material3.Button.OutlinedButton"
@@ -155,7 +148,6 @@
                     app:strokeColor="@color/g_verde"
                     app:strokeWidth="1dp" />
 
-                <!-- BUSCAR SERVIDOR -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_buscar"
                     style="@style/Widget.Material3.Button.OutlinedButton"
@@ -169,7 +161,6 @@
                     app:strokeColor="#CBD5E1"
                     app:strokeWidth="1dp" />
 
-                <!-- GUARDAR CONFIGURACIÓN -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_guardar"
                     android:layout_width="match_parent"
@@ -183,7 +174,6 @@
                     android:textStyle="bold"
                     app:cornerRadius="14dp" />
 
-                <!-- RESTABLECER -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_restablecer"
                     style="@style/Widget.Material3.Button.TextButton"
@@ -197,7 +187,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- PIE INSTITUCIONAL -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

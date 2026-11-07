@@ -1,7 +1,5 @@
 package com.gn.gestion.models;
 
-// Modelo de datos de la aplicación
-
 enum class TipoDocumento(val label: String, val icon: String) {
     MENSAJE("Mensaje C.E.I.", "✉"),
     OFICIO("Oficio", "📄"),
@@ -20,9 +18,8 @@ object Clasificacion {
     val ETIQUETAS = mapOf(PUBLICO to "Público", CONFIDENCIAL to "Confidencial", RESERVADO to "Reservado")
 }
 
-// Estados del ciclo de vida documental (idénticos a web/app/utils/enums.py)
 enum class EstadoDocumento(val label: String) {
-    // Flujo institucional FGN (12 estados canónicos)
+
     RECIBIDO("Recibido"),
     PENDIENTE_TURNO("Pendiente de turno"),
     TURNADO("Turnado"),
@@ -35,12 +32,12 @@ enum class EstadoDocumento(val label: String) {
     EN_VALIDACION("En validación"),
     VALIDADO("Validado"),
     CONCLUIDO("Concluido"),
-    // Resolución / cierre
+
     RECHAZADO("Rechazado"),
     HISTORICO("Histórico"),
     CANCELADO("Cancelado"),
     ARCHIVADO("Archivado"),
-    // Legado
+
     PENDIENTE_ASIGNACION("Pendiente de asignación"),
     DESIGNADO("Designado"),
     ASIGNADO("Asignado"),
@@ -55,7 +52,6 @@ enum class EstadoDocumento(val label: String) {
     companion object {
         val TERMINALES = setOf("CANCELADO", "ARCHIVADO", "HISTORICO", "CONCLUIDO")
 
-        // Mapea etiquetas/estados legado a su equivalente canónico.
         val LEGADO_A_CANONICO = mapOf(
             "PENDIENTE_ASIGNACION" to "PENDIENTE_TURNO",
             "DESIGNADO" to "TURNADO",
@@ -72,7 +68,6 @@ enum class EstadoDocumento(val label: String) {
     }
 }
 
-// Estados individuales de una asignación (web/app/utils/enums.py)
 object EstadoIndividual {
     const val NO_LEIDO = "NO_LEIDO"
     const val LEIDO = "LEIDO"
@@ -98,7 +93,7 @@ enum class Urgencia(val label: String) {
     URGENTE("Urgente"),
     EXTRAURGENTE("Extraurgente");
     companion object {
-        // Mapea urgencias legado a su equivalente canónico.
+
         val LEGADO_A_CANONICO = mapOf(
             "NORMAL" to ORDINARIO,
             "MUY_URGENTE" to EXTRAURGENTE,
@@ -124,7 +119,6 @@ object NivelAsignacion {
     )
 }
 
-// Roles RBAC (el servidor es la autoridad; la app solo oculta opciones con esto)
 enum class RolSistema(val label: String) {
     ADMINISTRADOR("Administrador"),
     CAPTURISTA("Capturista (Archivo)"),
@@ -134,7 +128,6 @@ enum class RolSistema(val label: String) {
     CONSULTA("Consulta")
 }
 
-// Códigos de permiso RBAC compartidos con web/app/utils/enums.py
 object Permisos {
     const val DOCUMENTO_CONSULTAR = "DOCUMENTO_CONSULTAR"
     const val DOCUMENTO_CREAR = "DOCUMENTO_CREAR"

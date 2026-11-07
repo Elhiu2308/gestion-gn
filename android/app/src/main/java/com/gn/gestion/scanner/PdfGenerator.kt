@@ -24,20 +24,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * Genera un PDF real a partir de una lista de páginas (Bitmap) o de los datos de un [Documento],
- * y los guarda en el almacenamiento seguro de la aplicación.
- */
 object PdfGenerator {
 
-    /** Tamaño A4 en puntos (72 dpi). */
     private const val A4_ANCHO = 595
     private const val A4_ALTO = 842
     private const val MARGEN = 24f
 
-    /**
-     * Genera un PDF a partir de una lista de imágenes escaneadas.
-     */
     fun save(
         context: Context,
         pages: List<Bitmap>,
@@ -78,7 +70,6 @@ object PdfGenerator {
                 documento.finishPage(page)
             }
 
-            // 1. Guardar en el almacenamiento privado de la app
             val dirPrivado = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) ?: context.filesDir, "pdfs")
             if (!dirPrivado.exists()) dirPrivado.mkdirs()
             val archivoPrivado = File(dirPrivado, "$nombreLimpio.pdf")
@@ -86,7 +77,6 @@ object PdfGenerator {
                 documento.writeTo(salida)
             }
 
-            // 2. Copia secundaria en el directorio público de Descargas (MediaStore)
             runCatching {
                 guardarEnDescargas(context, "application/pdf", "$nombreLimpio.pdf") { salida ->
                     archivoPrivado.inputStream().use { ins -> ins.copyTo(salida) }
@@ -101,10 +91,6 @@ object PdfGenerator {
         }
     }
 
-    /**
-     * Genera un archivo PDF oficial estructurado para un [Documento] cuando no se cuenta
-     * con un archivo PDF escaneado previamente.
-     */
     fun generarPdfDocumento(context: Context, doc: Documento): File {
         val nombreLimpio = sanitizeFileName(doc.folio.ifBlank { doc.uuid })
         val dirPrivado = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) ?: context.filesDir, "pdfs")
@@ -146,7 +132,6 @@ object PdfGenerator {
 
             var y = 50f
 
-            // Encabezado Guardia Nacional
             canvas.drawText("GUARDIA NACIONAL · GESTIÓN DOCUMENTAL", 40f, y, paintVerde)
             y += 18f
             canvas.drawText("DOCUMENTO OFICIAL REGISTRADO EN EL SISTEMA", 40f, y, paintGris)
@@ -155,13 +140,11 @@ object PdfGenerator {
             canvas.drawLine(40f, y, 555f, y, paintDorado)
             y += 30f
 
-            // Folio y Tipo
             val tipoStr = doc.tipo.ifBlank { "DOCUMENTO" }
             val folioStr = doc.folio.ifBlank { "Sin folio" }
             canvas.drawText("$tipoStr: $folioStr", 40f, y, paintBold)
             y += 25f
 
-            // Asunto
             canvas.drawText("ASUNTO:", 40f, y, paintVerde)
             y += 18f
             val asuntoStr = doc.asunto.ifBlank { "Sin asunto registrado." }
@@ -171,7 +154,6 @@ object PdfGenerator {
             }
             y += 20f
 
-            // Tabla de Datos
             val campos = listOf(
                 "Remitente" to doc.remitente.ifBlank { "—" },
                 "Destinatario" to doc.destinatario.ifBlank { "—" },
@@ -192,7 +174,6 @@ object PdfGenerator {
             canvas.drawLine(40f, y, 555f, y, paintDorado)
             y += 30f
 
-            // Código QR y Firma Digital
             val textoQr = doc.codigoQr.ifBlank { "GESTIONN::${doc.uuid}" }
             val qrBmp = qrBitmap(textoQr, 120, 120)
             if (qrBmp != null) {
@@ -232,9 +213,6 @@ object PdfGenerator {
         }
     }
 
-    /**
-     * Dibuja el texto con alfa 0: no se ve, pero queda en el PDF.
-     */
     private fun dibujarCapaTextoInvisible(
         canvas: Canvas,
         lineas: List<LineaOcr>,

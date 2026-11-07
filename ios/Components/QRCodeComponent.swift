@@ -3,7 +3,6 @@ import CoreImage
 import CoreImage.CIFilterBuiltins
 import UIKit
 
-/// Visualización de un código QR interoperable con los lectores del sistema.
 struct QRCodeComponent: View {
 
     let url: String
@@ -35,7 +34,6 @@ struct QRCodeComponent: View {
     }
 }
 
-/// Generador basado en Core Image, compatible con lectores QR estándar.
 enum QRCode {
 
     static func imagenDe(texto: String, tamaño: CGFloat) -> UIImage? {

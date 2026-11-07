@@ -1,15 +1,5 @@
 import SwiftUI
 
-/// Pantalla de inicio de sesión de GestióN.
-///
-/// Si la biometría está activa:
-/// - Muestra el acceso rápido con Face ID / Touch ID sin necesidad de escribir credenciales.
-/// - Lanza automáticamente el diálogo biométrico al presentarse.
-/// - Permite alternar a ingreso con credenciales si se desea.
-///
-/// Si la biometría no está activa:
-/// - Presenta el formulario tradicional de usuario y contraseña.
-/// - Incluye el switch institucional para activar biometría al iniciar sesión.
 struct LoginView: View {
 
     @StateObject private var vistaModelo = LoginViewModel()
@@ -38,7 +28,6 @@ struct LoginView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
 
-                    // MARK: Identidad Institucional Superior
                     Image("defensa")
                         .resizable()
                         .scaledToFit()
@@ -46,7 +35,6 @@ struct LoginView: View {
                         .padding(.horizontal, 24)
                         .padding(.top, 14)
 
-                    // MARK: Presentación de la Aplicación
                     VStack(spacing: 6) {
                         Image("logo_doc")
                             .resizable()
@@ -67,10 +55,8 @@ struct LoginView: View {
                     }
                     .padding(.bottom, 18)
 
-                    // MARK: Tarjeta Principal
                     VStack(spacing: 0) {
 
-                        // Logotipo de la app
                         Image("logo_app")
                             .resizable()
                             .scaledToFit()
@@ -78,9 +64,7 @@ struct LoginView: View {
                             .padding(.top, 4)
 
                         if vistaModelo.tieneAccesoBiometrico && !mostrarFormularioCredenciales {
-                            // =========================================================
-                            // MODO BIOMÉTRICO (YA NO HAY NECESIDAD DE INGRESAR CREDENCIALES)
-                            // =========================================================
+
                             VStack(spacing: 6) {
                                 Text("¡Hola, \(primerNombreBiometrico)!")
                                     .font(.system(size: 22, weight: .bold))
@@ -93,7 +77,6 @@ struct LoginView: View {
                                     .multilineTextAlignment(.center)
                                     .padding(.bottom, 18)
 
-                                // Botón principal biométrico
                                 Button {
                                     ejecutarLoginBiometrico()
                                 } label: {
@@ -117,7 +100,6 @@ struct LoginView: View {
                                 }
                                 .disabled(vistaModelo.estaCargando)
 
-                                // Opción para ingresar con contraseña u otro usuario
                                 Button {
                                     withAnimation(.easeInOut(duration: 0.25)) {
                                         mostrarFormularioCredenciales = true
@@ -136,9 +118,7 @@ struct LoginView: View {
                                 .padding(.top, 6)
                             }
                         } else {
-                            // =========================================================
-                            // MODO FORMULARIO TRADICIONAL
-                            // =========================================================
+
                             VStack(spacing: 0) {
                                 Text("Iniciar sesión")
                                     .font(.system(size: 23, weight: .bold))
@@ -152,10 +132,8 @@ struct LoginView: View {
                                     .padding(.top, 4)
                                     .padding(.bottom, 16)
 
-                                // Campos de texto
                                 VStack(spacing: 14) {
 
-                                    // Campo Usuario
                                     HStack(spacing: 12) {
                                         Image(systemName: "person.fill")
                                             .font(.system(size: 16))
@@ -192,7 +170,6 @@ struct LoginView: View {
                                             )
                                     )
 
-                                    // Campo Contraseña
                                     HStack(spacing: 12) {
                                         Image(systemName: "lock.fill")
                                             .font(.system(size: 16))
@@ -235,7 +212,6 @@ struct LoginView: View {
                                             )
                                     )
 
-                                    // Switch Activar Biometría
                                     VStack(alignment: .leading, spacing: 6) {
                                         HStack(alignment: .center) {
                                             VStack(alignment: .leading, spacing: 3) {
@@ -280,7 +256,6 @@ struct LoginView: View {
                                     }
                                     .padding(.top, 4)
 
-                                    // Botón Iniciar Sesión con credenciales
                                     Button {
                                         ejecutarLoginCredenciales()
                                     } label: {
@@ -306,7 +281,6 @@ struct LoginView: View {
                                     .opacity((vistaModelo.usuario.trimmingCharacters(in: .whitespaces).isEmpty || vistaModelo.contrasena.isEmpty) ? 0.65 : 1.0)
                                     .padding(.top, 6)
 
-                                    // Botón para volver a la opción biométrica si ya estaba activa
                                     if vistaModelo.tieneAccesoBiometrico {
                                         Button {
                                             withAnimation(.easeInOut(duration: 0.25)) {
@@ -326,7 +300,6 @@ struct LoginView: View {
                             }
                         }
 
-                        // MARK: Mensajes de Error
                         if let errorTexto = vistaModelo.errorTexto {
                             HStack(alignment: .top, spacing: 8) {
                                 Image(systemName: "exclamationmark.circle.fill")
@@ -350,7 +323,6 @@ struct LoginView: View {
                     .shadow(color: Color.black.opacity(0.06), radius: 10, y: 4)
                     .padding(.horizontal, 20)
 
-                    // MARK: Configuración de Servidor (IP)
                     Button {
                         mostrandoConfiguracion = true
                     } label: {
@@ -366,7 +338,6 @@ struct LoginView: View {
                     }
                     .padding(.top, 8)
 
-                    // MARK: Pie Institucional
                     Text("GestióN · Gestión Documental")
                         .font(.system(size: 11))
                         .foregroundColor(EstiloInstitucional.textoSecundario)
@@ -390,9 +361,9 @@ struct LoginView: View {
             Text("La autenticación biométrica se usa solo para desbloquear el acceso a la aplicación en este dispositivo. No se envía tu huella ni tu rostro al servidor; únicamente se guarda de forma segura la sesión protegida por el sistema. Puedes desactivarla cuando quieras.")
         }
         .task {
-            // Si la biometría está activa, solicita la verificación automáticamente al abrir la pantalla
+
             if vistaModelo.tieneAccesoBiometrico && !mostrarFormularioCredenciales {
-                try? await Task.sleep(nanoseconds: 300_000_000) // 0.3s para animación inicial limpia
+                try? await Task.sleep(nanoseconds: 300_000_000)
                 ejecutarLoginBiometrico()
             }
         }

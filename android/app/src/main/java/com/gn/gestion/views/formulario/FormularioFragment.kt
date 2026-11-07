@@ -31,7 +31,9 @@ import com.gn.gestion.services.ApiFactory
 import com.gn.gestion.services.TokenProvider
 import com.gn.gestion.util.OpcionItem
 import com.gn.gestion.util.colorRes
+import com.gn.gestion.util.Hora
 import com.gn.gestion.util.formatFecha
+import com.gn.gestion.util.mensajeServidor
 import com.gn.gestion.util.pintarOpciones
 import com.gn.gestion.viewmodels.GestionViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -94,7 +96,6 @@ class FormularioFragment : Fragment(R.layout.fragment_formulario) {
         clasificacion = doc?.clasificacion ?: Clasificacion.PUBLICO
         fecha = doc?.fecha ?: System.currentTimeMillis()
 
-        // REQUERIMIENTO 6: Fecha límite por defecto es la fecha actual si no existe
         fechaLimite = doc?.fechaLimite.orEmpty().ifBlank { formatFechaISO(System.currentTimeMillis()) }
 
         view.findViewById<TextView>(R.id.lbl_title).text =
@@ -132,21 +133,17 @@ class FormularioFragment : Fragment(R.layout.fragment_formulario) {
         inputNumAnexos.setText(if (doc != null && doc.numAnexos > 0) doc.numAnexos.toString() else "")
         inputNotas.setText(doc?.notas ?: "")
 
-        // REQUERIMIENTO 6: Tarjeta de Fecha límite homologada con Fecha de documento
         inputFechaLimite = view.findViewById(R.id.limite_fecha_text)
         inputHoraLimite = view.findViewById(R.id.input_hora_limite)
 
         inputFechaLimite.text = fechaLimite
         view.findViewById<View>(R.id.limite_fecha_card)?.setOnClickListener { mostrarPickerLimite() }
 
-        // REQUERIMIENTO 7: Configuración de los 3 desplegables de Hora Límite (10 : 30 PM)
         configurarSpinnersHora(view, doc?.fechaLimiteHora.orEmpty())
 
-        // REQUERIMIENTO 4: Control de visibilidad del Departamento
         lblDestDept = view.findViewById(R.id.lbl_dest_dept)
         cardDestDept = view.findViewById(R.id.card_dest_dept)
 
-        // Remitente / Destinatario: cascada 4 niveles Área → Subdirección → Departamento → Persona
         cascadaDest = CascadaPersonas(
             spArea = view.findViewById(R.id.sp_dest_area),
             spSub = view.findViewById(R.id.sp_dest_sub),
@@ -199,8 +196,6 @@ class FormularioFragment : Fragment(R.layout.fragment_formulario) {
             view.findViewById<TextView>(R.id.lbl_sin_permiso).isVisible = true
         }
     }
-
-    // ---------------- Requerimiento 7: Configuración de hora con 3 Spinners ----------------
 
     private fun configurarSpinnersHora(view: View, horaInicial: String) {
         val spHora = view.findViewById<Spinner>(R.id.sp_hora_limite)
@@ -262,8 +257,6 @@ class FormularioFragment : Fragment(R.layout.fragment_formulario) {
         val cal = Calendar.getInstance().apply { timeInMillis = millis }
         return String.format("%04d-%02d-%02d", cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH))
     }
-
-    // ---------------- Remitente / Destinatario: cascada 4 niveles ----------------
 
     private inner class CascadaPersonas(
         val spArea: Spinner,
@@ -524,7 +517,6 @@ class FormularioFragment : Fragment(R.layout.fragment_formulario) {
         }
         c.depts = depts
 
-        // REQUERIMIENTO: Departamento se muestra SOLO cuando existen registros disponibles
         if (depts.isNotEmpty()) {
             lblDestDept.isVisible = true
             cardDestDept.isVisible = true
@@ -533,12 +525,11 @@ class FormularioFragment : Fragment(R.layout.fragment_formulario) {
             c.spDept.isEnabled = true
             c.deptSel = null
             c.ayuda.text = "Seleccione la Persona o elija un Departamento específico."
-            // Cargar de inmediato las personas de la Subdirección para permitir la selección de persona sin necesidad de seleccionar un departamento específico
+
             cargarPersonas(c, c.areaSel, subId, pre?.persona, pre?.texto)
             return
         }
 
-        // Si no hay departamentos, ocultar selector de departamento y pasar directamente a personas de la Subdirección
         c.deptSel = null
         lblDestDept.isVisible = false
         cardDestDept.isVisible = false
@@ -696,7 +687,6 @@ class FormularioFragment : Fragment(R.layout.fragment_formulario) {
         }
     }
 
-    // REQUERIMIENTO 2: RENDERIZAR MINIATURAS DINÁMICAS DE TODAS LAS PÁGINAS DEL PDF ESCANEADO
     private fun renderizarVistaPrevia(root: View, pdfPath: String) {
         val card = root.findViewById<com.google.android.material.card.MaterialCardView>(R.id.card_preview)
         val btnVerPdf = root.findViewById<View>(R.id.btn_ver_pdf_completo)
@@ -879,13 +869,45 @@ class FormularioFragment : Fragment(R.layout.fragment_formulario) {
 
         lifecycleScope.launch {
             try {
-                vm.guardar(doc)
+                Log.i(
+                    TAG_GUARDAR,
+                    "Guardando local folio=${doc.folio} horaLocal=${doc.fechaLimiteHora} " +
+                            "horaServidor=${Hora.a24(doc.fechaLimiteHora)}"
+                )
+                val nuevoId = vm.guardar(doc)
+
+                if (originalDoc == null) {
+                    val persona = cascadaDest.personas.firstOrNull {
+                        it.clave == cascadaDest.personaSel
+                    }
+                    val uid = persona?.idUsuario
+                    val destino = when {
+                        persona?.idDepartamento != null ->
+                            "departamento" to persona.idDepartamento!!
+                        persona?.idSubdireccion != null ->
+                            "subdireccion" to persona.idSubdireccion!!
+                        persona?.idDireccion != null ->
+                            "direccion" to persona.idDireccion!!
+                        uid != null -> "usuario" to uid
+                        else -> null
+                    }
+                    if (destino != null) {
+                        Log.i(
+                            TAG_GUARDAR,
+                            "Alta local id=$nuevoId; turnando al guardar a " +
+                                    "${destino.first}/${destino.second} usuario=$uid"
+                        )
+                        vm.turnarAlGuardar(nuevoId, destino.first, destino.second, uid)
+                    } else {
+                        Log.i(TAG_GUARDAR, "Alta local id=$nuevoId sin persona destino; no se turna")
+                    }
+                }
                 findNavController().popBackStack()
             } catch (e: Exception) {
                 Log.e(TAG_GUARDAR, "Error al guardar el documento", e)
                 MaterialAlertDialogBuilder(requireContext(), R.style.GestioN_Dialog_Base)
                     .setTitle("Error al guardar")
-                    .setMessage(e.message ?: "No se pudo guardar la información del documento.")
+                    .setMessage(e.mensajeServidor())
                     .setPositiveButton("OK", null)
                     .show()
             }

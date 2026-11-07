@@ -1,10 +1,5 @@
 import SwiftUI
 
-/// Hoja modal para crear un expediente (`POST /api/expedientes`).
-///
-/// Réplica del diálogo "Nuevo expediente" de Android: número, descripción,
-/// área responsable y clasificación. El backend identifica el expediente por
-/// `numero`, no por un título libre.
 struct CrearExpedienteView: View {
 
     @Environment(\.dismiss) private var dismiss

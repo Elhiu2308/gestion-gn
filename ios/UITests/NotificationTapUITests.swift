@@ -12,8 +12,6 @@ final class NotificationTapUITests: XCTestCase {
         inicio.press(forDuration: 0.1, thenDragTo: fin)
     }
 
-    /// Verifica que al tocar una notificación real de documento con la app
-    /// terminada se abra el detalle correspondiente (documento 93, folio 95c0d615).
     func testNotificationTapOpensRelatedDocument() throws {
         let app = XCUIApplication()
         app.launch()

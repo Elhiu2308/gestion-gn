@@ -2,7 +2,6 @@ import SwiftUI
 import QuickLook
 import PDFKit
 
-/// Visor de documentos (PDF, imágenes y otros archivos) usando QuickLook.
 struct VistaPreviaArchivo: UIViewControllerRepresentable {
 
     let url: URL
@@ -40,7 +39,6 @@ struct VistaPreviaArchivo: UIViewControllerRepresentable {
     }
 }
 
-/// Visor en línea de un PDF a partir de sus datos en memoria.
 struct VisorPDF: UIViewRepresentable {
     let datos: Data
 
@@ -61,7 +59,6 @@ struct VisorPDF: UIViewRepresentable {
     }
 }
 
-/// Pantalla de vista previa de un archivo con botón para cerrar.
 struct PantallaVistaPrevia: View {
 
     @Environment(\.dismiss) private var dismiss

@@ -1,18 +1,11 @@
 import Foundation
 
-/// Repositorio de expedientes (`/api/expedientes/ *`).
 final class RepositorioExpedientes {
 
     static let shared = RepositorioExpedientes()
 
     private init() {}
 
-    // MARK: Consultas
-
-    /// GET /expedientes
-    ///
-    /// El backend devuelve un arreglo JSON (`List<ExpedienteDto>` en Android);
-    /// se tolera también la variante envuelta en `{"expedientes": [...]}`.
     func listar() async throws -> [Expediente] {
         do {
             let filas = try await RedCentral.enviarArreglo("GET", "/expedientes")
@@ -27,13 +20,11 @@ final class RepositorioExpedientes {
         }
     }
 
-    /// GET /expedientes/<id>
     func obtener(id: Int) async throws -> Expediente? {
         let (expediente, _) = try await detalle(id: id)
         return expediente
     }
 
-    /// GET /expedientes/<id> con sus documentos vinculados.
     func detalle(id: Int) async throws -> (Expediente?, [Documento]) {
         let (objeto, _) = try await ejecutar(
             peticion: "GET",
@@ -50,21 +41,13 @@ final class RepositorioExpedientes {
         return (expediente, documentos)
     }
 
-    /// GET /expedientes/<id>/documentos
-    ///
-    /// El backend entrega los documentos dentro del detalle del expediente
-    /// (`{"expediente": {...}, "documentos": [...]}`), no en una ruta aparte.
     func documentosDelExpediente(expedienteId: Int) async throws -> [Documento] {
         let (_, documentos) = try await detalle(id: expedienteId)
         return documentos
     }
 
-    // MARK: Mutaciones
-
-    /// POST /expedientes
     func crearExpediente(datos: DatosExpediente) async throws -> Expediente {
-        // El backend identifica los expedientes por `numero` (no `codigo`) y
-        // espera `area_responsable` y `clasificacion` (ver `api/expedientes`).
+
         let cuerpo: [String: Any] = [
             "numero": datos.numero,
             "descripcion": datos.descripcion,
@@ -80,7 +63,6 @@ final class RepositorioExpedientes {
         return RepositorioExpedientes.expediente(json: expedienteJson)
     }
 
-    /// PUT /expedientes/<id>
     func actualizar(id: Int, cambios: [String: String]) async throws -> Expediente {
         let (respuesta, _) = try await ejecutar(
             peticion: "PUT",
@@ -90,7 +72,6 @@ final class RepositorioExpedientes {
         return RepositorioExpedientes.expediente(json: respuesta, idPorDefecto: id)
     }
 
-    /// Construye un expediente a partir del JSON del backend.
     static func expediente(json: [String: Any], idPorDefecto: Int = 0) -> Expediente {
         let numero = (json["numero"] as? String)
             ?? (json["codigo"] as? String)
@@ -111,7 +92,6 @@ final class RepositorioExpedientes {
         )
     }
 
-    /// POST /expedientes/<id>/documentos
     func vincular(expedienteId: Int, documentoId: Int) async throws {
         let cuerpo: [String: Any] = ["documento_id": documentoId]
         _ = try await ejecutar(
@@ -121,7 +101,6 @@ final class RepositorioExpedientes {
         )
     }
 
-    /// DELETE /expedientes/<id>/documentos/<doc_id>
     func desvincular(expedienteId: Int, documentoId: Int) async throws {
         _ = try await ejecutar(
             peticion: "DELETE",
@@ -129,15 +108,12 @@ final class RepositorioExpedientes {
         )
     }
 
-    /// DELETE /expedientes/<id>
     func eliminar(expedienteId: Int) async throws {
         _ = try await ejecutar(
             peticion: "DELETE",
             ruta: "/expedientes/\(expedienteId)"
         )
     }
-
-    // MARK: HTTP
 
     func ejecutar(
         peticion: String,

@@ -3,11 +3,6 @@ import Foundation
 import Security
 import LocalAuthentication
 
-/// Almacén seguro de la sesión JWT y de las credenciales biométricas.
-///
-/// - Access token y refresh token en Keychain.
-/// - Credenciales biométricas en Keychain.
-/// - Datos del perfil en UserDefaults.
 enum ServicioKeychain {
 
     enum Error: LocalizedError {
@@ -31,12 +26,6 @@ enum ServicioKeychain {
 
     private static let service = "com.gn.gestion.ios"
 
-    // MARK: - Sesión JWT
-
-    /// Guarda una sesión nueva y los datos del perfil.
-    ///
-    /// Si no llega refresh token, elimina cualquier refresh anterior
-    /// para evitar reutilizar credenciales de otra cuenta.
     @discardableResult
     static func guardarSesion(_ sesion: TokenSesion) -> Bool {
 
@@ -89,12 +78,10 @@ enum ServicioKeychain {
         return true
     }
 
-    /// Devuelve el access token actual.
     static func tokenAcceso() -> String? {
         leerTokenEnKeychain(cuenta: "token_acceso")
     }
 
-    /// Guarda únicamente el access token.
     @discardableResult
     static func guardarAccessToken(_ token: String) -> Bool {
         guardarEnKeychain(
@@ -103,12 +90,6 @@ enum ServicioKeychain {
         )
     }
 
-    /// Actualiza los tokens después de una renovación.
-    ///
-    /// Si el servidor no devuelve un refresh token nuevo,
-    /// conserva el refresh token que ya existe.
-    ///
-    /// No modifica los datos del perfil.
     @discardableResult
     static func guardarTokens(
         accessToken: String,
@@ -139,11 +120,6 @@ enum ServicioKeychain {
         return true
     }
 
-    /// Cierra la sesión local.
-    ///
-    /// Elimina ambos tokens JWT porque el backend revoca las sesiones
-    /// al cerrar sesión. Conserva las credenciales biométricas para
-    /// permitir un nuevo inicio de sesión mediante biometría.
     @discardableResult
     static func cerrarSesion() -> Bool {
 
@@ -175,10 +151,6 @@ enum ServicioKeychain {
         return accessEliminado && refreshEliminado
     }
 
-    // MARK: - Acceso biométrico
-
-    /// Indica si el acceso biométrico está activado
-    /// y existe información para recuperar la sesión.
     static func tieneAccesoBiometrico() -> Bool {
 
         let datos = UserDefaults.standard
@@ -197,10 +169,6 @@ enum ServicioKeychain {
         return tieneRefresh || tieneCredenciales
     }
 
-    /// Guarda las credenciales para futuros accesos biométricos.
-    ///
-    /// La bandera de activación se establece únicamente cuando
-    /// se han almacenado correctamente las credenciales.
     @discardableResult
     static func activarBiometria(
         usuario: String,
@@ -221,7 +189,6 @@ enum ServicioKeychain {
             )
             : sesion.nombre
 
-        // Guardar o eliminar el refresh token anterior.
         if !sesion.refreshToken.isEmpty {
 
             guard guardarEnKeychain(
@@ -240,7 +207,6 @@ enum ServicioKeychain {
             }
         }
 
-        // Guardar las credenciales biométricas.
         guard guardarEnKeychain(
             token: contrasena,
             cuenta: "biometria_pass"
@@ -264,22 +230,16 @@ enum ServicioKeychain {
         return true
     }
 
-    /// Desactiva el acceso biométrico.
-    ///
-    /// Elimina las credenciales biométricas, pero conserva el
-    /// refresh token para que la sesión normal pueda renovarse.
     @discardableResult
     static func desactivarBiometria() -> Bool {
 
         let datos = UserDefaults.standard
 
-        // Desactivar primero el acceso biométrico.
         datos.set(false, forKey: "biometria_activada")
 
         datos.removeObject(forKey: "biometria_nombre_usuario")
         datos.removeObject(forKey: "biometria_usuario")
 
-        // No eliminar token_refresh.
         let passEliminada = eliminarTokenEnKeychain(
             cuenta: "biometria_pass"
         )
@@ -291,7 +251,6 @@ enum ServicioKeychain {
         return passEliminada && userEliminado
     }
 
-    /// Nombre amigable del usuario para la pantalla biométrica.
     static func nombreUsuarioBiometrico() -> String {
 
         let datos = UserDefaults.standard
@@ -311,7 +270,6 @@ enum ServicioKeychain {
         return usuario.isEmpty ? "Usuario" : usuario
     }
 
-    /// Recupera las credenciales almacenadas.
     static func credencialesBiometricas() -> (
         usuario: String,
         contrasena: String
@@ -329,7 +287,6 @@ enum ServicioKeychain {
         return (user, pass)
     }
 
-    /// Detecta la biometría disponible.
     static func tipoBiometria() -> (
         disponible: Bool,
         nombre: String,
@@ -365,7 +322,6 @@ enum ServicioKeychain {
         }
     }
 
-    /// Recupera el refresh token después de validar la biometría.
     static func refreshTokenBiometrico() async throws -> String {
 
         let contexto = LAContext()
@@ -389,14 +345,9 @@ enum ServicioKeychain {
         return token
     }
 
-    /// Devuelve el refresh token guardado.
-    ///
-    /// Debe utilizarse después de validar la identidad biométrica.
     static func tokenRefreshGuardado() -> String? {
         leerTokenEnKeychain(cuenta: "token_refresh")
     }
-
-    // MARK: - Permisos efectivos
 
     static func permisos() -> Set<String> {
 
@@ -408,8 +359,6 @@ enum ServicioKeychain {
             texto.split(separator: ",").map(String.init)
         )
     }
-
-    // MARK: - Datos del usuario
 
     static func nombreUsuario() -> String {
 
@@ -463,12 +412,6 @@ enum ServicioKeychain {
             : subdireccion
     }
 
-    // MARK: - Keychain
-
-    /// Inserta o actualiza un elemento del Keychain.
-    ///
-    /// Los elementos están disponibles cuando el dispositivo
-    /// se encuentra desbloqueado.
     @discardableResult
     private static func guardarEnKeychain(
         token: String,
@@ -539,7 +482,6 @@ enum ServicioKeychain {
         return true
     }
 
-    /// Lee un elemento del Keychain.
     private static func leerTokenEnKeychain(
         cuenta: String
     ) -> String? {
@@ -570,10 +512,6 @@ enum ServicioKeychain {
         return token
     }
 
-    /// Elimina un elemento del Keychain.
-    ///
-    /// La operación se considera correcta si el elemento ya
-    /// no existe o si se eliminó correctamente.
     @discardableResult
     private static func eliminarTokenEnKeychain(
         cuenta: String

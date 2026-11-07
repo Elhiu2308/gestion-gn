@@ -35,20 +35,6 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
 
-/**
- * Buscador de documentos sobre /api/buscar.
- *
- * Búsqueda rápida: el usuario escribe directamente cualquier dato que recuerda
- * (folio, asunto, descripción, destinatario, remitente o área) y obtiene
- * resultados, sin obligarlo a elegir un filtro antes.
- *
- * Búsqueda avanzada: el panel "Filtros" se abre y se cierra a voluntad y sus
- * campos se combinan entre sí y con el texto rápido.
- *
- * Los documentos devueltos por el servidor se guardan en Room antes de mostrarse,
- * de modo que el detalle y los flujos por ID de servidor funcionan igual que con
- * los documentos descargados por la sincronización.
- */
 class BusquedaGlobalFragment : Fragment(R.layout.fragment_busqueda_global) {
 
     private val vm: GestionViewModel by activityViewModels()
@@ -78,13 +64,11 @@ class BusquedaGlobalFragment : Fragment(R.layout.fragment_busqueda_global) {
         )
     }
 
-    // Campos de texto de los filtros avanzados.
     private lateinit var campos: Map<String, TextInputEditText>
     private lateinit var selTipo: MaterialAutoCompleteTextView
     private lateinit var selEstado: MaterialAutoCompleteTextView
     private lateinit var selUrgencia: MaterialAutoCompleteTextView
 
-    /** Etiqueta visible -> valor que espera el servidor. */
     private val opcionesTipo = linkedMapOf<String, String>("Todos" to "")
     private val opcionesEstado = linkedMapOf<String, String>("Todos" to "")
     private val opcionesUrgencia = linkedMapOf<String, String>("Todos" to "")
@@ -120,8 +104,6 @@ class BusquedaGlobalFragment : Fragment(R.layout.fragment_busqueda_global) {
         configurarFechas(view)
         configurarPanelFiltros(view)
 
-        // Búsqueda rápida: resultados inmediatos mientras se escribe, con debounce
-        // para no lanzar una petición por pulsación.
         input.doAfterTextChanged { texto ->
             actualizarResumenFiltros()
             if (hayFiltrosActivos()) return@doAfterTextChanged
@@ -221,8 +203,6 @@ class BusquedaGlobalFragment : Fragment(R.layout.fragment_busqueda_global) {
         }
     }
 
-    // ---------------------------------------------------------------- búsqueda
-
     private fun buscarAhora() {
         busquedaJob?.cancel()
         val q = view?.findViewById<TextInputEditText>(R.id.input_busqueda)
@@ -236,11 +216,6 @@ class BusquedaGlobalFragment : Fragment(R.layout.fragment_busqueda_global) {
 
     private fun hayFiltrosActivos(): Boolean = filtrosActivos().isNotEmpty()
 
-    /**
-     * Recoge los filtros avanzados informados. Los campos de texto se envían tal
-     * cual; las listas se traducen al valor que espera el servidor y las fechas se
-     * convierten de dd/mm/aaaa a YYYY-MM-DD.
-     */
     private fun filtrosActivos(): Map<String, String> {
         if (!isAdded) return emptyMap()
         val out = linkedMapOf<String, String>()
@@ -311,7 +286,7 @@ class BusquedaGlobalFragment : Fragment(R.layout.fragment_busqueda_global) {
     }
 
     private suspend fun render(cuerpo: BusquedaDto) {
-        // Persistir primero: el detalle y los flujos requieren servidor_id.
+
         val guardados = if (cuerpo.documentos.isNotEmpty()) {
             vm.guardarDesdeServidor(cuerpo.documentos.map { it.aDocumento() })
         } else {
@@ -353,7 +328,6 @@ class BusquedaGlobalFragment : Fragment(R.layout.fragment_busqueda_global) {
         }
     }
 
-    /** Muestra al usuario qué criterios está aplicando la búsqueda. */
     private fun actualizarResumenFiltros() {
         val etiqueta = view?.findViewById<TextView>(R.id.lbl_filtros_activos) ?: return
         val activos = filtrosActivos()
@@ -370,9 +344,6 @@ class BusquedaGlobalFragment : Fragment(R.layout.fragment_busqueda_global) {
         }
     }
 
-    // ----------------------------------------------------------------- fechas
-
-    /** 'dd/mm/aaaa' -> 'YYYY-MM-DD'; null si el formato no es válido. */
     private fun aIso(texto: String): String? {
         val partes = texto.trim().split("/")
         if (partes.size != 3) return null
@@ -383,7 +354,6 @@ class BusquedaGlobalFragment : Fragment(R.layout.fragment_busqueda_global) {
         return String.format(Locale.US, "%04d-%02d-%02d", anio, mes, dia)
     }
 
-    /** 'dd/mm/aaaa' -> Calendar en esa fecha; hoy si el texto no es válido. */
     private fun Calendar.aIsoACalendario(texto: String?): Calendar {
         val cal = Calendar.getInstance()
         val iso = texto?.let { aIso(it) } ?: return cal

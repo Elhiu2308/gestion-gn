@@ -6,17 +6,12 @@ import android.widget.LinearLayout
 import com.gn.gestion.R
 import com.google.android.material.button.MaterialButton
 
-/** Opción de un selector: valor interno, etiqueta mostrada y color opcional. */
 data class OpcionItem(
     val valor: String,
     val etiqueta: String,
     val colorRes: Int? = null
 )
 
-/**
- * Construye una fila de botones tipo "chip" sobre [container].
- * Reconstruye el grupo con la nueva selección al hacer clic.
- */
 fun LinearLayout.pintarOpciones(
     opciones: List<OpcionItem>,
     seleccion: String,

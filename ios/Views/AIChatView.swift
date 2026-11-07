@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Vista de chat con el agente de IA gratuito y local (Ollama).
 struct AIChatView: View {
     @StateObject private var viewModel = AIChatViewModel()
 

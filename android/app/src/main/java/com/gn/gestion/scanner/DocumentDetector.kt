@@ -8,28 +8,12 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
-/**
- * Detector de bordes del documento y corrección de perspectiva.
- *
- * Algoritmo similar a los scanneadores estándar:
- * 1. Se trabaja sobre una versión reducida en escala de grises para rendimiento.
- * 2. Se aplica reducción de ruido (blur medio) y binarización adaptativa.
- * 3. Se detecta el contorno de mayor área entre el fondo y el documento (el
- *    papel suele ser lo más claro o un bloque uniforme).
- * 4. Se ajusta el cuadrilátero de 4 esquinas y se aplica corrección de
- *    perspectiva (homografía) para generar una vista "frontal" del documento.
- */
 object DocumentDetector {
 
-    /** Esquinas (4 puntos) del documento detectado en las coordenadas de la imagen original. */
     class CornerResult(val corners: List<PointF>, val boxScaleX: Float, val boxScaleY: Float)
 
-    /**
-     * Detecta el contorno del documento en la imagen.
-     * Devuelve las 4 esquinas en píxeles de la imagen original (o null si no detecta).
-     */
     fun detectCorners(bitmap: Bitmap): List<PointF>? {
-        // Escala de análisis (mantenerla pequeña para velocidad)
+
         val scale = 0.2f
         val smallW = max(1, (bitmap.width * scale).toInt())
         val smallH = max(1, (bitmap.height * scale).toInt())
@@ -48,14 +32,10 @@ object DocumentDetector {
                 }
             }
 
-            // Reducción de ruido (promedio de 3x3) y gradiente
             val blurred = blur(gray, smallW, smallH)
 
-            // Umbral adaptativo local: marca píxeles que difieren de su vecindad
-            // (bordes del papel contra mesa/fondo)
             val edges = adaptiveThreshold(blurred, smallW, smallH)
 
-            // Extraer puntos candidatos de borde (las coordenadas en la imagen pequeña)
             val points = ArrayList<PointF>()
             for (y in 1 until smallH - 1) {
                 var idx = y * smallW
@@ -68,14 +48,11 @@ object DocumentDetector {
 
             if (points.size < 4) return null
 
-            // Convex hull (Andrew monotone chain)
             val hull = convexHull(points)
             if (hull.size < 4) return null
 
-            // Dejar los 4 puntos "extremos" -> esquinas aproximadas (usar el cuarto más lejano)
             val corners = approximateQuadSingle(hull)
 
-            // Escalar de regreso a la imagen original
             val sx = bitmap.width.toFloat() / smallW
             val sy = bitmap.height.toFloat() / smallH
             return corners.map { PointF(it.x * sx, it.y * sy) }
@@ -84,10 +61,6 @@ object DocumentDetector {
         }
     }
 
-    /**
-     * Aplica corrección de perspectiva: mapea el cuadrilátero [src] a un
-     * rectángulo y devuelve el documento "frontal" mejorado.
-     */
     fun cropAndStraighten(
         bitmap: Bitmap,
         corners: List<PointF>
@@ -95,7 +68,6 @@ object DocumentDetector {
         val pts = orderPoints(corners)
         val (tl, tr, br, bl) = pts
 
-        // Dimensiones de salida (basadas en las longitudes de los lados)
         val widthTop = distance(tl, tr)
         val widthBottom = distance(bl, br)
         val heightLeft = distance(tl, bl)
@@ -105,17 +77,13 @@ object DocumentDetector {
 
         val result = Bitmap.createBitmap(outW, outH, Bitmap.Config.ARGB_8888)
 
-        // Matriz de homografía H tal que H*(src) = dst.
-        // dst = (0,0),(outW,0),(outW,outH),(0,outH)
         val srcX = floatArrayOf(tl.x, tr.x, br.x, bl.x)
         val srcY = floatArrayOf(tl.y, tr.y, br.y, bl.y)
         val dstX = floatArrayOf(0f, outW.toFloat(), outW.toFloat(), 0f)
         val dstY = floatArrayOf(0f, 0f, outH.toFloat(), outH.toFloat())
 
-        // solve min-cost at each dst pixel: inverse mapping via homography
         val hom = solveHomography(srcX, srcY, dstX, dstY)
 
-        // build inverse for bilinear sampling
         val inv = invertHomography(hom)
         val srcPixels = IntArray(bitmap.width * bitmap.height)
         bitmap.getPixels(srcPixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
@@ -135,15 +103,11 @@ object DocumentDetector {
         }
         result.setPixels(outPixels, 0, outW, 0, 0, outW, outH)
 
-        // Recorte de márgenes blancos producidos (pequeño recorte del borde)
         val trimmed = trimWhiteBorders(result, 0.02f)
         if (trimmed != result) result.recycle()
         return trimmed
     }
 
-    // ------------------------------------------------------------------
-    // Utilidades de imagen pequeña
-    // ------------------------------------------------------------------
     private fun blur(src: IntArray, w: Int, h: Int): IntArray {
         val out = IntArray(w * h)
         for (y in 0 until h) {
@@ -166,7 +130,6 @@ object DocumentDetector {
         return out
     }
 
-    // Marca como borde los píxeles cuya diferencia con la media local es alta.
     private fun adaptiveThreshold(src: IntArray, w: Int, h: Int): IntArray {
         val out = IntArray(w * h)
         val radius = 8
@@ -187,7 +150,7 @@ object DocumentDetector {
                 }
                 val mean = sum / n
                 val v = src[y * w + x]
-                // Alto contraste local -> posible borde del documento
+
                 if (abs(v - mean) > 30) {
                     out[y * w + x] = 255
                 }
@@ -196,13 +159,9 @@ object DocumentDetector {
         return out
     }
 
-    // ------------------------------------------------------------------
-    // Geometría
-    // ------------------------------------------------------------------
     private fun distance(a: PointF, b: PointF): Float =
         sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y))
 
-    /** Ordena los 4 puntos de forma geométrica precisa: TL, TR, BR, BL */
     private fun orderPoints(pts: List<PointF>): Array<PointF> {
         val sortedByY = pts.sortedBy { it.y }
         val topTwo = sortedByY.take(2).sortedBy { it.x }
@@ -216,7 +175,6 @@ object DocumentDetector {
         return arrayOf(tl, tr, br, bl)
     }
 
-    /** Convex hull (Andrew monotone chain). */
     private fun convexHull(points: List<PointF>): List<PointF> {
         val p = points.sortedWith(
             compareBy({ it.x }, { it.y })
@@ -247,11 +205,9 @@ object DocumentDetector {
     private fun cross(o: PointF, a: PointF, b: PointF): Float =
         (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x)
 
-    /** Reduce el hull a ~4 esquinas seleccionando los extremos por pliegue de la forma. */
     private fun approximateQuadSingle(hull: List<PointF>): List<PointF> {
         if (hull.size <= 4) return hull
 
-        // Primero encontrar los 4 extremos geométricos (TL, TR, BR, BL) en O(N)
         var tlIdx = 0; var brIdx = 0; var trIdx = 0; var blIdx = 0
         var minSum = Float.MAX_VALUE; var maxSum = -Float.MAX_VALUE
         var maxDiff = -Float.MAX_VALUE; var minDiff = Float.MAX_VALUE
@@ -271,7 +227,6 @@ object DocumentDetector {
             return listOf(hull[tlIdx], hull[trIdx], hull[brIdx], hull[blIdx])
         }
 
-        // Si los extremos coinciden, usamos una búsqueda combinatoria ultra rápida reduciendo el hull
         val sampledHull = if (hull.size > 12) {
             hull.filterIndexed { index, _ -> index in uniqueIndices || index % (hull.size / 6) == 0 }
         } else {
@@ -299,7 +254,7 @@ object DocumentDetector {
     }
 
     private fun quadArea(q: List<PointF>): Float {
-        // Fórmula del área del cuadrilátero (shoelace)
+
         var sum = 0f
         for (i in q.indices) {
             val j = (i + 1) % q.size
@@ -308,14 +263,11 @@ object DocumentDetector {
         return abs(sum / 2f)
     }
 
-    // ------------------------------------------------------------------
-    // Homografía (Direct Linear Transform simplificado con resolución por inversa)
-    // ------------------------------------------------------------------
     private fun solveHomography(
         srcX: FloatArray, srcY: FloatArray,
         dstX: FloatArray, dstY: FloatArray
     ): FloatArray {
-        // H (3x3, fila mayor) tal que H * [src,1] = [dst,1]
+
         val a = Array(8) { FloatArray(9) }
         for (i in 0..3) {
             val x = srcX[i]; val y = srcY[i]
@@ -363,7 +315,7 @@ object DocumentDetector {
     }
 
     private fun solveLeastSquares(a: Array<FloatArray>): FloatArray {
-        // SVD pequeño o eliminación Gauss-Jordan sobre el sistema 8x8 (8x9 aumentada)
+
         val m = Array(8) { FloatArray(9) }
         for (i in 0 until 8) for (j in 0 until 9) m[i][j] = a[i][j]
         gaussJordan(m, 8)
@@ -392,7 +344,6 @@ object DocumentDetector {
         }
     }
 
-    /** Recorta márgenes blancos casi uniformes resultantes del remapeo. */
     private fun trimWhiteBorders(bmp: Bitmap, marginRatio: Float): Bitmap {
         val w = bmp.width
         val h = bmp.height

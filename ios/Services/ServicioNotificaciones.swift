@@ -3,24 +3,14 @@ import Foundation
 import SwiftUI
 import UIKit
 
-/// Servicio de acceso al centro de notificaciones.
-///
-/// Las consultas HTTP se delegan al repositorio.
-/// La conexión Socket.IO se administra desde VistaSesion.
-///
-/// Evento canónico de Socket.IO: "notification".
 struct ServicioNotificaciones {
 
     private let repositorio = RepositorioNotificaciones.shared
     private let socket = SocketManager.shared
 
-    // MARK: - Centro de notificaciones
-
     func centro() async throws -> CentroNotificaciones {
         try await repositorio.centro()
     }
-
-    // MARK: - Historial
 
     func historial(
         masLeidas: Bool
@@ -30,21 +20,14 @@ struct ServicioNotificaciones {
         )
     }
 
-    // MARK: - Marcar como leída
-
     func marcarLeida(id: Int) async throws {
         try await repositorio.marcarLeida(id: id)
     }
-
-    // MARK: - Marcar todas como leídas
 
     func marcarTodasLeidas() async throws {
         try await repositorio.marcarTodasLeidas()
     }
 
-    // MARK: - Socket.IO
-
-    /// Conecta Socket.IO con el JWT proporcionado.
     func conectar(token: String) {
         guard !token.isEmpty else {
             print("[Notificaciones] No se puede conectar sin JWT.")
@@ -54,9 +37,6 @@ struct ServicioNotificaciones {
         socket.conectar(token: token)
     }
 
-    /// Recupera el JWT guardado en Keychain y conecta Socket.IO.
-    ///
-    /// Se utiliza al recuperar una sesión previamente autenticada.
     func conectarConTokenGuardado() {
         guard
             let token = ServicioKeychain.tokenAcceso(),
@@ -69,18 +49,11 @@ struct ServicioNotificaciones {
         conectar(token: token)
     }
 
-    /// Desconecta Socket.IO.
-    ///
-    /// Utilizar únicamente cuando se cierre la sesión.
     func desconectar() {
         socket.desconectar()
     }
 }
 
-// MARK: - Presentación uniforme
-
-/// Títulos legibles compartidos por el centro de notificaciones y el aviso
-/// emergente. Android usa exactamente los mismos textos.
 enum NotificacionPresentacion {
 
     static func titulo(
@@ -123,7 +96,6 @@ enum NotificacionPresentacion {
     }
 }
 
-/// Notificación lista para mostrarse dentro de la app.
 struct AvisoNotificacion: Identifiable, Equatable {
 
     let id = UUID()
@@ -139,10 +111,6 @@ struct AvisoNotificacion: Identifiable, Equatable {
     }
 }
 
-/// Recibe Socket.IO/FCM y publica un aviso emergente cuando la app está activa.
-///
-/// Se deduplica por `notificacion_id` y por documento+mensaje para que el
-/// mismo aviso que llega por Socket.IO y por APNs no se muestre dos veces.
 @MainActor
 final class AvisosNotificaciones: ObservableObject {
 
@@ -170,8 +138,6 @@ final class AvisosNotificaciones: ObservableObject {
         )
     }
 
-    // MARK: - Entradas
-
     func presentar(payload: NotificacionSocketPayload) {
 
         guard UIApplication.shared.applicationState == .active else {
@@ -187,7 +153,6 @@ final class AvisosNotificaciones: ObservableObject {
         )
     }
 
-    /// Presenta el contenido de una push recibida con la app en primer plano.
     func presentar(
         desde info: [AnyHashable: Any],
         titulo tituloPush: String,
@@ -215,8 +180,6 @@ final class AvisosNotificaciones: ObservableObject {
             self.aviso = nil
         }
     }
-
-    // MARK: - Implementación
 
     private func presentar(
         notificacionId: Int,

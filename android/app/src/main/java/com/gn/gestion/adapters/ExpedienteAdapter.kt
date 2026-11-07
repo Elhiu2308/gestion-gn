@@ -12,7 +12,6 @@ import com.gn.gestion.models.ExpedienteDto
 import com.gn.gestion.util.c
 import com.gn.gestion.util.formatFecha
 
-/** Fila de expediente para resultados de búsqueda global y archivo. */
 class ExpedienteAdapter(
     private val onClick: (ExpedienteDto) -> Unit
 ) : ListAdapter<ExpedienteDto, ExpedienteAdapter.VH>(DIFF) {

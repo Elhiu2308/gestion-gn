@@ -8,11 +8,6 @@ import com.gn.gestion.scanner.EncabezadoDocumento
 import com.gn.gestion.viewmodels.EscaneoViewModel
 import com.gn.gestion.viewmodels.guardarPdf
 
-/**
- * Genera el PDF de las capturas, ejecuta el OCR de cada página y arma los
- * argumentos con los que se abre directamente el formulario "Nuevo Documento"
- * (sin pantallas intermedias de vista previa ni de generación de PDF).
- */
 suspend fun prepararNuevoDocumento(
     context: Context,
     vm: EscaneoViewModel,

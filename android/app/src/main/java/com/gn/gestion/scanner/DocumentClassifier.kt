@@ -4,14 +4,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-/**
- * Clasificador de documentos escaneados (paso 4).
- *
- * A partir del texto extraído con OCR detecta el tipo de documento
- * (factura, recibo, contrato, acta, estado de cuenta, ...), la entidad
- * emisora y un período, y compone un nombre de archivo inteligente como
- * "Factura_Internet_Septiembre".
- */
 object DocumentClassifier {
 
     data class Clasificacion(
@@ -23,7 +15,6 @@ object DocumentClassifier {
 
     private data class TipoDoc(val nombre: String, val keywords: List<String>)
 
-    // Tipos ordenados de más específico a más genérico.
     private val TIPOS = listOf(
         TipoDoc("Estado de cuenta", listOf(
             "estado de cuenta", "movimientos", "resumen de", "saldo", "banca", "deposito", "retiro"
@@ -57,7 +48,6 @@ object DocumentClassifier {
         ))
     )
 
-    // Entidades emisoras conocidas (más específicas primero).
     private data class Entidad(val etiqueta: String, val keywords: List<String>)
 
     private val ENTIDADES = listOf(
@@ -80,10 +70,6 @@ object DocumentClassifier {
 
     private val ANIO = Regex("\\b(19|20)\\d{2}\\b")
 
-    /**
-     * Clasifica el texto OCR y genera un nombre de archivo inteligente.
-     * [fechaCreacionMs] se usa como respaldo cuando el texto no revela período.
-     */
     fun clasificar(texto: String, fechaBase: Long = System.currentTimeMillis()): Clasificacion {
         val t = texto.lowercase(Locale.getDefault())
         val tipo = detectarTipo(t) ?: "Documento"
@@ -106,7 +92,7 @@ object DocumentClassifier {
         for (ent in ENTIDADES) {
             if (ent.keywords.any { t.contains(it) }) return ent.etiqueta
         }
-        // Intenta obtener la razón social / emisor de los encabezados comunes.
+
         val emisor = Regex("(?i)(razon social|proveedor|empresa|emisor|prestador)\\s*[:\\-]\\s*([^\\r\\n]{3,60})")
             .find(original)
         if (emisor != null) {
@@ -118,7 +104,6 @@ object DocumentClassifier {
         return ""
     }
 
-    /** Detecta el período (ej. "Septiembre 2026"); si no, usa el mes del [fechaBase]. */
     private fun detectarPeriodo(t: String, fechaBase: Long): String {
         for (mes in MESES) {
             if (t.contains(mes)) {

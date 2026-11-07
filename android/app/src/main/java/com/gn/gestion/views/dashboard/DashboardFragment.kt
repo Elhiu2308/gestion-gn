@@ -27,36 +27,30 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
 
         val ctx = requireContext()
 
-        // Identidad del usuario autenticado
         val nombre = TokenProvider.nombreCompleto(ctx)
             .ifBlank { TokenProvider.nombre(ctx) }
             .ifBlank { TokenProvider.usuario(ctx).orEmpty() }
             .ifBlank { "Usuario" }
         view.findViewById<TextView>(R.id.dash_saludo)?.text = nombre
 
-        // Adscripción institucional
         val adscripcion = TokenProvider.subdireccion(ctx)
             .ifBlank { TokenProvider.area(ctx) }
             .ifBlank { "Guardia Nacional" }
         view.findViewById<TextView>(R.id.dash_area_chip)?.text = adscripcion
 
-        // Botón 1: Escanear Nuevo Documento
         val cardEscanear = view.findViewById<View>(R.id.card_escanear)
         val puedeCrear = TokenProvider.puede(ctx, Permisos.DOCUMENTO_CREAR)
         cardEscanear?.isVisible = puedeCrear
         cardEscanear?.setOnClickListener { findNavController().navigate(R.id.escanner) }
 
-        // Botón 2: Mis Documentos Asignados
         view.findViewById<View>(R.id.card_mis_documentos)?.setOnClickListener {
             findNavController().navigate(R.id.documentos)
         }
 
-        // Botón 3: Buscar Documento
         view.findViewById<View>(R.id.card_buscar_documento)?.setOnClickListener {
             findNavController().navigate(R.id.busqueda_global)
         }
 
-        // Tarjetas de resumen -> Navegan a documentos aplicando el filtro de estado correspondiente
         view.findViewById<View>(R.id.card_stat_total)?.setOnClickListener {
             findNavController().navigate(
                 R.id.documentos,
@@ -82,7 +76,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
             )
         }
 
-        // Indicadores numéricos del resumen
         val tvTotal = view.findViewById<TextView>(R.id.dash_count_total)
         val tvPendientes = view.findViewById<TextView>(R.id.dash_count_pendientes)
         val tvProceso = view.findViewById<TextView>(R.id.dash_count_proceso)
@@ -100,7 +93,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Refrescar documentos desde el servidor en segundo plano
+
                 launch {
                     runCatching {
                         val api = ApiFactory.api(requireContext())

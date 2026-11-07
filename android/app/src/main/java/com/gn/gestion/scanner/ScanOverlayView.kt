@@ -12,13 +12,6 @@ import android.util.AttributeSet
 import android.view.View
 import com.gn.gestion.R
 
-/**
- * Overlay futurista de escáner:
- * - Mientras NO se detecta documento dibuja el marco fijo con láser neón.
- * - Cuando se detecta un cuadrilátero en vivo dibuja el polígono detectado
- *   (verde estable / ámbar en movimiento), oscurece el exterior y muestra
- *   una barra de estabilidad para la captura automática.
- */
 class ScanOverlayView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
@@ -62,7 +55,6 @@ class ScanOverlayView @JvmOverloads constructor(
         setShadowLayer(10f * dim, 0f, 0f, Color.WHITE)
     }
 
-    // Pinturas del contorno detectado (paso 1)
     private val paintQuadFill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.argb(58, 0, 200, 120)
         style = Paint.Style.FILL
@@ -104,17 +96,15 @@ class ScanOverlayView @JvmOverloads constructor(
     private var pulse = 0f
     private var animator: ValueAnimator? = null
 
-    // Estado del contorno detectado en vivo (coordenadas del View)
     private var contorno: List<PointF>? = null
     private var contornoEstable = false
-    private var estabilidad = 0f // 0..1
+    private var estabilidad = 0f
 
     private fun colorCompat(resId: Int): Int {
         @Suppress("DEPRECATION")
         return resources.getColor(resId, context.theme)
     }
 
-    /** Inicia el barrido continuo de la línea láser. */
     fun startScan() {
         if (animator?.isRunning == true) return
         val a = ValueAnimator.ofFloat(0f, 1f)
@@ -131,23 +121,17 @@ class ScanOverlayView @JvmOverloads constructor(
         animator = a
     }
 
-    /** Detiene el barrido (llamar desde onDestroyView). */
     fun stopScan() {
         animator?.cancel()
         animator = null
     }
 
-    /**
-     * Actualiza el polígono detectado en vivo. Coordenadas en píxeles del View.
-     * [estable] indica si el cuadrilátero lleva quieto varios frames.
-     */
     fun setContorno(pts: List<PointF>?, estable: Boolean) {
         contorno = pts
         contornoEstable = estable
         invalidate()
     }
 
-    /** Progreso de estabilidad de sensores (0..1) para la captura automática. */
     fun setEstabilidad(valor: Float) {
         estabilidad = valor.coerceIn(0f, 1f)
         invalidate()
@@ -177,7 +161,6 @@ class ScanOverlayView @JvmOverloads constructor(
             dibujarMarcoFijo(canvas, w, h)
         }
 
-        // Barra de estabilidad (solo en modo detección)
         if (contorno != null) {
             dibujarBarraEstabilidad(canvas)
         }
@@ -187,7 +170,6 @@ class ScanOverlayView @JvmOverloads constructor(
         val m = 28f * dim
         val frame = RectF(m, h * 0.16f, w - m, h * 0.78f)
 
-        // Caja oscura fuera del marco
         canvas.drawRect(0f, 0f, w, frame.top, paintMask)
         canvas.drawRect(0f, frame.bottom, w, h, paintMask)
         canvas.drawRect(0f, frame.top, frame.left, frame.bottom, paintMask)
@@ -223,7 +205,7 @@ class ScanOverlayView @JvmOverloads constructor(
     }
 
     private fun dibujarContorno(canvas: Canvas, cuad: List<PointF>, w: Float, h: Float) {
-        // Oscurece el exterior del cuadrilátero y deja visible el documento
+
         val path = Path().apply {
             fillType = Path.FillType.EVEN_ODD
             addRect(0f, 0f, w, h, Path.Direction.CW)
@@ -235,7 +217,6 @@ class ScanOverlayView @JvmOverloads constructor(
         }
         canvas.drawPath(path, paintMask)
 
-        // Relleno + borde del documento (verde estable, ámbar en movimiento)
         val quad = Path().apply {
             moveTo(cuad[0].x, cuad[0].y)
             lineTo(cuad[1].x, cuad[1].y)
@@ -246,7 +227,6 @@ class ScanOverlayView @JvmOverloads constructor(
         canvas.drawPath(quad, paintQuadFill)
         canvas.drawPath(quad, if (contornoEstable) paintQuadOk else paintQuadMove)
 
-        // Vértices resaltados
         val r = 7f * dim + pulse * 2f * dim
         val vp = if (contornoEstable) paintVertexOk else paintVertexMove
         for (p in cuad) {

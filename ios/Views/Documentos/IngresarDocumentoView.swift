@@ -2,17 +2,10 @@ import SwiftUI
 import PhotosUI
 import UniformTypeIdentifiers
 
-/// Pantalla "Ingresar documento": punto de entrada para dar de alta un documento.
-///
-/// Réplica de la pantalla Android con las tres formas de ingreso:
-/// 1. **Escanear documento** — abre el escáner nativo (`VNDocumentCameraViewController`).
-/// 2. **Seleccionar de galería** — elige una fotografía o imagen guardada.
-/// 3. **Importar archivo** — selecciona un PDF u otro archivo compatible.
 struct IngresarDocumentoView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    /// Se invoca tras registrar un documento correctamente.
     var onCreada: (Documento) -> Void = { _ in }
 
     @State private var origen: OrigenDocumento = .ninguno
@@ -53,7 +46,7 @@ struct IngresarDocumentoView: View {
                     Button("Cerrar") { dismiss() }
                 }
             }
-            // Escáner de documentos nativo (con el marco de ajuste de esquinas).
+
             .fullScreenCover(isPresented: $mostrandoEscaner) {
                 if EscanerDocumentosVista.esCompatible {
                     EscanerDocumentosVista(
@@ -70,7 +63,7 @@ struct IngresarDocumentoView: View {
                     VistaNoCompatible()
                 }
             }
-            // Importador de archivos (PDF, imágenes y documentos).
+
             .fileImporter(
                 isPresented: $mostrandoImportador,
                 allowedContentTypes: [.pdf, .image, .plainText, .data],
@@ -78,12 +71,12 @@ struct IngresarDocumentoView: View {
             ) { resultado in
                 manejarImportacion(resultado)
             }
-            // Al seleccionar una imagen de la galería.
+
             .onChange(of: seleccionGaleria) { _, nuevaSeleccion in
                 guard let nuevo = nuevaSeleccion else { return }
                 Task { await cargarDesdeGaleria(nuevo) }
             }
-            // Empuje del formulario "Nuevo Documento" con el origen elegido.
+
             .navigationDestination(isPresented: $irANuevoDocumento) {
                 CrearDocumentoView(origen: origen, onCreada: onCreada)
             }
@@ -95,8 +88,6 @@ struct IngresarDocumentoView: View {
             }
         }
     }
-
-    // MARK: - Encabezado
 
     private var encabezado: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -120,8 +111,6 @@ struct IngresarDocumentoView: View {
                 .lineSpacing(2)
         }
     }
-
-    // MARK: - Tarjetas de opción
 
     private var tarjetaEscanear: some View {
         TarjetaOpcionDocumento(
@@ -203,8 +192,6 @@ struct IngresarDocumentoView: View {
         }
     }
 
-    // MARK: - Acciones
-
     private func manejarImportacion(_ resultado: Result<[URL], Error>) {
         switch resultado {
         case .success(let urls):
@@ -227,9 +214,6 @@ struct IngresarDocumentoView: View {
     }
 }
 
-// MARK: - Subvistas
-
-/// Tarjeta de opción reutilizable (icono + título + descripción + botón).
 private struct TarjetaOpcionDocumento: View {
 
     let titulo: String?
@@ -303,7 +287,6 @@ private struct TarjetaOpcionDocumento: View {
     }
 }
 
-/// Vista informativa para dispositivos sin soporte de escáner (p. ej. simulador).
 private struct VistaNoCompatible: View {
     @Environment(\.dismiss) private var dismiss
 

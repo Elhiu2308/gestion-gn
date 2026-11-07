@@ -1,10 +1,5 @@
 import SwiftUI
 
-/// Pantalla de expedientes: listado y creación.
-///
-/// Réplica de la pantalla Android: encabezado institucional, tarjeta de
-/// "Total registrado" con botón **+ Nuevo** y listado de expedientes en
-/// tarjetas con badge de estado.
 struct ExpedientesView: View {
 
     var alRegresar: (() -> Void)? = nil
@@ -63,8 +58,6 @@ struct ExpedientesView: View {
         }
     }
 
-    // MARK: - Encabezado
-
     private var encabezado: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
@@ -84,8 +77,6 @@ struct ExpedientesView: View {
                 .foregroundColor(EstiloInstitucional.textoSecundario)
         }
     }
-
-    // MARK: - Búsqueda y filtros
 
     private var barraBusqueda: some View {
         HStack(spacing: 8) {
@@ -144,8 +135,6 @@ struct ExpedientesView: View {
         }
     }
 
-    // MARK: - Total registrado
-
     private var tarjetaTotal: some View {
         HStack(spacing: 14) {
             ZStack {
@@ -195,8 +184,6 @@ struct ExpedientesView: View {
         .shadow(color: Color.black.opacity(0.03), radius: 4, y: 2)
     }
 
-    // MARK: - Listado
-
     private var listado: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Listado de expedientes")
@@ -237,7 +224,6 @@ struct ExpedientesView: View {
     }
 }
 
-/// Tarjeta de un expediente.
 private struct FilaExpediente: View {
 
     let expediente: Expediente
@@ -314,8 +300,6 @@ private struct FilaExpediente: View {
     }
 }
 
-// MARK: - Filtros
-
 private struct FiltrosExpedientesSheet: View {
 
     @ObservedObject var vistaModelo: ExpedientesViewModel
@@ -358,8 +342,6 @@ private struct FiltrosExpedientesSheet: View {
         }
     }
 }
-
-// MARK: - ViewModel
 
 @MainActor
 final class ExpedientesViewModel: ObservableObject {
@@ -407,7 +389,7 @@ final class ExpedientesViewModel: ObservableObject {
         do {
             expedientes = try await servicio.listar()
         } catch {
-            // Sin expedientes visibles para este usuario.
+
         }
     }
 
@@ -421,7 +403,7 @@ final class ExpedientesViewModel: ObservableObject {
 }
 
 extension ServicioExpedientes {
-    /// Lista los expedientes accesibles para el usuario autenticado.
+
     func listar() async throws -> [Expediente] {
         try await RepositorioExpedientes.shared.listar()
     }

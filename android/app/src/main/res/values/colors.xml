@@ -42,7 +42,6 @@
     <color name="blanco">#FFFFFF</color>
     <color name="negro">#000000</color>
 
-    <!-- Paleta institucional -->
     <color name="g_grisc">#C8C8C8</color>
     <color name="g_dorado">#B38E5D</color>
     <color name="g_doradoc">#D4C19C</color>
@@ -58,7 +57,6 @@
     <color name="colorPrimaryDark">#285C4D</color>
     <color name="colorAccent">#d4c19c</color>
 
-    <!-- Tarjetas 2x2 Grid (soft pastel backgrounds) -->
     <color name="card_bg_documentos">#FEF8EC</color>
     <color name="card_stroke_documentos">#F3E5C8</color>
 

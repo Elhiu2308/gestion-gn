@@ -4,10 +4,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-/**
- * Aviso que se muestra dentro de la app cuando llega una notificación con la
- * aplicación en primer plano.
- */
 data class AvisoNotificacion(
     val titulo: String,
     val cuerpo: String,
@@ -16,11 +12,6 @@ data class AvisoNotificacion(
     val notificacionId: Long = 0L
 )
 
-/**
- * Puente entre los receptores de notificaciones (Socket.IO/FCM) y la actividad
- * visible. Mientras la app está en primer plano se evita publicar una
- * notificación del sistema y se muestra un mensaje emergente con acciones.
- */
 object NotificacionForeground {
 
     @Volatile
@@ -30,7 +21,6 @@ object NotificacionForeground {
 
     val aviso: StateFlow<AvisoNotificacion?> = _aviso.asStateFlow()
 
-    /** Evita duplicados cuando Socket.IO y FCM entregan el mismo evento. */
     private val clavesMostradas = LinkedHashSet<String>()
 
     fun emitir(

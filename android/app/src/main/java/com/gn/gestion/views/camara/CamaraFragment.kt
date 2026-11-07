@@ -54,9 +54,6 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
-/**
- * Fragmento de captura con cámara. Implementa auto-detección y auto-captura.
- */
 class CamaraFragment : Fragment() {
 
     private val viewModel: EscaneoViewModel by viewModels({ requireActivity() })
@@ -78,7 +75,6 @@ class CamaraFragment : Fragment() {
             }
         }
 
-    /** Importa una imagen de la galería y la lleva a la vista previa. */
     private val galeriaLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri == null) return@registerForActivityResult
@@ -97,7 +93,6 @@ class CamaraFragment : Fragment() {
             }
         }
 
-    /** Genera el PDF con OCR y abre directamente el formulario "Nuevo Documento". */
     private fun irAFormulario(bitmaps: List<Bitmap>) {
         viewLifecycleOwner.lifecycleScope.launch {
             Toast.makeText(requireContext(), "Generando documento…", Toast.LENGTH_SHORT).show()
@@ -147,7 +142,7 @@ class CamaraFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         overlay = view.findViewById(R.id.scan_overlay)
         lblEstado = view.findViewById(R.id.lbl_estado)
 
@@ -175,7 +170,7 @@ class CamaraFragment : Fragment() {
                 .build()
 
             val scanner = GmsDocumentScanning.getClient(options)
-            
+
             scanner.getStartScanIntent(requireActivity())
                 .addOnSuccessListener { intentSender ->
                     try {
@@ -214,7 +209,7 @@ class CamaraFragment : Fragment() {
                         val bytes = ins.readBytes()
                         val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                         if (bmp != null) {
-                            // ML Kit entrega el papel ya recortado y plano.
+
                             viewModel.empezarConImagen(
                                 bmp,
                                 listOf(
@@ -256,8 +251,7 @@ class CamaraFragment : Fragment() {
         providerFuture.addListener({
             try {
                 val provider = providerFuture.get()
-                
-                // Use default resolution to avoid compatibility issues with fixed sizes
+
                 val preview = Preview.Builder()
                     .build().also {
                         it.setSurfaceProvider(previewView.surfaceProvider)
@@ -275,7 +269,7 @@ class CamaraFragment : Fragment() {
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888)
                     .build()
-                
+
                 analisis.setAnalyzer(analisisExecutor!!) { proxy ->
                     analizar(proxy, previewView)
                 }
@@ -295,11 +289,10 @@ class CamaraFragment : Fragment() {
         }, ContextCompat.getMainExecutor(ctx))
     }
 
-    /** Procesa cada frame del preview: detecta el cuadrilátero y decide auto-captura. */
     private fun analizar(proxy: ImageProxy, previewView: PreviewView) {
-        // use proxy.toBitmap() from CameraX 1.3+
+
         val imagen = runCatching { proxy.toBitmap() }.getOrNull() ?: run { proxy.close(); return }
-        
+
         framesAnalizados++
         var imagenAlta: Bitmap? = null
         var pequena: Bitmap? = null
@@ -330,7 +323,6 @@ class CamaraFragment : Fragment() {
 
             if (detectado && quieto) framesEstables++ else framesEstables = 0
 
-            // Actualiza el overlay con las esquinas mapeadas a la vista
             val main = ContextCompat.getMainExecutor(requireContext())
             val iw = pequena.width
             val ih = pequena.height
@@ -339,7 +331,7 @@ class CamaraFragment : Fragment() {
             val progreso = if (detectado) {
                 (framesEstables / FRAMES_ESTABLES_REQ.toFloat()).coerceIn(0f, 1f)
             } else 0f
-            
+
             main.execute {
                 overlay?.setContorno(esquinasVista, estableOverlay)
                 if (detectado) {
@@ -350,7 +342,6 @@ class CamaraFragment : Fragment() {
                 actualizarLbl(lblEstado, detectado, quieto, sensorEstable, framesEstables)
             }
 
-            // Dispara captura automática
             val autoMode = view?.findViewById<SwitchMaterial>(R.id.switch_auto)?.isChecked ?: true
             if (
                 autoMode &&
@@ -378,7 +369,7 @@ class CamaraFragment : Fragment() {
         iw: Int, ih: Int
     ): List<PointF> {
         if (vw <= 0 || vh <= 0 || iw <= 0 || ih <= 0) return esquinas
-        // fitCenter: la imagen se escala para caber completa dentro de la vista
+
         val scale = min(vw.toFloat() / iw, vh.toFloat() / ih)
         val dx = (vw - iw * scale) / 2f
         val dy = (vh - ih * scale) / 2f

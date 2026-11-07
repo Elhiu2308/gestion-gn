@@ -1,11 +1,5 @@
 import Foundation
 
-/**
- * Servicio de autenticación contra `/api/auth/ *`.
- *
- - login(usuario:contrasena:)
- - renovarAcceso()
- */
 struct ServicioAutenticacion {
 
     enum Error: LocalizedError {
@@ -34,8 +28,6 @@ struct ServicioAutenticacion {
         )
     }
 
-    /// Renueva el access token. No requiere volver a leer el perfil: los
-    /// campos del perfil se sincronizan cuando la pantalla lo solicite.
     func renovarAcceso() async throws -> TokenSesion {
         let respuesta = try await repositorio.renovarAcceso()
         return TokenSesion(
@@ -54,7 +46,6 @@ struct ServicioAutenticacion {
         )
     }
 
-    /// Valida la sesión contra el backend (`GET /api/auth/me`).
     func validarSesion() async throws {
         _ = try await repositorio.me()
     }

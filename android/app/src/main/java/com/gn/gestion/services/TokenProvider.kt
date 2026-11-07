@@ -5,10 +5,6 @@ import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
-/**
- * Guarda el token JWT y los datos de sesión en almacenamiento cifrado
- * (EncryptedSharedPreferences respaldado por el Android Keystore).
- */
 object TokenProvider {
 
     private const val PREF_NOMBRE = "gestion_secure"
@@ -53,13 +49,6 @@ object TokenProvider {
     fun token(context: Context): String? =
         obtenerPrefs(context).getString(K_TOKEN, null)
 
-    /**
-     * Guarda solo el access token renovado por `/api/auth/refresh`.
-     *
-     * La sesión biométrica arranca sin token: primero se obtiene uno nuevo con el refresh
-     * descifrado, se persiste para que el interceptor lo adjunte y recién entonces se
-     * consulta `/api/auth/me`, que exige `Authorization`.
-     */
     fun guardarAccessToken(context: Context, token: String) {
         obtenerPrefs(context).edit().putString(K_TOKEN, token).apply()
     }
@@ -137,14 +126,9 @@ object TokenProvider {
             .filter { it.isNotEmpty() }
             .toSet()
 
-    /** El rol ADMINISTRADOR lo tiene todo por diseño; el resto se valida contra la lista. */
     fun puede(context: Context, codigo: String): Boolean =
         rol(context) == "ADMINISTRADOR" || codigo in permisos(context)
 
-    /**
-     * Guarda el refresh token cifrado con la clave del Keystore ligada a biometría,
-     * junto con el IV necesario para descifrarlo.
-     */
     fun guardarRefreshBiometrico(context: Context, refreshToken: String, iv: ByteArray, cifrado: ByteArray) {
         obtenerPrefs(context).edit()
             .putBoolean(K_BIOMETRIA_ACTIVADA, true)
@@ -167,7 +151,6 @@ object TokenProvider {
             runCatching { android.util.Base64.decode(it, android.util.Base64.NO_WRAP) }.getOrNull()
         }
 
-    /** Desactiva el acceso biométrico y borra el refresh token cifrado. */
     fun desactivarBiometria(context: Context) {
         obtenerPrefs(context).edit()
             .remove(K_BIOMETRIA_ACTIVADA)
@@ -177,10 +160,6 @@ object TokenProvider {
         BiometricKeyStore.eliminarClave()
     }
 
-    /**
-     * Cierra la sesión dejando intacto el acceso biométrico: solo se borran las claves
-     * de sesión. Para desactivarlo por completo está `desactivarBiometria()`.
-     */
     fun cerrarSesion(context: Context) {
         obtenerPrefs(context).edit()
             .remove(K_TOKEN)
@@ -201,12 +180,10 @@ object TokenProvider {
     fun sessionActiva(context: Context): Boolean =
         !token(context).isNullOrBlank()
 
-    /** Descarta el access token sin tocar el refresh token biométrico ya cifrado. */
     fun limpiarToken(context: Context) {
         obtenerPrefs(context).edit().remove(K_TOKEN).apply()
     }
 
-    /** Última marca de tiempo sincronizada (para el pull incremental). */
     fun lastSync(context: Context): Long =
         obtenerPrefs(context).getLong(K_LAST_SYNC, 0L)
 

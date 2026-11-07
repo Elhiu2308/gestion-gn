@@ -3,12 +3,6 @@ import Foundation
 import Combine
 import LocalAuthentication
 
-/// ViewModel de inicio de sesión con soporte para Face ID y Touch ID.
-///
-/// - Autentica contra /api/auth/login.
-/// - Renueva sesiones mediante el refresh token.
-/// - Conserva los datos del perfil durante la renovación.
-/// - Permite recuperar la sesión mediante credenciales biométricas.
 @MainActor
 final class LoginViewModel: ObservableObject {
 
@@ -37,8 +31,6 @@ final class LoginViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Propiedades publicadas
-
     @Published var usuario = ""
     @Published var contrasena = ""
     @Published var activarBiometria = false
@@ -47,11 +39,7 @@ final class LoginViewModel: ObservableObject {
     @Published private(set) var errorTexto: String?
     @Published private(set) var sesionActiva = false
 
-    // MARK: - Servicios
-
     private let servicioAutenticacion = ServicioAutenticacion()
-
-    // MARK: - Biometría
 
     var tieneAccesoBiometrico: Bool {
         ServicioKeychain.tieneAccesoBiometrico()
@@ -69,9 +57,6 @@ final class LoginViewModel: ObservableObject {
         ServicioKeychain.tipoBiometria()
     }
 
-    // MARK: - Login tradicional
-
-    /// Inicia sesión con usuario y contraseña.
     func iniciarSesion() async {
         guard !estaCargando else {
             return
@@ -102,13 +87,11 @@ final class LoginViewModel: ObservableObject {
                 return
             }
 
-            // Primero debe guardarse correctamente la sesión.
             guard aplicar(sesion) else {
                 errorTexto = "No se pudo guardar la sesión de forma segura en el dispositivo."
                 return
             }
 
-            // La sesión permanece activa aunque falle la configuración biométrica.
             if activarBiometria {
                 let biometriaGuardada = ServicioKeychain.activarBiometria(
                     usuario: usuarioLimpio,
@@ -126,13 +109,6 @@ final class LoginViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Acceso biométrico
-
-    /// Accede mediante Face ID o Touch ID.
-    ///
-    /// Primero intenta renovar la sesión mediante el refresh token.
-    /// Si no es posible, intenta autenticar con las credenciales
-    /// almacenadas para el acceso biométrico.
     func accederConBiometria() async {
         guard !estaCargando else {
             return
@@ -176,8 +152,6 @@ final class LoginViewModel: ObservableObject {
             return
         }
 
-        // Intento 1: renovar mediante refresh token.
-
         if let tokenRefresco = ServicioKeychain.tokenRefreshGuardado(),
            !tokenRefresco.isEmpty {
 
@@ -190,8 +164,6 @@ final class LoginViewModel: ObservableObject {
                     throw RepositorioAutenticacion.Error.tokenNoRecibido
                 }
 
-                // Actualiza el access token y conserva el refresh token
-                // existente si el backend no devuelve uno nuevo.
                 guard ServicioKeychain.guardarTokens(
                     accessToken: sesion.accessToken,
                     refreshToken: sesion.refreshToken
@@ -201,17 +173,13 @@ final class LoginViewModel: ObservableObject {
                     )
                 }
 
-                // No se sobrescribe el perfil con cadenas vacías.
                 sesionActiva = true
                 return
 
             } catch {
-                // Si el refresh token expiró, fue revocado o no pudo
-                // guardarse la renovación, se intenta el login.
+
             }
         }
-
-        // Intento 2: autenticación con credenciales biométricas.
 
         guard let credenciales = ServicioKeychain.credencialesBiometricas() else {
             errorTexto = "No se encontraron credenciales biométricas guardadas. Inicia sesión con tu usuario y contraseña."
@@ -229,7 +197,6 @@ final class LoginViewModel: ObservableObject {
                 return
             }
 
-            // Guarda la sesión completa, incluidos los datos del perfil.
             guard ServicioKeychain.guardarSesion(sesion) else {
                 errorTexto = "No se pudo guardar la sesión de forma segura en el dispositivo."
                 return
@@ -242,8 +209,6 @@ final class LoginViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Desactivar biometría
-
     func desactivarBiometria() {
         guard ServicioKeychain.desactivarBiometria() else {
             errorTexto = "No se pudo desactivar el acceso biométrico."
@@ -252,8 +217,6 @@ final class LoginViewModel: ObservableObject {
 
         errorTexto = nil
     }
-
-    // MARK: - Aplicar sesión
 
     @discardableResult
     private func aplicar(_ sesion: TokenSesion) -> Bool {
@@ -266,8 +229,6 @@ final class LoginViewModel: ObservableObject {
         return true
     }
 
-    // MARK: - Errores
-
     private func mensajeError(_ error: Swift.Error) -> String {
         if let errorAutenticacion = error as? LoginViewModel.Error {
             return errorAutenticacion.mensaje
@@ -277,14 +238,8 @@ final class LoginViewModel: ObservableObject {
     }
 }
 
-// MARK: - Renovación biométrica
-
 extension ServicioAutenticacion {
 
-    /// Renueva el access token mediante el refresh token biométrico.
-    ///
-    /// No modifica los datos del perfil porque el endpoint
-    /// /api/auth/refresh solamente devuelve tokens.
     func renovarConRefreshToken(
         _ refresco: String
     ) async throws -> TokenSesion {

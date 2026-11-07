@@ -1,22 +1,12 @@
 
 import Foundation
 
-/// Repositorio de configuración del servidor y sincronización
-/// de la aplicación GestióN.
 final class RepositorioConfiguracion {
-
-    // MARK: - Singleton
 
     static let shared = RepositorioConfiguracion()
 
     private init() {}
 
-    // MARK: - Obtener configuración
-
-    /// Obtiene los datos de configuración almacenados localmente.
-    ///
-    /// La URL y las preferencias se administran mediante
-    /// ConfiguracionServidor y UserDefaults.
     func datosServidor() async throws -> DatosServidor {
 
         let ultima = ConfiguracionServidor.ultimaSincronizacion
@@ -30,11 +20,6 @@ final class RepositorioConfiguracion {
         )
     }
 
-    // MARK: - Sincronización
-
-    /// Ejecuta la sincronización con el backend Flask.
-    ///
-    /// Endpoint: POST /api/sync
     func sincronizar() async throws {
 
         _ = try await RedCentral.enviar(
@@ -42,7 +27,6 @@ final class RepositorioConfiguracion {
             "/sync"
         )
 
-        // Actualiza la fecha de la última sincronización.
         let ahora = Date()
 
         let formato = String(ahora.timeIntervalSince1970)
@@ -64,9 +48,6 @@ final class RepositorioConfiguracion {
         }
     }
 
-    // MARK: - Guardar preferencias
-
-    /// Guarda la URL del servidor y el modo de sincronización automática.
     func guardarConfiguracion(
         url: String,
         sincronizacionAutomatica: Bool

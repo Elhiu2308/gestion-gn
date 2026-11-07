@@ -1,7 +1,5 @@
 import Foundation
 
-/// Servicio gratuito y local que habla con Ollama (modelos de IA ejecutándose en tu Mac).
-/// No requiere clave de API, no expira y los datos no salen de tu ordenador.
 enum AIError: Error, LocalizedError {
     case invalidURL
     case requestFailed(Error)
@@ -34,12 +32,10 @@ actor OllamaAIService {
 
     private init() {}
 
-    /// Cambia el modelo que usará Ollama (ej. "llama3.2", "codellama", "deepseek-coder").
     func setModel(_ name: String) {
         model = name
     }
 
-    /// Envía un historial de mensajes y devuelve la respuesta del asistente.
     func sendMessage(_ messages: [AIMessage]) async throws -> String {
         var ollamaMessages: [[String: String]] = []
 

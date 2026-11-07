@@ -1,20 +1,18 @@
 import SwiftUI
 import UIKit
 
-/// Pantalla "Nuevo Documento": registra y turna un documento oficial.
 struct CrearDocumentoView: View {
 
     @Environment(\.dismiss) private var dismiss
     @StateObject private var vistaModelo = CrearDocumentoViewModel()
 
     let origen: OrigenDocumento
-    /// Cuando se recibe un documento, la pantalla funciona como edición.
+
     var documento: Documento? = nil
     var onCreada: (Documento) -> Void = { _ in }
 
     @State private var mostrandoVistaPrevia = false
 
-    // Organigrama real (destino / turnar a)
     @State private var dgDestino: [NivelOrganizacional] = []
     @State private var dirDestino: [NivelOrganizacional] = []
     @State private var subDestino: [NivelOrganizacional] = []
@@ -27,7 +25,6 @@ struct CrearDocumentoView: View {
     @State private var selPersonaDestino: Int? = nil
     @State private var cargandoOrg = false
 
-    // Organigrama del usuario (origen)
     @State private var orgOrigenDg: Int? = nil
     @State private var orgOrigenDir: Int? = nil
     @State private var orgOrigenSub: Int? = nil
@@ -86,8 +83,6 @@ struct CrearDocumentoView: View {
         }
     }
 
-    // MARK: - Encabezado
-
     private var encabezado: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
@@ -114,8 +109,6 @@ struct CrearDocumentoView: View {
             .foregroundColor(.black)
         }
     }
-
-    // MARK: - Vista previa
 
     private var seccionVistaPrevia: some View {
         SeccionDocumento(titulo: "Vista previa del documento") {
@@ -206,8 +199,6 @@ struct CrearDocumentoView: View {
         }
     }
 
-    // MARK: - Información del documento
-
     private var seccionInformacion: some View {
         SeccionDocumento(titulo: "Información del documento") {
 
@@ -253,8 +244,6 @@ struct CrearDocumentoView: View {
         }
     }
 
-    // MARK: - Turnar a (catálogos reales)
-
     private var seccionTurnar: some View {
         SeccionDocumento(
             titulo: "Turnar a (para)",
@@ -265,8 +254,6 @@ struct CrearDocumentoView: View {
                     .scaleEffect(0.9)
                     .tint(.black)
             }
-
-            // Área (Dirección)
 
             CampoMenu(
                 etiqueta: "1. Área",
@@ -295,8 +282,6 @@ struct CrearDocumentoView: View {
                     }
                 }
             }
-
-            // Subdirección
 
             CampoMenu(
                 etiqueta: "2. Subdirección",
@@ -331,8 +316,6 @@ struct CrearDocumentoView: View {
                 }
             }
 
-            // Departamento
-
             if !deptDestino.isEmpty {
                 CampoMenu(
                     etiqueta: "3. Departamento",
@@ -363,8 +346,6 @@ struct CrearDocumentoView: View {
                 }
             }
 
-            // Persona
-
             CampoMenu(
                 etiqueta: "Persona",
                 seleccion: nombrePersonaSeleccionada,
@@ -391,8 +372,6 @@ struct CrearDocumentoView: View {
         }
     }
 
-    // MARK: - Remitente
-
     private var seccionRemitente: some View {
         SeccionDocumento(titulo: "Remitente (automático)") {
             FilaValor(
@@ -411,8 +390,6 @@ struct CrearDocumentoView: View {
             )
         }
     }
-
-    // MARK: - Datos complementarios
 
     private var seccionComplementarios: some View {
         SeccionDocumento(titulo: "Datos complementarios") {
@@ -488,13 +465,9 @@ struct CrearDocumentoView: View {
         }
     }
 
-    // MARK: - Guardar
-
     private var botonGuardar: some View {
         Button {
             Task {
-
-                // Sincronizar los campos del turnado con el viewModel.
 
                 vistaModelo.area = textoAreaOrigen
 
@@ -555,14 +528,11 @@ struct CrearDocumentoView: View {
         .disabled(vistaModelo.estaCargando)
     }
 
-    // MARK: - Helpers de carga
-
     private func cargarOrganigrama() async {
         cargandoOrg = true
         defer { cargandoOrg = false }
 
         do {
-            // Perfil del usuario (origen).
 
             let perfil = try await RepositorioPerfil.shared.me()
 
@@ -570,8 +540,6 @@ struct CrearDocumentoView: View {
             orgOrigenDir = perfil.idDireccion
             orgOrigenSub = perfil.idSubdireccion
             textoAreaOrigen = perfil.area
-
-            // Direcciones (destino).
 
             let dgs = try await RepositorioOrganigrama.shared
                 .direccionesGeneralesPadre()
@@ -644,12 +612,8 @@ struct CrearDocumentoView: View {
     }
 }
 
-// MARK: - ViewModel
-
 @MainActor
 final class CrearDocumentoViewModel: ObservableObject {
-
-    // Información del documento
 
     @Published var tipo: TipoDocumento = .oficio
     @Published var folio = ""
@@ -659,13 +623,9 @@ final class CrearDocumentoViewModel: ObservableObject {
 
     var esEdicion: Bool { documentoEnEdicion != nil }
 
-    // Turnar a
-
     @Published var area = ""
     @Published var subdireccion = ""
     @Published var persona = ""
-
-    // Datos complementarios
 
     @Published var referencia = ""
     @Published var anexos = ""
@@ -674,18 +634,12 @@ final class CrearDocumentoViewModel: ObservableObject {
     @Published var urgencia: UrgenciaDocumento = .ordinario
     @Published var notas = ""
 
-    // Estado
-
     @Published var estaCargando = false
     @Published var errorTexto: String?
-
-    // Archivo / escaneo
 
     @Published private(set) var paginas: [UIImage] = []
     @Published private(set) var urlArchivo: URL?
     @Published private(set) var rutaPDF: URL?
-
-    // Remitente automático
 
     let remitenteArea = ServicioKeychain.areaUsuario()
 
@@ -737,7 +691,6 @@ final class CrearDocumentoViewModel: ObservableObject {
         errorTexto = nil
     }
 
-    /// Carga los valores actuales del documento para editarlo sin duplicarlo.
     func prepararEdicion(_ documento: Documento) {
         documentoEnEdicion = documento
         tipo = documento.tipo
@@ -818,8 +771,6 @@ final class CrearDocumentoViewModel: ObservableObject {
         let formatoFecha = DateFormatter()
         formatoFecha.dateFormat = "yyyy-MM-dd"
 
-        // En edición se actualiza el registro existente; no se crea otro
-        // documento ni se repite el turnado.
         if let documentoEnEdicion {
             let cuerpo: [String: Any] = [
                 "tipo": tipo.rawValue,
@@ -875,8 +826,6 @@ final class CrearDocumentoViewModel: ObservableObject {
         do {
             let documento = try await servicio.crear(datos: datos)
 
-            // El aviso debe salir en cuanto se guarda el alta, sin esperar a
-            // que termine la carga del archivo adjunto.
             await notificarAsignacionAlGuardar(
                 documento: documento,
                 persona: personaDestino,
@@ -915,11 +864,6 @@ final class CrearDocumentoViewModel: ObservableObject {
         }
     }
 
-    /// El alta sólo guarda al destinatario. Para que reciba la notificación en
-    /// el momento de guardar, se registra también el turno en el servidor.
-    ///
-    /// Si el alta ya dejó el documento turnado, no se duplica la asignación.
-    /// Un fallo de esta llamada no invalida el alta.
     private func notificarAsignacionAlGuardar(
         documento: Documento,
         persona: PersonaCatalogo?,
@@ -954,7 +898,6 @@ final class CrearDocumentoViewModel: ObservableObject {
         )
     }
 
-    /// Nivel inmediatamente inferior que acepta el endpoint `/asignar`.
     private func destinoAsignacion(
         persona: PersonaCatalogo?,
         orgDestino: (Int?, Int?, Int?, Int?)
@@ -995,8 +938,6 @@ final class CrearDocumentoViewModel: ObservableObject {
         return nil
     }
 }
-
-// MARK: - Componentes de sección
 
 struct SeccionDocumento<Contenido: View>: View {
 
@@ -1044,8 +985,6 @@ struct SeccionDocumento<Contenido: View>: View {
     }
 }
 
-// MARK: - Campo de texto
-
 private struct CampoTexto: View {
 
     let etiqueta: String
@@ -1081,8 +1020,6 @@ private struct CampoTexto: View {
         }
     }
 }
-
-// MARK: - Campo de texto multilínea
 
 private struct CampoTextoArea: View {
 
@@ -1122,8 +1059,6 @@ private struct CampoTextoArea: View {
         }
     }
 }
-
-// MARK: - Menú desplegable
 
 private struct CampoMenu: View {
 
@@ -1194,8 +1129,6 @@ private struct CampoMenu: View {
     }
 }
 
-// MARK: - Botón de urgencia
-
 private struct BotonUrgencia: View {
 
     let titulo: String
@@ -1244,8 +1177,6 @@ private struct BotonUrgencia: View {
         .buttonStyle(PlainButtonStyle())
     }
 }
-
-// MARK: - Fila de valores
 
 private struct FilaValor: View {
 

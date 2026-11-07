@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Pestaña "Más": acceso a los módulos que no están en la barra inferior
-/// (Expedientes, Archivo, Recepción y Servidor).
 struct MasView: View {
 
     @State private var mostrandoServidor = false
@@ -93,7 +91,6 @@ struct MasView: View {
     }
 }
 
-/// Tarjeta de módulo navegable (empuja una vista).
 private struct TarjetaModulo<Destino: View>: View {
 
     let titulo: String
@@ -117,7 +114,6 @@ private struct TarjetaModulo<Destino: View>: View {
     }
 }
 
-/// Tarjeta de módulo que ejecuta una acción (p. ej. abrir una hoja).
 private struct BotonModulo: View {
 
     let titulo: String
@@ -139,7 +135,6 @@ private struct BotonModulo: View {
     }
 }
 
-/// Apariencia compartida de las tarjetas de módulo.
 private struct ContenidoModulo: View {
 
     let titulo: String

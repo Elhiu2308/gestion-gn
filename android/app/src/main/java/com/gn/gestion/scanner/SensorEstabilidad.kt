@@ -8,14 +8,6 @@ import android.hardware.SensorManager
 import java.util.ArrayDeque
 import kotlin.math.abs
 
-/**
- * Estabilidad de la cámara mediante sensores (paso 2).
- *
- * Combina giroscopio y acelerómetro: si la velocidad angular media y su
- * varianza son bajas, y la aceleración se mantiene cerca de 1g, el teléfono
- * está quieto. La captura automática solo se dispara con el cuadrilátero
- * detectado mientras el dispositivo permanece estable.
- */
 class SensorEstabilidad(context: Context) {
 
     private val sm = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -26,7 +18,6 @@ class SensorEstabilidad(context: Context) {
     private val gyros = ArrayDeque<Float>()
     private val distanciasAccel = ArrayDeque<Float>()
 
-    /** True cuando los sensores reportan movimiento suficientemente bajo. */
     @Volatile
     var estable = false
         private set

@@ -12,19 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
-/**
- * Gestor singleton de conexión Socket.IO y estado del contador
- * de notificaciones.
- *
- * Centraliza:
- * - Estado de conexión.
- * - Contador de notificaciones no leídas.
- * - Distribución de eventos.
- * - Deduplicación compartida entre Socket.IO y FCM.
- *
- * Los IDs se registran como publicados únicamente después de que
- * Notificador.mostrar() confirme la publicación.
- */
 object SocketManager {
 
     private const val TAG = "SocketManager"
@@ -45,24 +32,12 @@ object SocketManager {
 
     val contadorNotif: StateFlow<Int> = _contadorNotif
 
-    /**
-     * Conserva eventos aunque todavía no exista un colector activo.
-     *
-     * replay permite recuperar eventos pendientes cuando el servicio
-     * inicia su colector después de establecerse la conexión.
-     */
     private val _eventosFlow =
         MutableSharedFlow<EventoSocket>(
             replay = MAX_EVENTOS_PENDIENTES,
             extraBufferCapacity = MAX_EVENTOS_PENDIENTES
         )
 
-    /**
-     * IDs de notificaciones publicadas correctamente.
-     *
-     * LinkedHashMap con acceso ordenado para conservar los últimos
-     * IDs utilizados y limitar el consumo de memoria.
-     */
     private val vistas =
         object : LinkedHashMap<Long, Boolean>(
             64,
@@ -77,17 +52,8 @@ object SocketManager {
             }
         }
 
-    /**
-     * IDs que actualmente están siendo procesados por FCM o Socket.IO.
-     */
     private val enProceso = mutableSetOf<Long>()
 
-    /**
-     * Reserva el ID para iniciar la publicación.
-     *
-     * Retorna false si ya fue publicado o está siendo procesado
-     * por el otro canal.
-     */
     fun iniciarProcesamiento(id: Long): Boolean {
 
         if (id <= 0L) {
@@ -120,9 +86,6 @@ object SocketManager {
         }
     }
 
-    /**
-     * Confirma que Android publicó correctamente la notificación.
-     */
     fun confirmarMostrada(id: Long) {
 
         if (id <= 0L) return
@@ -140,9 +103,6 @@ object SocketManager {
         )
     }
 
-    /**
-     * Libera la reserva cuando la publicación falla.
-     */
     fun cancelarProcesamiento(id: Long) {
 
         if (id <= 0L) return
@@ -158,10 +118,6 @@ object SocketManager {
         )
     }
 
-    /**
-     * Consulta si una notificación ya fue publicada
-     * o está siendo procesada.
-     */
     fun esDuplicada(id: Long): Boolean {
 
         if (id <= 0L) return false
@@ -173,9 +129,6 @@ object SocketManager {
         }
     }
 
-    /**
-     * Inicia o verifica la conexión Socket.IO.
-     */
     fun conectar(
         context: Context,
         usuario: String,
@@ -268,9 +221,6 @@ object SocketManager {
         }
     }
 
-    /**
-     * Actualiza el estado de conexión.
-     */
     fun marcarConexion(estado: ConexionSocket) {
 
         Log.i(
@@ -281,12 +231,6 @@ object SocketManager {
         _conexion.value = estado
     }
 
-    /**
-     * Recibe el evento Socket.IO y lo distribuye.
-     *
-     * La deduplicación se realiza posteriormente,
-     * cuando NotificationMap intenta publicar la notificación.
-     */
     fun emitirNotificacion(notif: NotificacionSocket) {
 
         if (notif.notificacionId <= 0L) {
@@ -318,7 +262,6 @@ object SocketManager {
                     "tipo=${notif.tipo}"
         )
 
-        // El contador solamente se actualiza con el valor del servidor.
         notif.noLeidas?.let { valor ->
             setContador(valor)
         }
@@ -338,17 +281,11 @@ object SocketManager {
         }
     }
 
-    /**
-     * Flujo de eventos para SocketIOBackground y otros colectores.
-     */
     fun eventos(): Flow<EventoSocket> {
 
         return _eventosFlow.asSharedFlow()
     }
 
-    /**
-     * Actualiza el contador oficial recibido del servidor.
-     */
     fun setContador(valor: Int) {
 
         val nuevoValor = valor.coerceAtLeast(0)
@@ -378,11 +315,6 @@ object SocketManager {
         }
     }
 
-    /**
-     * Desconexión temporal.
-     *
-     * Conserva contador, IDs publicados y eventos pendientes.
-     */
     fun desconectar() {
 
         Log.i(
@@ -406,16 +338,6 @@ object SocketManager {
         _conexion.value = ConexionSocket.Desconectado
     }
 
-    /**
-     * Limpieza definitiva al cerrar sesión.
-     *
-     * Elimina:
-     * - Conexión Socket.IO.
-     * - Contador.
-     * - IDs publicados.
-     * - IDs en proceso.
-     * - Eventos pendientes de la sesión anterior.
-     */
     @OptIn(ExperimentalCoroutinesApi::class)
     fun limpiarSesion() {
 

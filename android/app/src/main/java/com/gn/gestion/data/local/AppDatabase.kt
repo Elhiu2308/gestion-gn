@@ -25,7 +25,6 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        /** v1 -> v2: nuevas columnas de documento + tablas de trazabilidad y cola de sinc. */
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE documentos ADD COLUMN uuid TEXT NOT NULL DEFAULT ''")
@@ -46,7 +45,6 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE documentos ADD COLUMN actualizadoEn INTEGER NOT NULL DEFAULT 0")
                 db.execSQL("ALTER TABLE documentos ADD COLUMN eliminadoEn INTEGER")
 
-                // Documentos heredados de la v1: asigna uuid estable y sello de tiempo.
                 db.execSQL(
                     "UPDATE documentos SET uuid = 'v1-' || CAST(id AS TEXT), " +
                         "creadoEn = fechaRegistro, actualizadoEn = fechaRegistro, " +
@@ -83,7 +81,6 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        /** v2 -> v3 (RBAC): campos del formulario registral completo. */
         val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE documentos ADD COLUMN areaOrigen TEXT NOT NULL DEFAULT ''")
@@ -94,7 +91,6 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        /** v3 -> v4 (flujo FGN): clasificación, área actual, compartición y respuesta consolidada. */
         val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE documentos ADD COLUMN clasificacion TEXT NOT NULL DEFAULT 'CONFIDENCIAL'")
@@ -104,30 +100,12 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        /**
-         * v4 -> v5: se persiste el ID del backend (`servidor_id`).
-         *
-         * La columna es Nullable a propósito: NULL significa "aún no se conoce
-         * el ID del servidor". NO se rellena con la PK local de Room — hacer eso
-         * reintroduciría exactamente el bug que esta migración corrige. Los
-         * documentos ya sincronizados se rellenan en el siguiente sync, cuando el
-         * servidor devuelve su `id` dentro del DTO.
-         */
         val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE documentos ADD COLUMN servidor_id INTEGER")
             }
         }
 
-        /**
-         * v5 -> v6: relación con el catálogo institucional de personas.
-         *
-         * `id_remitente` / `id_destinatario` son las claves foráneas a
-         * `personas.id_persona` (1:1 con `usuarios`). Ambas son Nullable a
-         * propósito: NULL significa "sin relación", que es el caso de los
-         * documentos legados que sólo guardan el nombre como texto. Nunca se
-         * rellena con el id local de Room.
-         */
         val MIGRATION_5_6 = object : Migration(5, 6) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE documentos ADD COLUMN id_remitente INTEGER")
@@ -135,14 +113,12 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        /** v6 -> v7: hora límite del documento (fecha_limite_hora). */
         val MIGRATION_6_7 = object : Migration(6, 7) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE documentos ADD COLUMN fechaLimiteHora TEXT NOT NULL DEFAULT ''")
             }
         }
 
-        /** v7 -> v8: área del usuario en la trazabilidad (movimientos.area). */
         val MIGRATION_7_8 = object : Migration(7, 8) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE movimientos ADD COLUMN area TEXT NOT NULL DEFAULT ''")

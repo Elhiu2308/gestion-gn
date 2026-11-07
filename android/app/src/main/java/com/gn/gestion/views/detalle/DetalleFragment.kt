@@ -39,6 +39,7 @@ import com.gn.gestion.util.dp
 import com.gn.gestion.util.estadoFromString
 import com.gn.gestion.util.formatFecha
 import com.gn.gestion.util.formatHora
+import com.gn.gestion.util.mensajeServidor
 import com.gn.gestion.util.textoBadge
 import com.gn.gestion.util.tipoFromString
 import com.gn.gestion.util.urgenciaFromString
@@ -65,8 +66,6 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
     @Volatile
     private var leidoEnviado = false
 
-    // Paso de pestaña activa:
-    // 0 = Datos, 1 = PDF, 2 = OCR, 3 = Trámite, 4 = Anotaciones, 5 = Historial
     private var tabActiva = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -155,12 +154,10 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
         val urg = urgenciaFromString(doc.urgencia)
         val cls = doc.clasificacion.uppercase()
 
-        // Encabezado
         val tipoFechaLabel = "${tipoView.label} · recibido ${formatFecha(doc.fecha)}"
         view.findViewById<TextView>(R.id.tipo_fecha_label)?.text = tipoFechaLabel
         view.findViewById<TextView>(R.id.asunto)?.text = doc.asunto.ifBlank { "Sin asunto" }
 
-        // Badges
         val badges = view.findViewById<LinearLayout>(R.id.badges_top)
         badges?.removeAllViews()
         badges?.addView(ctx.textoBadge(estado.label, ctx.c(estado.colorRes())))
@@ -173,7 +170,6 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
             badges?.addView(ctx.textoBadge("Compartido 2D", ctx.c(R.color.verde)))
         }
 
-        // PESTAÑA 1: DATOS GENERALES
         val containerInfo = view.findViewById<LinearLayout>(R.id.container_info)
         containerInfo?.removeAllViews()
         if (containerInfo != null) {
@@ -202,7 +198,6 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
             infoRow(ctx, containerInfo, "UUID", doc.uuid)
         }
 
-        // PESTAÑA 6: HISTORIAL DE TRAZABILIDAD
         val containerTrazab = view.findViewById<LinearLayout>(R.id.container_trazabilidad)
         if (containerTrazab != null) {
             viewLifecycleOwner.lifecycleScope.launch {
@@ -212,7 +207,6 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
             }
         }
 
-        // PESTAÑA 2: PDF
         val pdfNombre = view.findViewById<TextView>(R.id.pdf_nombre)
         val containerPdf = view.findViewById<LinearLayout>(R.id.container_pdf_paginas)
 
@@ -227,7 +221,6 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
             compartirPdf(doc)
         }
 
-        // PESTAÑA 3: OCR
         val tvOcr = view.findViewById<TextView>(R.id.tv_ocr_texto)
         val textoOcr = doc.textoOcr.ifBlank { "Sin texto OCR reconocido para este documento." }
         tvOcr?.text = textoOcr
@@ -243,11 +236,9 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
             }
         }
 
-        // PESTAÑA 4: TRÁMITE
         renderPasosTramite(ctx, view, doc.estado)
         renderAcciones(view, doc)
 
-        // PESTAÑA 5: ANOTACIONES
         val btnNuevaAnotacionTop = view.findViewById<View>(R.id.btn_nueva_anotacion_top)
         val btnAnotar = view.findViewById<View>(R.id.btn_anotar)
 
@@ -264,13 +255,11 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
             doc.servidorIdRequerido?.let { sid -> dialogoAnotar(view, doc, sid) }
         }
 
-        // Vincular documento relacionado
         val btnVincular = view.findViewById<View>(R.id.btn_vincular)
         btnVincular?.isVisible = doc.sincronizadoEnServidor &&
                 TokenProvider.puede(ctx, Permisos.DOCUMENTO_ANOTAR)
         btnVincular?.setOnClickListener { dialogoVincular(view, doc) }
 
-        // Configurar menú contextual de opciones (3 puntos ⋮ en Toolbar)
         val btnMenuOpciones = requireActivity().findViewById<View>(R.id.btn_menu_opciones)
         btnMenuOpciones?.setOnClickListener { anchor ->
             mostrarPopupMenuDocumento(anchor, doc)
@@ -492,8 +481,6 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
         }
     }
 
-    // ---------------- Acciones del Flujo Institucional ----------------
-
     private data class AccionItem(val texto: String, val color: Int, val run: () -> Unit)
 
     private fun renderAcciones(view: View, doc: Documento) {
@@ -569,7 +556,7 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
                 confirmarSimple(view, doc, "Mover a histórico") { flujo.historico(sid) }
             }
         }
-        // Acuse explícito de recibo.
+
         if (est !in EstadoDocumento.TERMINALES && puedeResponder) {
             acc += AccionItem("Acuse", ctx.c(R.color.fondo_claro)) {
                 ejecutar(view, doc) { flujo.leer(sid, acuse = true) }
@@ -622,10 +609,8 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
 
             backgroundTintList = ColorStateList.valueOf(accion.color)
 
-            // Color del texto.
             setTextColor(verdeInstitucional)
 
-            // Color directo del ícono.
             icon = icono
             iconTint = ColorStateList.valueOf(verdeInstitucional)
             iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
@@ -661,7 +646,7 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
             } catch (e: Exception) {
                 MaterialAlertDialogBuilder(requireContext(), R.style.GestioN_Dialog_Base)
                     .setTitle("Error")
-                    .setMessage(e.message ?: "No se pudo completar la acción.")
+                    .setMessage(e.mensajeServidor())
                     .setPositiveButton("OK", null)
                     .show()
             } finally {
@@ -874,28 +859,17 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
         dialogo.setOnShowListener {
             dialogo.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 val p = personaSel
-                val s = subSel
-                val a = areaSel
+                if (p == null) {
+                    toast("Selecciona la persona responsable para que reciba la notificación")
+                    return@setOnClickListener
+                }
 
-                val (tipo, idDestino, usuarioDestinoId) = when {
-                    p != null -> {
-                        val uid = p.idUsuario ?: p.clave
-                        when {
-                            p.idDepartamento != null ->
-                                Triple("departamento", p.idDepartamento!!, uid)
-                            p.idSubdireccion != null ->
-                                Triple("subdireccion", p.idSubdireccion!!, uid)
-                            p.idDireccion != null ->
-                                Triple("direccion", p.idDireccion!!, uid)
-                            else -> Triple("usuario", uid ?: 0L, uid)
-                        }
-                    }
-                    s != null -> Triple("subdireccion", s.id, null)
-                    a != null -> Triple("direccion", a.id, null)
-                    else -> {
-                        toast("Selecciona un Área, Subdirección o Persona de la lista")
-                        return@setOnClickListener
-                    }
+                val uid = p.idUsuario
+                val candidatos = buildList {
+                    p.idDepartamento?.let { add("departamento" to it) }
+                    p.idSubdireccion?.let { add("subdireccion" to it) }
+                    p.idDireccion?.let { add("direccion" to it) }
+                    uid?.let { add("usuario" to it) }
                 }
 
                 ejecutar(view, doc) {
@@ -903,18 +877,30 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
                     if (currentSid <= 0L) {
                         vm.sincronizar()
                         currentSid = vm.resolverIdLocal(doc.uuid, doc.servidorId ?: 0L) ?: 0L
-                        // Si era un id local, necesitamos el servidorId real
+
                         val docActualizado = vm.documentoPorId(doc.id)
                         currentSid = docActualizado?.servidorIdRequerido ?: currentSid
                         if (currentSid <= 0L) {
                             throw IllegalStateException("El documento aún no está registrado en el servidor. Sincronice o guarde de nuevo.")
                         }
                     }
+
+                    val opciones = flujo.turnadoOpciones()
+                    val valida = candidatos.mapNotNull { (tipo, id) ->
+                        opciones.opciones.firstOrNull {
+                            it.id == id && it.tipo.equals(tipo, ignoreCase = true)
+                        }
+                    }.firstOrNull() ?: throw IllegalStateException(
+                        "No puedes turnar a esa persona: el servidor sólo permite el nivel " +
+                                "${opciones.etiquetaSiguiente.ifBlank { opciones.nivelSiguiente }}. " +
+                                "Opciones: " + opciones.opciones.joinToString(", ") { it.nombre }
+                    )
+
                     flujo.turnar(
                         currentSid,
-                        tipo,
-                        idDestino ?: 0L,
-                        usuarioDestinoId = usuarioDestinoId,
+                        valida.tipo,
+                        valida.id,
+                        usuarioDestinoId = uid,
                         comentario = inputComent.text.toString().trim()
                     )
                 }
@@ -922,7 +908,6 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
             }
         }
 
-        // Cargar Áreas
         viewLifecycleOwner.lifecycleScope.launch {
             dialogo.show()
             try {
@@ -956,7 +941,6 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
                     spPer.isEnabled = false
                     tilPer.placeholderText = "Primero seleccione Subdirección"
 
-                    // Cargar Subdirecciones
                     viewLifecycleOwner.lifecycleScope.launch {
                         tilSub.placeholderText = "Cargando Subdirecciones…"
                         spSub.isEnabled = false
@@ -974,7 +958,6 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
                                 personaSel = null
                                 spPer.setText("", false)
 
-                                // Cargar Personas
                                 viewLifecycleOwner.lifecycleScope.launch {
                                     tilPer.placeholderText = "Cargando Personas…"
                                     spPer.isEnabled = false
@@ -1000,7 +983,6 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
                             tilSub.placeholderText = "Sin Subdirecciones en esta Área"
                             spSub.isEnabled = false
 
-                            // Si no hay subdirecciones, cargar Personas por Área directamente
                             viewLifecycleOwner.lifecycleScope.launch {
                                 tilPer.placeholderText = "Cargando Personas…"
                                 spPer.isEnabled = false
@@ -1025,7 +1007,7 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
                     }
                 }
             } catch (e: Exception) {
-                toast(e.message ?: "Error al cargar la estructura organizacional")
+                toast(e.mensajeServidor())
             }
         }
     }
@@ -1138,7 +1120,7 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
                             flujo.anotar(sid, texto)
                             cargarTramite(view, doc)
                         } catch (e: Exception) {
-                            toast(e.message ?: "Error")
+                            toast(e.mensajeServidor())
                         }
                     }
                 }
@@ -1172,7 +1154,7 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
                             flujo.vincularRelacion(sid, otro, spTipo.text.toString().trim())
                             cargarTramite(view, doc)
                         } catch (e: Exception) {
-                            toast(e.message ?: "No se pudo vincular")
+                            toast(e.mensajeServidor())
                         }
                     }
                 }
@@ -1184,8 +1166,6 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
     private fun toast(msj: String) {
         Toast.makeText(requireContext(), msj, Toast.LENGTH_SHORT).show()
     }
-
-    // ---------------- Carga del trámite desde el servidor ----------------
 
     private suspend fun cargarTramite(view: View, doc: Documento) {
         val serverId = doc.servidorIdRequerido ?: return

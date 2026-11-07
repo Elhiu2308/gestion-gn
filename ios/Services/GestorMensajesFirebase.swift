@@ -5,20 +5,6 @@ import UserNotifications
 import FirebaseCore
 import FirebaseMessaging
 
-/// Gestiona APNs, Firebase Cloud Messaging y las notificaciones del sistema.
-///
-/// APNs:
-/// - Recibe el token del dispositivo.
-/// - Lo entrega a Firebase Messaging.
-///
-/// FCM:
-/// - Obtiene el token de registro FCM.
-/// - Registra el token en Flask cuando existe una sesión JWT.
-/// - Elimina la asociación del token al cerrar sesión.
-///
-/// Backend:
-/// POST   /api/fcm/token
-/// DELETE /api/fcm/token
 final class GestorMensajesFirebase: NSObject {
 
     static let shared = GestorMensajesFirebase()
@@ -30,7 +16,6 @@ final class GestorMensajesFirebase: NSObject {
 
     private var configurado = false
 
-    // Controla los registros automáticos del token.
     private let estadoLock = NSLock()
     private var registroAutomaticoHabilitado = false
     private var registroEnCurso = false
@@ -38,8 +23,6 @@ final class GestorMensajesFirebase: NSObject {
     private override init() {
         super.init()
     }
-
-    // MARK: - Configuración
 
     func configurar() {
 
@@ -81,11 +64,6 @@ final class GestorMensajesFirebase: NSObject {
         }
     }
 
-    // MARK: - Control del registro automático
-
-    /// Habilita el registro automático después de iniciar sesión.
-    ///
-    /// Debe llamarse cuando el JWT ya está guardado en Keychain.
     func habilitarRegistroAutomatico() {
 
         estadoLock.lock()
@@ -95,7 +73,6 @@ final class GestorMensajesFirebase: NSObject {
         print("[FCM] Registro automático habilitado.")
     }
 
-    /// Bloquea los registros automáticos al comenzar el cierre de sesión.
     func bloquearRegistroAutomatico() {
 
         estadoLock.lock()
@@ -114,7 +91,6 @@ final class GestorMensajesFirebase: NSObject {
         return habilitado
     }
 
-    /// Evita que dos solicitudes de registro se ejecuten simultáneamente.
     private func iniciarRegistro() -> Bool {
 
         estadoLock.lock()
@@ -136,12 +112,6 @@ final class GestorMensajesFirebase: NSObject {
         estadoLock.unlock()
     }
 
-    // MARK: - Recepción del token APNs
-
-    /// Recibe el token APNs desde AppDelegate.
-    ///
-    /// APNs no se registra directamente en Flask.
-    /// Firebase utiliza este token para comunicarse con APNs.
     func registrarDeviceToken(_ token: Data) {
 
         Messaging.messaging().apnsToken = token
@@ -150,8 +120,6 @@ final class GestorMensajesFirebase: NSObject {
 
         obtenerTokenFCM()
     }
-
-    // MARK: - Obtener token FCM
 
     private func obtenerTokenFCM() {
 
@@ -177,13 +145,9 @@ final class GestorMensajesFirebase: NSObject {
 
             print("[FCM] Token FCM obtenido correctamente")
 
-            // El registro en Flask se realiza únicamente cuando
-            // existe una sesión y el registro automático está habilitado.
             self.registrarAutomaticamenteSiCorresponde()
         }
     }
-
-    // MARK: - Guardar token FCM
 
     private func guardarTokenFCM(_ token: String) {
 
@@ -197,14 +161,11 @@ final class GestorMensajesFirebase: NSObject {
 
             defaults.set(token, forKey: claveTokenFCM)
 
-            // Un token diferente necesita registrarse nuevamente.
             defaults.removeObject(forKey: claveTokenRegistrado)
 
             print("[FCM] Se detectó un token nuevo.")
         }
     }
-
-    // MARK: - Registro automático
 
     private func registrarAutomaticamenteSiCorresponde() {
 
@@ -231,11 +192,6 @@ final class GestorMensajesFirebase: NSObject {
         }
     }
 
-    // MARK: - Registrar token en Flask
-
-    /// Registra el token FCM del dispositivo en el backend.
-    ///
-    /// Debe ejecutarse después de iniciar sesión para disponer del JWT.
     func registrarTokenFCMEnBackend() async throws {
 
         guard puedeRegistrarAutomaticamente() else {
@@ -247,7 +203,6 @@ final class GestorMensajesFirebase: NSObject {
             throw ErrorFCM.sesionNoDisponible
         }
 
-        // Evita registros simultáneos.
         guard iniciarRegistro() else {
             return
         }
@@ -269,7 +224,6 @@ final class GestorMensajesFirebase: NSObject {
             guardarTokenFCM(token)
         }
 
-        // Se vuelve a comprobar el estado después de obtener el token.
         guard puedeRegistrarAutomaticamente(),
               let jwtActual = ServicioKeychain.tokenAcceso(),
               !jwtActual.isEmpty else {
@@ -334,21 +288,15 @@ final class GestorMensajesFirebase: NSObject {
             )
         }
 
-        // Si el cierre comenzó mientras se ejecutaba la solicitud,
-        // no se marca el token como registrado.
         guard puedeRegistrarAutomaticamente() else {
             defaults.removeObject(forKey: claveTokenRegistrado)
             throw ErrorFCM.registroBloqueado
         }
 
-        // Solo se considera registrado después de una respuesta 2xx
-        // y si el registro continúa habilitado.
         defaults.set(token, forKey: claveTokenRegistrado)
 
         print("[FCM] Token registrado correctamente en Flask")
     }
-
-    // MARK: - Obtener token FCM de forma asíncrona
 
     private func obtenerTokenFCMAsync() async throws -> String {
 
@@ -374,12 +322,6 @@ final class GestorMensajesFirebase: NSObject {
         }
     }
 
-    // MARK: - Eliminar token al cerrar sesión
-
-    /// Elimina la asociación del token FCM al usuario autenticado.
-    ///
-    /// Bloquea primero los registros automáticos.
-    /// Debe ejecutarse antes de borrar el JWT del Keychain.
     func eliminarDeviceToken() async throws {
 
         bloquearRegistroAutomatico()
@@ -448,7 +390,6 @@ final class GestorMensajesFirebase: NSObject {
                 )
             }
 
-            // El backend confirmó la eliminación.
             defaults.removeObject(forKey: claveTokenFCM)
             defaults.removeObject(forKey: claveTokenRegistrado)
 
@@ -456,17 +397,11 @@ final class GestorMensajesFirebase: NSObject {
 
         } catch {
 
-            // Se conserva el token local para poder reintentar
-            // su asociación en el siguiente inicio de sesión.
-            //
-            // Se elimina únicamente la marca de registro.
             defaults.removeObject(forKey: claveTokenRegistrado)
 
             throw error
         }
     }
-
-    // MARK: - Utilidades
 
     private static func mensajeServidor(_ datos: Data) -> String {
 
@@ -480,8 +415,6 @@ final class GestorMensajesFirebase: NSObject {
             ?? objeto["error"] as? String
             ?? ""
     }
-
-    // MARK: - Errores
 
     enum ErrorFCM: LocalizedError {
 
@@ -516,11 +449,8 @@ final class GestorMensajesFirebase: NSObject {
     }
 }
 
-// MARK: - Firebase Messaging Delegate
-
 extension GestorMensajesFirebase: MessagingDelegate {
 
-    /// Firebase entrega o renueva el token FCM.
     func messaging(
         _ messaging: Messaging,
         didReceiveRegistrationToken fcmToken: String?
@@ -534,21 +464,12 @@ extension GestorMensajesFirebase: MessagingDelegate {
 
         guardarTokenFCM(fcmToken)
 
-        // Si existe sesión y el registro está habilitado,
-        // actualiza la asociación del token en Flask.
         registrarAutomaticamenteSiCorresponde()
     }
 }
 
-// MARK: - Delegado de notificaciones del sistema
-
 extension GestorMensajesFirebase: UNUserNotificationCenterDelegate {
 
-    /// Presentación de notificaciones push con la app abierta.
-    ///
-    /// En primer plano no se muestra el banner del sistema: se publica el aviso
-    /// emergente propio, que incluye las acciones Abrir y Ver datos. Socket.IO
-    /// y APNs pueden entregar el mismo evento; AvisosNotificaciones los deduplica.
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,
@@ -573,7 +494,6 @@ extension GestorMensajesFirebase: UNUserNotificationCenterDelegate {
         ])
     }
 
-    /// El usuario toca una notificación del sistema.
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
@@ -592,10 +512,8 @@ extension GestorMensajesFirebase: UNUserNotificationCenterDelegate {
 
         let documentoUuid = info["documento_uuid"] as? String ?? ""
 
-        // Se confirma inmediatamente la recepción de la interacción.
         completionHandler()
 
-        // La navegación se realiza en el hilo principal.
         Task { @MainActor in
 
             if documentoId > 0 {
@@ -607,8 +525,6 @@ extension GestorMensajesFirebase: UNUserNotificationCenterDelegate {
 
             } else if let notificacionId, notificacionId > 0 {
 
-                // Todavía no se navega al centro porque se requiere
-                // revisar la estructura de CentroNavegacion.
                 print(
                     "[FCM] Notificación seleccionada: \(notificacionId)"
                 )
@@ -619,8 +535,6 @@ extension GestorMensajesFirebase: UNUserNotificationCenterDelegate {
             }
         }
     }
-
-    // MARK: - Conversión de identificadores
 
     private static func entero(_ valor: Any?) -> Int? {
 

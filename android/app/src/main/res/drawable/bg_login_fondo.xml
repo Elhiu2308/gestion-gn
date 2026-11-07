@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Base clara con transición verde institucional -->
     <item>
         <shape android:shape="rectangle">
             <gradient
@@ -13,7 +12,6 @@
         </shape>
     </item>
 
-    <!-- Mancha verde suave en la esquina superior derecha -->
     <item
         android:width="300dp"
         android:height="300dp"
@@ -25,7 +23,6 @@
         </shape>
     </item>
 
-    <!-- Acento dorado discreto -->
     <item
         android:width="220dp"
         android:height="220dp"
@@ -37,7 +34,6 @@
         </shape>
     </item>
 
-    <!-- Segundo círculo verde para dar profundidad sin distraer del formulario -->
     <item
         android:width="150dp"
         android:height="150dp"

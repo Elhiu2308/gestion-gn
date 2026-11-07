@@ -1,12 +1,6 @@
 
 import Foundation
 
-/**
- * Repositorio de autenticación (/api/auth/).
- *
- * Usa URLSession con async/await.
- * Los tokens JWT se manejan en el Keychain.
- */
 final class RepositorioAutenticacion {
 
     static let shared = RepositorioAutenticacion()
@@ -37,8 +31,6 @@ final class RepositorioAutenticacion {
             }
         }
     }
-
-    // MARK: - LOGIN
 
     func login(
         usuario: String,
@@ -86,9 +78,6 @@ final class RepositorioAutenticacion {
         )
     }
 
-    // MARK: - REFRESH
-
-    /// Renueva el access token utilizando el refresh token guardado.
     func renovarAcceso() async throws -> RespuestaRenovacion {
 
         guard let refreshToken = ServicioKeychain.tokenRefreshGuardado(),
@@ -101,14 +90,6 @@ final class RepositorioAutenticacion {
         )
     }
 
-    /// Renueva el access token utilizando un refresh token específico.
-    ///
-    /// Flask-JWT-Extended espera el refresh token en:
-    /// Authorization: Bearer <refresh_token>
-    ///
-    /// El backend actual solamente genera un nuevo access token.
-    /// Por ello, refreshToken se devuelve vacío para conservar
-    /// el refresh token vigente que ya existe en Keychain.
     func renovarAcceso(
         conRefreshToken refreshToken: String
     ) async throws -> RespuestaRenovacion {
@@ -139,9 +120,6 @@ final class RepositorioAutenticacion {
         )
     }
 
-    // MARK: - PERFIL
-
-    /// Devuelve el perfil autenticado actual (GET /api/auth/me).
     func me() async throws -> [String: Any] {
 
         let (objeto, codigo) = try await ejecutar(
@@ -153,8 +131,6 @@ final class RepositorioAutenticacion {
 
         return objeto
     }
-
-    // MARK: - HTTP
 
     private func ejecutar(
         peticion: String,
@@ -211,8 +187,6 @@ final class RepositorioAutenticacion {
         return (objeto, codigo)
     }
 
-    // MARK: - VALIDACIÓN
-
     private func validarRespuesta(
         _ datos: [String: Any],
         codigo: Int
@@ -228,8 +202,6 @@ final class RepositorioAutenticacion {
             throw Error.servidor(codigo, mensaje)
         }
     }
-
-    // MARK: - RESPUESTAS
 
     struct RespuestaLogin {
         let accessToken: String

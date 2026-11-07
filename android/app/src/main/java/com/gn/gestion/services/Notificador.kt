@@ -54,9 +54,6 @@ object Notificador {
         return concedido
     }
 
-    /**
-     * @return true si Android aceptó la publicación.
-     */
     fun mostrar(
         context: Context,
         titulo: String,
@@ -79,8 +76,6 @@ object Notificador {
             return false
         }
 
-        // Con la app visible no se publica una notificación del sistema:
-        // MainActivity muestra el aviso emergente con las acciones.
         if (NotificacionForeground.visible) {
             NotificacionForeground.emitir(
                 titulo = titulo.ifBlank { tituloDe("") },
@@ -139,7 +134,7 @@ object Notificador {
                 appContext,
                 CHANNEL_ID
             )
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_notif_bell)
                 .setContentTitle(titulo.ifBlank { tituloDe("") })
                 .setContentText(cuerpo)
                 .setStyle(
@@ -186,7 +181,7 @@ object Notificador {
         }
     }
 
-    private fun crearCanal(context: Context) {
+    fun crearCanal(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return
         }

@@ -56,9 +56,6 @@ final class TurnarUITests: XCTestCase {
 
 extension TurnarUITests {
 
-    /// Abre la lista de documentos desde el dashboard. La pestaña
-    /// "Expedientes" ahora muestra expedientes (no documentos), por lo que el
-    /// acceso a documentos se hace desde la tarjeta "Mis documentos".
     private func abrirDocumentos(_ app: XCUIApplication) {
         XCTAssertTrue(app.staticTexts["Tus documentos"].waitForExistence(timeout: 30))
 
@@ -101,8 +98,6 @@ extension TurnarUITests {
         elegido.tap()
     }
 
-    /// Flujo real 48360 -> 72438: desde la app iOS, abre el documento 871
-    /// (turnado antes desde Android) y lo turna a la Subdirección de Christian.
     func testTurnarDocumentoAChristian() throws {
         let app = XCUIApplication()
         app.launch()

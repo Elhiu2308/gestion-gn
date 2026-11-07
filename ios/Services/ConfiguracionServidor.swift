@@ -1,7 +1,6 @@
 
 import Foundation
 
-/// Configuración local del servidor y de la sincronización.
 enum ConfiguracionServidor {
 
     private static var diccionario: NSDictionary {
@@ -17,7 +16,6 @@ enum ConfiguracionServidor {
         ] as NSDictionary
     }
 
-    /// URL base del servidor.
     static var url: String {
         let guardada = (
             diccionario["url"] as? String ?? ""
@@ -38,7 +36,6 @@ enum ConfiguracionServidor {
         return "https://thermos-provider-populace.ngrok-free.dev"
     }
 
-    /// Construye una URL incluyendo el prefijo /api.
     static func urlCon(ruta: String) -> URL {
         let baseOriginal = url.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -75,12 +72,10 @@ enum ConfiguracionServidor {
         urlCon(ruta: "")
     }
 
-    /// Indica si la sincronización automática está habilitada.
     static var automatica: Bool {
         diccionario["automatica"] as? Bool ?? true
     }
 
-    /// Fecha de la última sincronización.
     static var ultimaSincronizacion: Date {
         let texto = diccionario["ultima"] as? String ?? ""
 
@@ -89,7 +84,6 @@ enum ConfiguracionServidor {
             : Date(timeIntervalSince1970: Double(texto) ?? 0)
     }
 
-    /// Fecha de la próxima sincronización.
     static var proxima: Date {
         let texto = diccionario["proxima"] as? String ?? ""
 
@@ -98,7 +92,6 @@ enum ConfiguracionServidor {
             : Date(timeIntervalSince1970: Double(texto) ?? 0)
     }
 
-    /// Guarda la URL y la configuración de sincronización.
     static func guardar(url: String, automatica: Bool) {
         let copia = diccionario.mutableCopy() as! NSMutableDictionary
 

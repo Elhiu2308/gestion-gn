@@ -25,19 +25,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-/**
- * Servicio en primer plano encargado de mantener Socket.IO
- * y recibir notificaciones en tiempo real.
- *
- * Socket.IO:
- * - Recibe notificaciones cuando existe conexión.
- * - Actualiza el contador de no leídas.
- *
- * FCM:
- * - Funciona como canal complementario.
- *
- * La base de datos del servidor es la fuente de verdad.
- */
 class SocketIOBackground : Service() {
 
     private val serviceScope =
@@ -89,23 +76,15 @@ class SocketIOBackground : Service() {
             return START_NOT_STICKY
         }
 
-        // Primero se activa el colector.
-        // Así no se pierde un evento recibido inmediatamente
-        // después de establecer la conexión.
         iniciarColector()
 
-        // Se registra la conectividad.
         registrarCallbackRed()
 
-        // Finalmente se solicita la conexión.
         conectarSocket()
 
         return START_STICKY
     }
 
-    /**
-     * Inicia la notificación permanente del servicio.
-     */
     private fun iniciarForeground(): Boolean {
 
         val intent = Intent(
@@ -125,7 +104,7 @@ class SocketIOBackground : Service() {
             this,
             CHANNEL_SERVICE_ID
         )
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notif_bell)
             .setContentTitle("GestióN - Notificaciones")
             .setContentText("Servicio de notificaciones activo.")
             .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -164,9 +143,6 @@ class SocketIOBackground : Service() {
         }
     }
 
-    /**
-     * Comprueba que exista una sesión válida.
-     */
     private fun sesionValida(): Boolean {
 
         val sync = ApiConfig.SYNC_ENABLED
@@ -194,9 +170,6 @@ class SocketIOBackground : Service() {
                 token.isNotBlank()
     }
 
-    /**
-     * Solicita conexión con las credenciales actuales.
-     */
     private fun conectarSocket() {
 
         if (!sesionValida()) {
@@ -231,9 +204,6 @@ class SocketIOBackground : Service() {
         }
     }
 
-    /**
-     * Mantiene activo el colector de eventos.
-     */
     private fun iniciarColector() {
 
         if (collectorJob?.isActive == true) {
@@ -310,12 +280,6 @@ class SocketIOBackground : Service() {
         }
     }
 
-    /**
-     * Detecta cambios de conectividad.
-     *
-     * Socket.IO administra la reconexión automática.
-     * Este callback no crea sockets adicionales.
-     */
     private fun registrarCallbackRed() {
 
         if (netCallback != null) {
@@ -367,8 +331,6 @@ class SocketIOBackground : Service() {
                         "[RX] Se perdió la conexión de red"
                     )
 
-                    // No limpiar contador ni IDs procesados.
-                    // Socket.IO detectará la desconexión.
                 }
             }
 
@@ -388,9 +350,6 @@ class SocketIOBackground : Service() {
         }
     }
 
-    /**
-     * Libera el callback de conectividad.
-     */
     private fun liberarCallbackRed() {
 
         val callback = netCallback ?: return
@@ -415,11 +374,6 @@ class SocketIOBackground : Service() {
         }
     }
 
-    /**
-     * Detiene el servicio sin cerrar la sesión del usuario.
-     *
-     * No elimina el contador ni el historial de deduplicación.
-     */
     private fun detenerServicio() {
 
         if (servicioDeteniendose) {
@@ -465,8 +419,6 @@ class SocketIOBackground : Service() {
         collectorJob?.cancel()
         collectorJob = null
 
-        // Liberar también el socket para no dejar una conexión
-        // sin colector cuando el servicio sea destruido.
         try {
 
             SocketManager.desconectar()
@@ -481,9 +433,6 @@ class SocketIOBackground : Service() {
         super.onDestroy()
     }
 
-    /**
-     * Crea el canal de notificación permanente.
-     */
     private fun crearCanalServicio() {
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
@@ -528,9 +477,6 @@ class SocketIOBackground : Service() {
         private const val ACTION_DETENER =
             "com.gn.gestion.ACTION_STOP_SOCKET_SERVICE"
 
-        /**
-         * Inicia el servicio si existe una sesión activa.
-         */
         fun iniciar(context: Context) {
 
             val sync = ApiConfig.SYNC_ENABLED
@@ -573,9 +519,6 @@ class SocketIOBackground : Service() {
             }
         }
 
-        /**
-         * Solicita la detención controlada del servicio.
-         */
         fun detener(context: Context) {
 
             val intent = Intent(

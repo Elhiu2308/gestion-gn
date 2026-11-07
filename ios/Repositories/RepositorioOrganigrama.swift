@@ -1,16 +1,11 @@
 import Foundation
 
-/**
- * Repositorio de la estructura organizacional (`/api/organigrama/ *` y
- * `/api/personas`), equivalente al selector en cascada del panel web.
- */
 final class RepositorioOrganigrama {
 
     static let shared = RepositorioOrganigrama()
 
     private init() {}
 
-    /// Nivel superior (Dirección General) habilitado como padre.
     func direccionesGeneralesPadre() async throws -> [NivelOrganizacional] {
         let filas = try await RedCentral.enviarArreglo(
             "GET",
@@ -20,7 +15,6 @@ final class RepositorioOrganigrama {
         return filas.map(NivelOrganizacional.init(json:))
     }
 
-    /// Hijos de un nivel superior.
     func hijos(_ nivel: NivelOrganigrama, padreId: Int, incluirInactivos: Bool = false) async throws -> [NivelOrganizacional] {
         let nivelPadre = nivel.parametroPadre
         var consulta: [URLQueryItem] = []
@@ -30,12 +24,10 @@ final class RepositorioOrganigrama {
         return filas.map(NivelOrganizacional.init(json:))
     }
 
-    /// Árbol completo (`GET /api/organigrama/arbol`).
     func arbol() async throws -> [[String: Any]] {
         try await RedCentral.enviarArreglo("GET", "/organigrama/arbol")
     }
 
-    /// Crea un registro (`POST /api/organigrama/<nivel>`).
     @discardableResult
     func crear(nivel: NivelOrganigrama, nombre: String, idPadre: Int?) async throws -> [String: Any] {
         var cuerpo: [String: Any] = ["nombre": nombre]
@@ -43,7 +35,6 @@ final class RepositorioOrganigrama {
         return try await RedCentral.enviar("POST", "/organigrama/\(nivel.rawValue)", cuerpo: cuerpo)
     }
 
-    /// Edita un registro (`PUT /api/organigrama/<nivel>/<id>`).
     @discardableResult
     func editar(nivel: NivelOrganigrama, id: Int, nombre: String, estatus: Bool = true, idPadre: Int? = nil) async throws -> [String: Any] {
         var cuerpo: [String: Any] = ["nombre": nombre, "estatus": estatus]
@@ -51,14 +42,10 @@ final class RepositorioOrganigrama {
         return try await RedCentral.enviar("PUT", "/organigrama/\(nivel.rawValue)/\(id)", cuerpo: cuerpo)
     }
 
-    /// Desactiva un registro (`DELETE /api/organigrama/<nivel>/<id>`).
     func eliminar(nivel: NivelOrganigrama, id: Int) async throws {
         try await RedCentral.enviar("DELETE", "/organigrama/\(nivel.rawValue)/\(id)")
     }
 
-    // MARK: - Personas
-
-    /// Personas por dirección o subdirección (`GET /api/personas?direccion=|subdireccion=`).
     func personas(filtros: [String: String] = [:]) async throws -> [PersonaCatalogo] {
         var consulta: [URLQueryItem] = []
         for (clave, valor) in filtros where !valor.isEmpty {
@@ -69,10 +56,6 @@ final class RepositorioOrganigrama {
         return filas.map(PersonaCatalogo.init(json:))
     }
 
-    /// Usuarios activos (`GET /api/usuarios`). El catálogo de personas puede
-    /// estar desincronizado (por ejemplo, un encargado sin departamento pero
-    /// con subdirección); se usa como respaldo para que el turno pueda
-    /// seleccionar a cualquier usuario real de la estructura.
     func usuarios() async throws -> [PersonaCatalogo] {
         let filas = try await RedCentral.enviarArreglo(
             "GET",
@@ -87,9 +70,6 @@ final class RepositorioOrganigrama {
         }
     }
 
-    // MARK: - Bandejas
-
-    /// Bandejas de trabajo del usuario (`GET /api/bandejas`).
     func bandejas() async throws -> [Bandeja] {
         let filas = try await RedCentral.enviarArreglo("GET", "/bandejas")
         return filas.map(Bandeja.init(json:))

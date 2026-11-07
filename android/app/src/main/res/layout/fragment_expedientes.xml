@@ -14,7 +14,6 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- Encabezado -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,7 +41,6 @@
             android:textSize="14sp"
             android:lineSpacingExtra="2dp" />
 
-        <!-- Búsqueda y filtros avanzados de expedientes -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -94,7 +92,6 @@
 
         </LinearLayout>
 
-        <!-- Resumen y acción principal -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -164,7 +161,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Listado dinámico de expedientes -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -193,7 +189,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Pie institucional -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

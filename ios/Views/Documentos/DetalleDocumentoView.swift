@@ -1,9 +1,6 @@
 import SwiftUI
 import UIKit
 
-/// Ficha documental (`/api/documentos/<id>`) réplica de la app Android.
-///
-/// Pestañas: **Datos**, **PDF**, **OCR**, **Trámite**, **Anotaciones**, **Historial**.
 struct DetalleDocumentoView: View {
 
     let documentoId: Int
@@ -18,7 +15,7 @@ struct DetalleDocumentoView: View {
     @State private var mostrandoResponder = false
     @State private var mostrandoConsolidar = false
     @State private var mostrandoRevisarValidar = false
-    @State private var revisarAccion = false   // true = revisar, false = validar
+    @State private var revisarAccion = false
     @State private var mostrandoAnotar = false
     @State private var mostrandoQR = false
     @State private var mostrandoConfirmacionEliminar = false
@@ -141,8 +138,6 @@ struct DetalleDocumentoView: View {
         }
     }
 
-    // MARK: - Cabecera
-
     private func cabecera(doc: Documento) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
@@ -188,7 +183,7 @@ struct DetalleDocumentoView: View {
                     }
                 }
             }
-            // Acciones rápidas
+
             if !doc.estado.esTerminal {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
@@ -264,8 +259,6 @@ struct DetalleDocumentoView: View {
         }
     }
 
-    // MARK: - Pestañas
-
     private var pestañas: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 4) {
@@ -298,8 +291,6 @@ struct DetalleDocumentoView: View {
         case .historial: historialTab
         }
     }
-
-    // MARK: - Tabs
 
     private func datosTab(doc: Documento) -> some View {
         VStack(spacing: 12) {
@@ -560,8 +551,6 @@ struct DetalleDocumentoView: View {
         }
     }
 
-    // MARK: - Acciones
-
     private func recibir() {
         Task {
             do {
@@ -608,8 +597,7 @@ struct DetalleDocumentoView: View {
     }
 
     private func subirPDF() {
-        // Usa el document picker nativo.
-        // Implementación simplificada: se abre el selector de archivos.
+
     }
 
     private func fechaHora(_ fecha: Date?) -> String {
@@ -619,8 +607,6 @@ struct DetalleDocumentoView: View {
         f.timeStyle = .short
         return f.string(from: fecha)
     }
-
-    // MARK: - Helpers de estilo
 
     private func Fila(_ etiqueta: String, _ valor: String) -> some View {
         HStack(alignment: .top) {
@@ -635,8 +621,6 @@ struct DetalleDocumentoView: View {
         }
     }
 }
-
-// MARK: - ViewModel
 
 @MainActor
 final class DetalleDocumentoViewModel: ObservableObject {
@@ -674,7 +658,7 @@ final class DetalleDocumentoViewModel: ObservableObject {
             relaciones = try await rel
             anotaciones = try await ano
             textoOCR = documento?.textoOCR ?? ""
-            // QR
+
             let (t, m) = try await servicio.qr(documentoId: id)
             qrTexto = t
             qrMatriz = m
@@ -711,8 +695,6 @@ final class DetalleDocumentoViewModel: ObservableObject {
     }
 }
 
-// MARK: - Sheets auxiliares
-
 private struct TurnarSheet: View {
     @ObservedObject var modelo: DetalleDocumentoViewModel
     var onCerrar: () -> Void
@@ -741,8 +723,6 @@ private struct TurnarSheet: View {
         personas.first { $0.id == personaSeleccionada }
     }
 
-    /// El backend sólo acepta el nivel inmediatamente inferior. Para una persona
-    /// se envía su nivel organizacional real y su id de usuario como destinatario.
     private var destino: (tipo: String, id: Int)? {
         guard let p = persona else { return nil }
         if let d = p.idDepartamento { return ("departamento", d) }
@@ -922,9 +902,6 @@ private struct TurnarSheet: View {
             async let cuentas = repo.usuarios()
             departamentos = (try? await deptos) ?? []
 
-            // El catálogo de personas no siempre incluye a todos los usuarios
-            // con acceso (p. ej. encargados sin departamento). Se combinan
-            // ambas fuentes y se eliminan duplicados por id de usuario.
             let delCatalogo = (try? await lista) ?? []
             let deUsuarios = ((try? await cuentas) ?? []).filter {
                 $0.idSubdireccion == subdireccionId
@@ -1256,8 +1233,6 @@ private struct QRMatrixView: View {
         }
     }
 }
-
-// MARK: - Componentes pequeños
 
 private struct BotonAccion: View {
     let titulo: String

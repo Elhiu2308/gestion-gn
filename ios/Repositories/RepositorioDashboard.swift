@@ -1,7 +1,5 @@
 import Foundation
 
-/// Repositorio del panel y de movimientos recientes (`/api/dashboard` y
-/// `/api/movimientos/recientes`).
 final class RepositorioDashboard {
 
     static let shared = RepositorioDashboard()

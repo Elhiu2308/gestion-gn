@@ -21,6 +21,7 @@ import com.gn.gestion.models.*
 import com.gn.gestion.services.ApiFactory
 import com.gn.gestion.util.c
 import com.gn.gestion.util.dp
+import com.gn.gestion.util.mensajeServidor
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -66,7 +67,7 @@ class ExpedientesFragment : Fragment(R.layout.fragment_expedientes) {
             lbl.text = "Sin conexión"
             container.removeAllViews()
             container.addView(TextView(requireContext()).apply {
-                text = ex.message ?: "Error al cargar expedientes"
+                text = ex.mensajeServidor()
                 textSize = 14f
                 setTextColor(requireContext().c(R.color.rojo_urgencia))
                 setPadding(dp(requireContext(), 16), dp(requireContext(), 16), dp(requireContext(), 16), dp(requireContext(), 16))
@@ -186,7 +187,6 @@ class ExpedientesFragment : Fragment(R.layout.fragment_expedientes) {
             gravity = Gravity.CENTER_VERTICAL
         }
 
-        // Barra de color lateral izquierda
         val colorBar = View(ctx).apply {
             layoutParams = LinearLayout.LayoutParams(dp(ctx, 4), ViewGroup.LayoutParams.MATCH_PARENT)
             setBackgroundColor(ContextCompat.getColor(ctx, R.color.g_verde))
@@ -466,7 +466,7 @@ class ExpedientesFragment : Fragment(R.layout.fragment_expedientes) {
                     } catch (e: Exception) {
                         MaterialAlertDialogBuilder(requireContext(), R.style.GestioN_Dialog_Base)
                             .setTitle("Error al crear expediente")
-                            .setMessage(e.message ?: "Error de comunicación con el servidor.")
+                            .setMessage(e.mensajeServidor())
                             .setPositiveButton("OK", null)
                             .show()
                     }

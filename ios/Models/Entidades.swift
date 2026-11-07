@@ -1,18 +1,5 @@
 import Foundation
 
-/**
- * Entidades y DTOs compartidos entre la aplicación iOS y el backend.
-
- Todas las propiedades usan los nombres en *snake_case* tal como llegan por
- la serialización JSON del backend (la serialización se hace manualmente, sin
- codable automático, para respetar esos nombres).
- */
-
-// ---------------------------------------------------------------------------
-// Autenticación
-// ---------------------------------------------------------------------------
-
-/// Respuesta de `POST /api/auth/login` y de `/api/auth/refresh`.
 struct TokenSesion {
     let accessToken: String
     let refreshToken: String
@@ -28,7 +15,6 @@ struct TokenSesion {
     let permisos: Set<String>
 }
 
-/// Datos mínimos que se cargan del backend al sincronizar el perfil.
 struct DatosPerfil {
     let usuario: String
     let nombre: String
@@ -41,10 +27,6 @@ struct DatosPerfil {
     let correo: String
     let permisos: Set<String>
 }
-
-// ---------------------------------------------------------------------------
-// Documentos y flujo
-// ---------------------------------------------------------------------------
 
 enum TipoDocumento: String, CaseIterable, Identifiable {
     case mensaje = "MENSAJE"
@@ -71,35 +53,31 @@ enum TipoDocumento: String, CaseIterable, Identifiable {
     }
 }
 
-/// Solicitud de creación de documento (`POST /api/documentos`).
-///
-/// Los nombres de las claves son exactamente los que espera el backend
-/// (ver `web/app/static/js/ficha.js` → `Ficha.guardar`).
 struct DatosDocumento {
     var tipo: TipoDocumento = .oficio
     var folio: String = ""
     var asunto: String = ""
-    /// Destinatario (texto) e identificador del catálogo de personas.
+
     var destinatario: String = ""
     var idDestinatario: Int? = nil
     var referencia: String = ""
     var numAnexos: Int = 0
     var observaciones: String = ""
-    /// Fecha del documento (`YYYY-MM-DD`).
+
     var fechaDocumento: String = ""
-    /// Fecha de recepción (epoch en milisegundos).
+
     var fechaRecepcion: Double? = nil
-    /// Fecha y hora límite de atención.
+
     var fechaLimite: String = ""
     var fechaLimiteHora: String = ""
     var urgencia: UrgenciaDocumento = .ordinario
     var clasificacion: ClasificacionDocumento = .publico
     var notas: String = ""
     var textoOCR: String = ""
-    /// Área de origen y área destinataria (texto legible).
+
     var areaOrigen: String = ""
     var areaDestino: String = ""
-    /// Ids del organigrama para reconstruir la cascada.
+
     var orgDgOrigenId: Int? = nil
     var orgDirOrigenId: Int? = nil
     var orgSubOrigenId: Int? = nil
@@ -110,7 +88,6 @@ struct DatosDocumento {
     var orgDeptDestinoId: Int? = nil
 }
 
-/// Cambios que se envían al actualizar un documento (PUT /api/documentos/{id}).
 struct CambiosDocumento {
     var estado: String?
     var areaActual: String?
@@ -118,7 +95,6 @@ struct CambiosDocumento {
     var comentario: String?
 }
 
-/// Respuesta de acciones sobre el flujo documental.
 struct AccionFlujo {
     var ok: Bool = false
     var estado: String = ""
@@ -127,17 +103,12 @@ struct AccionFlujo {
     var documentoUuid: String?
 }
 
-/// Respuesta de compartir un documento en dos ramas.
 struct CompartirRespuesta {
     let ok: Bool
     let areaA: String
     let areaB: String
     let error: String = ""
 }
-
-// ---------------------------------------------------------------------------
-// Expedientes
-// ---------------------------------------------------------------------------
 
 struct Expediente: Identifiable {
     let id: Int
@@ -151,7 +122,6 @@ struct Expediente: Identifiable {
     var creadoEn: Date? = nil
     var documentos: [Documento] = []
 
-    /// Número oficial del expediente (`numero` en el backend).
     var numero: String { codigo }
 }
 
@@ -161,10 +131,6 @@ struct DatosExpediente {
     var areaResponsable: String = ""
     var clasificacion: String = "CONFIDENCIAL"
 }
-
-// ---------------------------------------------------------------------------
-// Archivo (histórico)
-// ---------------------------------------------------------------------------
 
 struct DocumentoArchivo: Identifiable {
     let id: Int
@@ -180,11 +146,11 @@ struct DocumentoArchivo: Identifiable {
     var clasificacion: String = ""
     var fechaLimite: String = ""
     var diasRestantes: Int? = nil
-    /// El documento fue turnado/asignado al usuario autenticado.
+
     var asignadoAMi: Bool = false
-    /// El documento fue creado por el usuario autenticado.
+
     var creadoPorMi: Bool = false
-    /// El documento proviene del archivo histórico (`/api/archivo`).
+
     var archivado: Bool = false
 
     init(
@@ -246,8 +212,6 @@ struct DocumentoArchivo: Identifiable {
         )
     }
 
-    /// Días restantes calculados a partir de la fecha límite cuando el backend
-    /// no envía `dias_restantes`.
     var diasParaVencer: Int? {
         if let diasRestantes { return diasRestantes }
         guard let fecha = Documento.fecha(fechaLimite) else { return nil }
@@ -264,20 +228,13 @@ struct DocumentoArchivo: Identifiable {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Notificaciones
-// ---------------------------------------------------------------------------
-
-
 struct Notificacion: Identifiable {
 
     let id: Int
     let uuid: String
 
-    /// Identificador del documento relacionado.
     var documentoId: Int?
 
-    /// UUID del documento relacionado.
     var documentoUuid: String
 
     var tipo: String
@@ -286,7 +243,6 @@ struct Notificacion: Identifiable {
     var emitidaEn: Date
     var leidaEn: Date? = nil
 
-    /// Indica si la notificación tiene un documento asociado.
     var tieneDocumento: Bool {
         guard let documentoId else {
             return false
@@ -296,14 +252,11 @@ struct Notificacion: Identifiable {
     }
 }
 
-
-/// Conjunto de notificaciones del centro de notificaciones.
 struct CentroNotificaciones {
     var noLeidas: Int
     var recientes: [Notificacion] = []
 }
 
-/// Versión del documento (PDF cargado).
 struct Version: Identifiable {
     let id: Int
     let numero: Int
@@ -311,20 +264,12 @@ struct Version: Identifiable {
     var creadoEn: Date
 }
 
-// ---------------------------------------------------------------------------
-// Configuración del servidor
-// ---------------------------------------------------------------------------
-
 struct DatosServidor {
     var url: String
     var sincronizacionAutomatica: Bool
     var ultimaSincronizacion: Date?
     var fechaSiguienteSincronizacion: Date?
 }
-
-// ---------------------------------------------------------------------------
-// Perfil
-// ---------------------------------------------------------------------------
 
 struct DatosPerfilRequest {
     var cargo: String
@@ -335,21 +280,14 @@ struct DatosPerfilRequest {
     var telefono: String?
 }
 
-// MARK: - Permisos efectivos
-
-/// Permisos efectivos del usuario autenticado.
 enum Permisos {
 
-    /// Determina si el usuario puede subir documentos (`DOCUMENTO_SUBIR_PDF` o
-    /// `DOCUMENTO_CREAR`), permiso que el backend otorga a SUPERVISOR,
-    /// RESPONSABLE y CAPTURISTA (ver `PERMISOS_POR_ROL` en el backend).
     static func puedeSubirDocumento(_ permisosDisponibles: Set<String>) -> Bool {
         return permisosDisponibles.contains("DOCUMENTO_SUBIR_PDF")
             || permisosDisponibles.contains("DOCUMENTO_CREAR")
     }
 }
 
-/// Resultado del OCR de un documento.
 struct DatosOCR {
     let texto: String
     let procesadoEn: Date

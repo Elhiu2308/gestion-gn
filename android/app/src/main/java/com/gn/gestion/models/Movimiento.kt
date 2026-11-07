@@ -3,7 +3,6 @@ package com.gn.gestion.models
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-/** Trazabilidad: un evento en el ciclo de vida de un documento. */
 @Entity(tableName = "movimientos")
 data class Movimiento(
     @PrimaryKey(autoGenerate = true)

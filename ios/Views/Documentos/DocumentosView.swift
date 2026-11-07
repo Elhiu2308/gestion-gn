@@ -1,10 +1,5 @@
 import SwiftUI
 
-/// Pantalla "Documentos": selector de bandeja y listado de resultados.
-///
-/// No incluye búsqueda, filtros ni alta. Esas acciones viven en "Buscar
-/// documento" para que la pantalla principal conserve el comportamiento
-/// homologado con Android.
 struct DocumentosView: View {
 
     @StateObject private var vistaModelo: DocumentosViewModel
@@ -120,10 +115,6 @@ struct DocumentosView: View {
     }
 }
 
-/// Pantalla "Buscar documento" (`GET /api/buscar`).
-///
-/// Reproduce el buscador de Android: texto rápido, panel de filtros plegable,
-/// filtros combinables y botón verde Buscar.
 struct BuscarDocumentoView: View {
 
     @StateObject private var vistaModelo = BuscarDocumentoViewModel()
@@ -155,8 +146,6 @@ struct BuscarDocumentoView: View {
         .scrollDismissesKeyboard(.interactively)
         .animation(.easeInOut(duration: 0.2), value: mostrandoFiltros)
     }
-
-    // MARK: Búsqueda rápida
 
     private var campoBusqueda: some View {
         HStack(spacing: 10) {
@@ -238,8 +227,6 @@ struct BuscarDocumentoView: View {
             .disabled(vistaModelo.estaCargando)
         }
     }
-
-    // MARK: Filtros avanzados
 
     private var panelFiltros: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -364,8 +351,6 @@ struct BuscarDocumentoView: View {
         }
     }
 
-    // MARK: Resultados
-
     @ViewBuilder
     private var resultados: some View {
         if vistaModelo.estaCargando {
@@ -424,8 +409,6 @@ struct BuscarDocumentoView: View {
         Task { await vistaModelo.buscar() }
     }
 }
-
-// MARK: - Campos reutilizables
 
 private struct CampoTextoFiltro: View {
 
@@ -553,7 +536,6 @@ private struct CampoFechaFiltro: View {
     }
 }
 
-/// Tarjeta de documento réplica de `item_documento.xml` (Android).
 struct DocumentoFila: View {
 
     let documento: Documento

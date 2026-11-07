@@ -9,10 +9,6 @@ import android.util.Log
 import com.gn.gestion.services.ApiConfig
 import com.gn.gestion.services.TokenProvider
 
-/**
- * Receptor de broadcasts que detecta cambios en la conectividad de red (WiFi / Datos Móviles).
- * Cuando el dispositivo recupera conexión a Internet, inicia o reconecta el servicio SocketIO.
- */
 class NetworkChangeReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {

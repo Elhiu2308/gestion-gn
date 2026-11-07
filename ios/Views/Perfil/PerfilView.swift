@@ -3,7 +3,6 @@ import PhotosUI
 import CryptoKit
 import UIKit
 
-/// Pantalla de perfil con identidad institucional, seguridad y firma digital.
 struct PerfilView: View {
 
     var alRegresar: (() -> Void)? = nil

@@ -1,4 +1,44 @@
+"""Quita los comentarios del cliente Android (Kotlin y XML).
+
+Uso:
+    python strip_comments.py [ruta]
+
+`ruta` es la carpeta que se recorre; si se omite se usa
+`app/src/main` del proyecto donde vive este script. Sólo se tocan archivos
+`.kt`, `.kts` y `.xml`; se conservan las cadenas de texto (incluidas las
+URLs con `//`) y los finales de línea originales.
+"""
+
 import os
+import sys
+from pathlib import Path
+
+# La consola de Windows puede no representar rutas con acentos combinados
+# (por ejemplo el nombre NFD del .xcodeproj); no se debe abortar por eso.
+try:
+    sys.stdout.reconfigure(errors='replace')
+    sys.stderr.reconfigure(errors='replace')
+except Exception:
+    pass
+
+
+def compactar_lineas(text):
+    """Quita espacios finales y deja como máximo una línea en blanco seguida."""
+    nl = '\r\n' if '\r\n' in text else '\n'
+    lineas = text.replace('\r\n', '\n').split('\n')
+    salida = []
+    vacias = 0
+    for linea in lineas:
+        linea = linea.rstrip(' \t')
+        if linea == '':
+            vacias += 1
+            if vacias <= 1:
+                salida.append('')
+        else:
+            vacias = 0
+            salida.append(linea)
+    return nl.join(salida)
+
 
 def remove_kotlin_comments(text):
     out = []
@@ -42,11 +82,13 @@ def remove_kotlin_comments(text):
                 i += 2
                 state = 'NORMAL'
             else:
+                if ch == '\n':
+                    out.append(ch)
                 i += 1
         elif state == 'STRING':
             out.append(ch)
             if ch == '\\' and i + 1 < n:
-                out.append(text[i+1])
+                out.append(text[i + 1])
                 i += 2
             elif ch == '"':
                 state = 'NORMAL'
@@ -64,7 +106,7 @@ def remove_kotlin_comments(text):
         elif state == 'CHAR':
             out.append(ch)
             if ch == '\\' and i + 1 < n:
-                out.append(text[i+1])
+                out.append(text[i + 1])
                 i += 2
             elif ch == "'":
                 state = 'NORMAL'
@@ -72,6 +114,7 @@ def remove_kotlin_comments(text):
             else:
                 i += 1
     return ''.join(out)
+
 
 def remove_xml_comments(text):
     out = []
@@ -100,56 +143,64 @@ def remove_xml_comments(text):
                 i += 3
                 state = 'NORMAL'
             else:
+                if text[i] == '\n':
+                    out.append('\n')
                 i += 1
         elif state == 'STRING_DOUBLE':
             out.append(text[i])
             if text[i] == '\\' and i + 1 < n:
-                out.append(text[i+1])
+                out.append(text[i + 1])
                 i += 2
             elif text[i] == '"':
                 state = 'NORMAL'
                 i += 1
             else:
-                out.append(text[i])
                 i += 1
         elif state == 'STRING_SINGLE':
             out.append(text[i])
             if text[i] == '\\' and i + 1 < n:
-                out.append(text[i+1])
+                out.append(text[i + 1])
                 i += 2
             elif text[i] == "'":
                 state = 'NORMAL'
                 i += 1
             else:
-                out.append(text[i])
                 i += 1
     return ''.join(out)
 
+
 def main():
-    main_dir = '/Users/estebangarciajuarez/Desktop/Android/app/src/main'
-    modified_count = 0
-    for root, dirs, files in os.walk(main_dir):
+    if len(sys.argv) > 1:
+        base = Path(sys.argv[1])
+    else:
+        base = Path(__file__).resolve().parent / 'app' / 'src' / 'main'
+
+    if not base.exists():
+        print(f'No existe la ruta: {base}')
+        return 1
+
+    modified = 0
+    for root, _, files in os.walk(base):
         for file in files:
-            path = os.path.join(root, file)
-            if file.endswith('.kt'):
-                with open(path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                new_content = remove_kotlin_comments(content)
-                if content != new_content:
-                    with open(path, 'w', encoding='utf-8') as f:
-                        f.write(new_content)
-                    print(f"Cleaned Kotlin comments in: {path}")
-                    modified_count += 1
+            path = Path(root) / file
+            if file.endswith(('.kt', '.kts')):
+                remove = remove_kotlin_comments
             elif file.endswith('.xml'):
-                with open(path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                new_content = remove_xml_comments(content)
-                if content != new_content:
-                    with open(path, 'w', encoding='utf-8') as f:
-                        f.write(new_content)
-                    print(f"Cleaned XML comments in: {path}")
-                    modified_count += 1
-    print(f"Total files modified: {modified_count}")
+                remove = remove_xml_comments
+            else:
+                continue
+            with open(path, 'r', encoding='utf-8', newline='') as f:
+                content = f.read()
+            new_content = remove(content)
+            if content != new_content:
+                new_content = compactar_lineas(new_content)
+                with open(path, 'w', encoding='utf-8', newline='') as f:
+                    f.write(new_content)
+                print(f'Comentarios quitados: {path}')
+                modified += 1
+    print(f'Total de archivos modificados: {modified}')
+    return 0
+
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

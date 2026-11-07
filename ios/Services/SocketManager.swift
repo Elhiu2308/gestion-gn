@@ -3,7 +3,6 @@ import Foundation
 import UIKit
 import SocketIO
 
-/// Payload del evento "notification" del backend.
 struct NotificacionSocketPayload {
     let mensaje: String
     let tipo: String
@@ -14,17 +13,12 @@ struct NotificacionSocketPayload {
     let ts: Double
 }
 
-/// Eventos disponibles del canal Socket.IO.
 struct EventosSocketNotificaciones {
     var notificacion: ((NotificacionSocketPayload) -> Void)?
     var contador: ((Int) -> Void)?
     var unido: ((String, Int) -> Void)?
 }
 
-/// Gestor del canal Socket.IO de Gestión Documental.
-///
-/// Namespace: /rt
-/// Evento: notification
 final class SocketManager {
 
     static let shared = SocketManager()
@@ -33,16 +27,10 @@ final class SocketManager {
     private var socket: SocketIOClient?
     private var tokenActual: String?
 
-    // MARK: - Suscripciones
-
     private var suscripciones: [UUID: EventosSocketNotificaciones] = [:]
 
     private let bloqueoSuscripciones = NSLock()
 
-    /// Registra un suscriptor independiente.
-    ///
-    /// Devuelve un identificador que debe conservar el suscriptor
-    /// para cancelar su registro cuando deje de necesitar los eventos.
     @discardableResult
     func suscribir(
         _ eventos: EventosSocketNotificaciones
@@ -57,7 +45,6 @@ final class SocketManager {
         return id
     }
 
-    /// Elimina exclusivamente la suscripción indicada.
     func cancelarSuscripcion(_ id: UUID) {
 
         bloqueoSuscripciones.lock()
@@ -73,14 +60,10 @@ final class SocketManager {
         return Array(suscripciones.values)
     }
 
-    // MARK: - Deduplicación
-
     private let bloqueoDeduplicacion = NSLock()
     private var identificadoresRecibidos = Set<Int>()
     private var ordenIdentificadores: [Int] = []
     private let maximoIdentificadoresRecordados = 300
-
-    // MARK: - Inicialización
 
     private init() {
         NotificationCenter.default.addObserver(
@@ -94,8 +77,6 @@ final class SocketManager {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-
-    // MARK: - Conexión
 
     func conectar(token: String) {
 
@@ -148,8 +129,6 @@ final class SocketManager {
 
         print("[Realtime] Iniciando conexión a /rt")
     }
-
-    // MARK: - Eventos
 
     private func registrarEventos(en socket: SocketIOClient) {
 
@@ -271,8 +250,6 @@ final class SocketManager {
         }
     }
 
-    // MARK: - Deduplicación
-
     private func registrarIdentificador(_ id: Int) -> Bool {
 
         bloqueoDeduplicacion.lock()
@@ -301,8 +278,6 @@ final class SocketManager {
         identificadoresRecibidos.removeAll()
         ordenIdentificadores.removeAll()
     }
-
-    // MARK: - Conversión de datos
 
     private static func entero(_ valor: Any?) -> Int? {
 
@@ -346,8 +321,6 @@ final class SocketManager {
         return cadena
     }
 
-    // MARK: - Comunicación
-
     func ping() {
         guard socket?.status == .connected else { return }
         socket?.emit("ping")
@@ -357,8 +330,6 @@ final class SocketManager {
         guard socket?.status == .connected else { return }
         socket?.emit("leave")
     }
-
-    // MARK: - Desconexión
 
     func desconectar() {
         finalizarConexion(limpiarDeduplicacion: true)
@@ -385,8 +356,6 @@ final class SocketManager {
     var isConnected: Bool {
         socket?.status == .connected
     }
-
-    // MARK: - Ciclo de vida iOS
 
     @objc
     private func aplicacionActiva() {

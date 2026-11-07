@@ -11,7 +11,7 @@ class AIChatViewModel: ObservableObject {
     private let service = OllamaAIService.shared
 
     init() {
-        // Instrucción inicial al agente (responde en español, claro y conciso).
+
         addSystemMessage("Eres un asistente de IA integrado en una app iOS nativa. Responde siempre en español, de forma clara, concisa y útil.")
     }
 

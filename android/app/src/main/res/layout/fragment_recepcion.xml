@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:background="@color/fondo">
 
-    <!-- CAMERA PREVIEW -->
     <FrameLayout
         android:id="@+id/container_camara"
         android:layout_width="match_parent"
@@ -16,13 +15,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <!-- OVERLAY DE ESCANEO -->
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#66000000" />
 
-        <!-- MARCO DE ESCANEO QR -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,7 +62,6 @@
 
         </LinearLayout>
 
-        <!-- BOTONES DE CONTROL SUPERIORES -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -104,7 +100,6 @@
 
     </FrameLayout>
 
-    <!-- CARGANDO INDICATOR -->
     <LinearLayout
         android:id="@+id/loading_layout"
         android:layout_width="wrap_content"
@@ -133,7 +128,6 @@
 
     </LinearLayout>
 
-    <!-- TARJETA INFORMATIVA / CONFIRMACIÓN DE RECEPCIÓN -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_confirmacion_recepcion"
         android:layout_width="match_parent"

@@ -1,6 +1,5 @@
 import Foundation
 
-/// Mensaje de conversación con el agente de IA.
 struct AIMessage: Identifiable, Codable {
     let id: UUID
     let role: AIRole

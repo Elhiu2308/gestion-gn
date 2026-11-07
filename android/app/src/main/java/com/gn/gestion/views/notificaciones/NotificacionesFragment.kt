@@ -72,19 +72,13 @@ class NotificacionesFragment : Fragment(R.layout.fragment_notificaciones) {
         boton.alpha = if (noLeidas > 0) 1f else 0.45f
     }
 
-    /**
-     * Refresca la lista en cuanto el servidor emite una notificación o un nuevo
-     * contador, sin polling ni swipe. `repeatOnLifecycle(STARTED)` deja de
-     * recoger en cuanto la pantalla sale de primer plano, y con ello se retiran
-     * los listeners del socket.
-     */
     private fun observarEventosSocket() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 SocketManager.eventos().collect { evento ->
                     when (evento) {
                         is EventoSocket.NuevaNotificacion -> {
-                            // El contador ya lo actualiza SocketManager.emitirNotificacion.
+
                             cargar()
                         }
                         is EventoSocket.ContadorActualizado -> {
@@ -127,10 +121,6 @@ class NotificacionesFragment : Fragment(R.layout.fragment_notificaciones) {
         }
     }
 
-    /**
-     * Al presionar una notificación se marca como leída y se abre el documento
-     * que la originó (descargándolo si aún no estaba en el dispositivo).
-     */
     private fun alAbrir(n: NotificacionDto) {
         marcarLeida(n.id)
         val servidorId = n.documentoId ?: 0L
@@ -148,7 +138,6 @@ class NotificacionesFragment : Fragment(R.layout.fragment_notificaciones) {
         }
     }
 
-    /** Marca la notificación como leída en el servidor y refresca el contador. */
     private fun marcarLeida(id: Long) {
         viewLifecycleOwner.lifecycleScope.launch {
             withContext(Dispatchers.IO) {

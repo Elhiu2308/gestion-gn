@@ -1,18 +1,16 @@
 package com.gn.gestion.services
 
 import android.content.Context
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-/**
- * Construye el cliente Retrofit con interceptor de autorización JWT.
- * El token se toma del almacenamiento cifrado (TokenProvider).
- */
 object ApiFactory {
 
     @Volatile
@@ -37,10 +35,22 @@ object ApiFactory {
 
     private fun logging() = HttpLoggingInterceptor().apply {
         level = if (ApiConfig.LOGS) {
-            HttpLoggingInterceptor.Level.BASIC
+            HttpLoggingInterceptor.Level.BODY
         } else {
             HttpLoggingInterceptor.Level.NONE
         }
+    }
+
+    private fun errores() = Interceptor { chain ->
+        val respuesta = chain.proceed(chain.request())
+        if (!respuesta.isSuccessful) {
+            val cuerpo = runCatching { respuesta.peekBody(4096).string() }.getOrDefault("")
+            Log.e(
+                "GN_HTTP",
+                "HTTP ${respuesta.code} ${chain.request().method} ${chain.request().url} -> $cuerpo"
+            )
+        }
+        respuesta
     }
 
     private fun construirCliente(conToken: Boolean, context: Context): OkHttpClient {
@@ -69,7 +79,10 @@ object ApiFactory {
                 chain.proceed(reqBuilder.build())
             }
         }
-        return builder.addInterceptor(logging()).build()
+        return builder
+            .addInterceptor(errores())
+            .addInterceptor(logging())
+            .build()
     }
 
     fun gson(): Gson = GsonBuilder().create()
@@ -88,10 +101,6 @@ object ApiFactory {
         }
     }
 
-    /**
-     * Cliente para el login biométrico: no inyecta el access token porque la
-     * petición viaja con el refresh token en la cabecera `Authorization`.
-     */
     fun apiSinToken(context: Context): ApiService =
         Retrofit.Builder()
             .baseUrl(baseUrl(context))

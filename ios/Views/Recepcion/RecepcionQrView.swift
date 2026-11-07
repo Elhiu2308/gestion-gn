@@ -1,14 +1,6 @@
 import AVFoundation
 import SwiftUI
 
-/// Pantalla de recepción documental con código QR.
-///
-/// La cámara se abre **inmediatamente** al entrar a la pestaña, con el marco
-/// guía institucional. Al detectar un QR se muestra la ficha del documento y se
-/// confirma la recepción (`POST /api/documentos/<id>/recibir`).
-///
-/// También ofrece búsqueda manual por folio/UUID y linterna, igual que la
-/// pantalla de Recepción de Android.
 struct RecepcionQrView: View {
 
     var alRegresar: (() -> Void)? = nil
@@ -113,8 +105,6 @@ struct RecepcionQrView: View {
         }
     }
 
-    // MARK: - Cámara
-
     @ViewBuilder
     private var camara: some View {
         if EscannerQRVista.esCompatible && !camaraNoDisponible {
@@ -141,7 +131,6 @@ struct RecepcionQrView: View {
         }
     }
 
-    /// Solicita acceso a la cámara antes de iniciar `DataScannerViewController`.
     private func prepararCamara() async {
         guard EscannerQRVista.esCompatible else {
             permisoCamara = false
@@ -191,8 +180,6 @@ struct RecepcionQrView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
     }
-
-    // MARK: - Barra superior
 
     private var barraSuperior: some View {
         HStack(alignment: .center, spacing: 10) {
@@ -260,8 +247,6 @@ struct RecepcionQrView: View {
         .buttonStyle(PlainButtonStyle())
     }
 
-    // MARK: - Instrucción
-
     private var instruccion: some View {
         VStack(spacing: 8) {
             if vistaModelo.estaCargando {
@@ -285,8 +270,6 @@ struct RecepcionQrView: View {
         .padding(.horizontal, 24)
         .padding(.bottom, 22)
     }
-
-    // MARK: - Ficha del documento
 
     private func tarjetaDocumento(_ documento: Documento) -> some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -434,10 +417,6 @@ struct RecepcionQrView: View {
         .padding(.bottom, 8)
     }
 
-    // MARK: - Acciones
-
-    /// Normaliza el contenido del QR: admite el UUID, el folio, el id, una URL
-    /// con `uuid=` o el prefijo `GESTIONN::` que usa el backend.
     private func normalizarCodigo(_ valor: String) -> String {
         var texto = valor.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -539,9 +518,6 @@ struct RecepcionQrView: View {
     }
 }
 
-// MARK: - Máscara del escáner
-
-/// Oscurece todo excepto el cuadrado central donde se coloca el QR.
 private struct MascaraEscaner: Shape {
 
     func path(in rect: CGRect) -> Path {
@@ -558,7 +534,6 @@ private struct MascaraEscaner: Shape {
     }
 }
 
-/// Marco con esquinas doradas que guía la lectura del QR.
 private struct MarcoRecepcionQR: View {
 
     var body: some View {
@@ -583,7 +558,6 @@ private struct MarcoRecepcionQR: View {
     }
 }
 
-/// Dibuja las cuatro esquinas del marco de recepción.
 private struct EsquinasRecepcion: Shape {
 
     func path(in rect: CGRect) -> Path {
@@ -610,8 +584,6 @@ private struct EsquinasRecepcion: Shape {
     }
 }
 
-// MARK: - ViewModel
-
 @MainActor
 final class RecepcionViewModel: ObservableObject {
 
@@ -623,7 +595,6 @@ final class RecepcionViewModel: ObservableObject {
 
     init() {}
 
-    /// Carga los documentos disponibles para la pantalla de recepción.
     func cargarDocumentos() async {
         estaCargando = true
         defer { estaCargando = false }
@@ -636,7 +607,6 @@ final class RecepcionViewModel: ObservableObject {
         }
     }
 
-    /// Busca un documento por UUID, folio o id.
     func buscar(_ clave: String) -> Documento? {
         let buscada = clave.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
         guard !buscada.isEmpty else { return nil }

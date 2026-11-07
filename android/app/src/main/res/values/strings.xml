@@ -14,7 +14,6 @@
     <string name="aplicar_filtros">Aplicar</string>
     <string name="cancelar">Cancelar</string>
 
-    <!-- Login & General Strings -->
     <string name="titulo_expedientes_control">Tus expedientes, bajo control</string>
     <string name="subtitulo_trazabilidad">Organización, seguimiento y trazabilidad documental</string>
     <string name="iniciar_sesion">Iniciar sesión</string>
@@ -29,7 +28,6 @@
     <string name="configurar_servidor">Configurar servidor (IP)</string>
     <string name="gestion_documental_footer">GestióN · Gestión Documental</string>
 
-    <!-- Layout extracted strings -->
     <string name="gestion_documental_header">GESTIÓN DOCUMENTAL</string>
     <string name="archivo">Archivo</string>
     <string name="archivo_subtitulo">Documentos asignados, respondidos, vencidos y archivados.</string>

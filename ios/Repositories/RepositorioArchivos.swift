@@ -1,8 +1,5 @@
 import Foundation
 
-/**
- * Repositorio del archivo histórico (`/api/archivo`).
- */
 final class RepositorioArchivos {
 
     static let shared = RepositorioArchivos()

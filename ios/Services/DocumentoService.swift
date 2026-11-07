@@ -1,12 +1,6 @@
 import Foundation
 import UniformTypeIdentifiers
 
-/**
- * Servicio de documentos (`/api/documentos/ *`).
- *
- * Las llamadas usan `async/await` (Swift 5.5+). Este servicio envuelve el
- * repositorio y ofrece una API de alto nivel para la capa de vistas.
- */
 struct ServicioDocumentos {
 
     enum Error: LocalizedError {
@@ -35,8 +29,6 @@ struct ServicioDocumentos {
     func eliminar(id: Int) async throws {
         try await repositorio.eliminar(id: id)
     }
-
-    // MARK: - Piezas de la ficha
 
     func historial(id: Int) async throws -> [PasoHistorial] {
         try await repositorio.historial(id: id)
@@ -69,8 +61,6 @@ struct ServicioDocumentos {
     func eliminarRelacion(documentoId: Int, relacionId: Int) async throws {
         try await repositorio.eliminarRelacion(documentoId: documentoId, relacionId: relacionId)
     }
-
-    // MARK: - Flujo
 
     func recibir(documentoId: Int) async throws -> AccionFlujo {
         try await repositorio.recibir(documentoId: documentoId)
@@ -124,8 +114,6 @@ struct ServicioDocumentos {
         try await repositorio.eliminarAnotacion(documentoId: documentoId, anotacionId: anotacionId)
     }
 
-    // MARK: - Archivos adjuntos
-
     func subirArchivo(documentoId: Int, url: URL, nombre: String, mimeType: String) async throws {
         _ = try await repositorio.subirArchivo(documentoId: documentoId, archivo: url, nombre: nombre, mimeType: mimeType)
     }
@@ -154,7 +142,6 @@ struct ServicioDocumentos {
         try await repositorio.bandejas()
     }
 
-    /// Busca documentos con los filtros combinables del buscador global.
     func buscar(filtros: RepositorioDocumentos.FiltrosBusqueda) async throws -> [Documento] {
         try await repositorio.buscar(filtros: filtros)
     }

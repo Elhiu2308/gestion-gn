@@ -1,10 +1,5 @@
 import Foundation
 
-/// Contenedor de servicios: permite que la capa de vistas (ViewModels) acceda a
-/// los servicios sin pasar el `Context` por cada llamada.
-///
- /// Es deliberadamente simple: un registro estático de instancias singleton.
-/// No se busca IoC complejo, sino código claro y mantenible.
 @MainActor
 final class ContenedorServicios {
     static let shared = ContenedorServicios()

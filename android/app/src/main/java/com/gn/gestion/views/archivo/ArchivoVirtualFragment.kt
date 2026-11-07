@@ -80,13 +80,11 @@ class ArchivoVirtualFragment : Fragment(R.layout.fragment_archivo_virtual) {
         val btnAplicar = view.findViewById<MaterialButton>(R.id.btn_aplicar_filtros)
         val btnLimpiar = view.findViewById<MaterialButton>(R.id.btn_limpiar_filtros)
 
-        // Búsqueda rápida en tiempo real
         inputBuscarGlobal?.doAfterTextChanged { text ->
             filtroAsunto = text.toString().trim()
             aplicarFiltrosEnMemoria()
         }
 
-        // Toggle panel de filtros avanzados
         btnToggleFiltros?.setOnClickListener {
             val visible = containerFiltrosAvanzados.isVisible
             containerFiltrosAvanzados.isVisible = !visible
@@ -95,7 +93,6 @@ class ArchivoVirtualFragment : Fragment(R.layout.fragment_archivo_virtual) {
             )
         }
 
-        // Configurar Spinners
         val tiposOpciones = listOf("Todos") + TipoDocumento.entries.map { it.label }
         spTipo?.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, tiposOpciones).apply {
             setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)

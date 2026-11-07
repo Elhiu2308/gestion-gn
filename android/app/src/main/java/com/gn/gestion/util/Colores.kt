@@ -81,7 +81,6 @@ fun dp(context: Context, value: Int): Int =
 
 fun Int.withAlpha(alpha: Int): Int = (this and 0x00FFFFFF) or ((alpha.coerceIn(0, 255)) shl 24)
 
-/** Construye una "etiqueta" tipo badge con fondo redondeado. */
 fun Context.textoBadge(texto: String, textColor: Int, bgColRes: Int = R.color.fondo_claro): TextView {
     return TextView(this).apply {
         text = texto

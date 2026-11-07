@@ -9,18 +9,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.URISyntaxException
 
-/**
- * Receptor y gestor de conexión Socket.IO con Flask-SocketIO.
- *
- * Contrato del backend:
- * - Namespace: /rt
- * - Autenticación: auth.token y query token
- * - Unión privada: join sin payload
- * - Confirmación: joined
- * - Notificaciones: notification
- * - Contador: contador_actualizado
- * - Salida: leave
- */
 object SocketIOReceiver {
 
     private const val TAG = "SocketIOReceiver"
@@ -96,7 +84,6 @@ object SocketIOReceiver {
             val s = IO.socket("$baseUrl$NAMESPACE", opts)
             socket = s
 
-            // Actualizar credenciales antes de cada reconexión.
             s.io().on(Manager.EVENT_RECONNECT_ATTEMPT) {
                 try {
                     val fresco = currentTokenProvider?.invoke()
@@ -115,7 +102,6 @@ object SocketIOReceiver {
                 }
             }
 
-            // Conexión establecida.
             s.on(Socket.EVENT_CONNECT) {
                 Log.i(
                     TAG,
@@ -127,7 +113,7 @@ object SocketIOReceiver {
                 )
 
                 try {
-                    // El servidor obtiene el usuario del JWT.
+
                     s.emit("join")
 
                     Log.i(TAG, "[RX] Evento join emitido")
@@ -137,7 +123,6 @@ object SocketIOReceiver {
                 }
             }
 
-            // Error de conexión.
             s.on(Socket.EVENT_CONNECT_ERROR) { args ->
                 val error = args.firstOrNull()?.toString()
                     ?: "desconocido"
@@ -149,7 +134,6 @@ object SocketIOReceiver {
                 )
             }
 
-            // Desconexión.
             s.on(Socket.EVENT_DISCONNECT) { args ->
                 val reason = args.firstOrNull()?.toString()
                     ?: "desconocido"
@@ -161,7 +145,6 @@ object SocketIOReceiver {
                 )
             }
 
-            // Confirmación de incorporación a la sala privada.
             s.on("joined") { args ->
                 try {
                     val data = aJson(args.firstOrNull())
@@ -188,12 +171,10 @@ object SocketIOReceiver {
                 }
             }
 
-            // Único evento oficial de notificaciones.
             s.on("notification") { args ->
                 procesarNotificacion(args)
             }
 
-            // Actualización del contador.
             s.on("contador_actualizado") { args ->
                 try {
                     val data = aJson(args.firstOrNull())
@@ -217,7 +198,6 @@ object SocketIOReceiver {
                 }
             }
 
-            // El servidor rechazó la incorporación a la sala.
             s.on("error_sala") { args ->
                 val error = args.firstOrNull()?.toString()
                     ?: "error desconocido"
@@ -228,8 +208,6 @@ object SocketIOReceiver {
                     ConexionSocket.Desconectado
                 )
 
-                // No conservar una conexión que no está autorizada
-                // para recibir notificaciones privadas.
                 try {
                     s.disconnect()
                 } catch (e: Exception) {
@@ -255,9 +233,6 @@ object SocketIOReceiver {
         }
     }
 
-    /**
-     * Convierte el contenido recibido a JSONObject.
-     */
     private fun aJson(raw: Any?): JSONObject? {
         return when (raw) {
             is JSONObject -> raw
@@ -272,22 +247,6 @@ object SocketIOReceiver {
         }
     }
 
-    /**
-     * Procesa una notificación recibida desde el evento notification.
-     *
-     * El backend envía:
-     * {
-     *   "type": "notification",
-     *   "data": {
-     *     "notificacion_id": 123,
-     *     "documento_id": 456,
-     *     "documento_uuid": "...",
-     *     "tipo": "...",
-     *     "mensaje": "..."
-     *   },
-     *   "no_leidas": 5
-     * }
-     */
     private fun procesarNotificacion(args: Array<out Any?>) {
 
         Log.i(
@@ -306,7 +265,6 @@ object SocketIOReceiver {
         try {
             val data = json.optJSONObject("data") ?: json
 
-            // El contador normalmente viene en el nivel superior.
             val noLeidas = when {
                 json.has("no_leidas") ->
                     json.optInt("no_leidas", -1)
@@ -339,7 +297,6 @@ object SocketIOReceiver {
                 ""
             ).trim()
 
-            // Solo procesar notificaciones persistidas.
             if (notifId <= 0L) {
                 Log.e(
                     TAG,
@@ -381,11 +338,6 @@ object SocketIOReceiver {
         }
     }
 
-    /**
-     * Desconecta y libera los listeners del socket.
-     *
-     * No limpia contador ni IDs publicados.
-     */
     @Synchronized
     fun disconnect() {
 
@@ -421,9 +373,6 @@ object SocketIOReceiver {
         }
     }
 
-    /**
-     * Indica si existe una conexión activa.
-     */
     @Synchronized
     fun isConnected(): Boolean {
         return socket?.connected() == true

@@ -10,7 +10,6 @@ import com.gn.gestion.models.servidorIdRequerido
 import com.gn.gestion.models.SYNC_SINCRONIZADO
 import kotlinx.coroutines.flow.Flow
 
-
 class DocumentoRepository(
     private val dao: DocumentoDao,
     private val movimientoDao: MovimientoDao,
@@ -35,17 +34,9 @@ class DocumentoRepository(
 
     suspend fun porServidorId(servidorId: Long): Documento? = dao.getByServidorId(servidorId)
 
-    /**
-     * Resuelve el identificador con el que hay que hablarle al backend.
-     *
-     * Devuelve null cuando el documento todavía no existe en el servidor, en cuyo
-     * caso las acciones de flujo deben bloquearse en lugar de invocarse con la PK
-     * local de Room (que produce 404 o, peor, opera sobre otro documento).
-     */
     suspend fun resolverServidorId(doc: Documento): Long? {
         doc.servidorIdRequerido?.let { return it }
-        // La entidad pudo venir desactualizada respecto a la tabla (p. ej. tras un
-        // sync concurrente): se reintenta contra la BD por uuid.
+
         if (doc.uuid.isBlank()) return null
         return dao.getByUuid(doc.uuid)?.servidorIdRequerido
     }
@@ -61,13 +52,6 @@ class DocumentoRepository(
         dao.marcarEstadosync(id, estado, System.currentTimeMillis())
     }
 
-    /**
-     * Upsert por uuid: inserta si no existe, si no fusiona.
-     *
-     * Se usa fusionar() en lugar de update() para no perder lo que solo existe en
-     * el dispositivo: la ruta del PDF escaneado, el estado de la cola de sync y el
-     * servidor_id ya conocido.
-     */
     suspend fun guardarRemote(doc: Documento) {
         val existente = dao.getByUuid(doc.uuid)
         if (existente == null) {
@@ -96,7 +80,6 @@ class DocumentoRepository(
     suspend fun ajusteColaEspera(docId: Long, accion: String) =
         syncQueueDao.marcarResuelto(docId, accion)
 
-    // Filtros en memoria
     fun filtrar(
         docs: List<Documento>,
         tipo: String? = null,

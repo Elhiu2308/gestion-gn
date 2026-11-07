@@ -12,8 +12,11 @@ import com.gn.gestion.models.SYNC_SINCRONIZADO
 import com.gn.gestion.models.aDocumento
 import com.gn.gestion.models.aMovimiento
 import com.gn.gestion.models.fusionar
+import com.gn.gestion.util.Hora
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -22,7 +25,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.security.MessageDigest
 
-/** Resultado de una ejecución de sincronización. */
 data class SyncResultado(
     val ok: Boolean,
     val subidos: Int = 0,
@@ -32,19 +34,17 @@ data class SyncResultado(
     val detalle: String = ""
 )
 
-/**
- * Sincronización incremental contra /api/sync.
- *
- * 1. Sube los cambios locales (SyncQueue / syncPendiente).
- * 2. Baja documentos, movimientos y eliminados nuevos del servidor.
- * 3. No sobrescribe local cuando el documento sigue pendiente de envío.
- */
 object SyncEngine {
 
     private const val TAG = "SyncEngine"
     val DISPOSITIVO = "android-gestion"
 
-    suspend fun sincronizar(context: Context): SyncResultado = withContext(Dispatchers.IO) {
+    private val syncMutex = Mutex()
+
+    suspend fun sincronizar(context: Context): SyncResultado =
+        syncMutex.withLock { sincronizarInterno(context) }
+
+    private suspend fun sincronizarInterno(context: Context): SyncResultado = withContext(Dispatchers.IO) {
         if (!ApiConfig.SYNC_ENABLED || !TokenProvider.sessionActiva(context)) {
             Log.w(TAG, "[TX] Sincronización omitida: SYNC_ENABLED=${ApiConfig.SYNC_ENABLED}, sesionActiva=${TokenProvider.sessionActiva(context)}")
             return@withContext SyncResultado(ok = false, detalle = "Sin sesión")
@@ -64,12 +64,6 @@ object SyncEngine {
                 Log.i(TAG, "[TX] Documento a subir -> UUID=${p.uuid} | Folio=${p.folio} | Destinatario=${p.destinatario} | Estado=${p.estado}")
             }
 
-            // Tras la migración v5, los documentos ya sincronizados siguen sin
-            // servidor_id. El pull del servidor es incremental (actualizado_en >
-            // lastSync), así que sin esto nunca recuperaríamos esos IDs y sus
-            // acciones de flujo quedarían bloqueadas para siempre. Se fuerza un
-            // pull completo una sola vez: al poblarse todos los IDs, el contador
-            // vuelve a 0 y el sync incremental normal se reanuda solo.
             val faltaServidorId = dao.countSinServidorId() > 0
             val lastSync = if (faltaServidorId) 0L else TokenProvider.lastSync(context)
 
@@ -81,11 +75,6 @@ object SyncEngine {
 
             val resp = api.sync(cambios)
 
-            // El resultado del push se interpreta ANTES de aplicar lo que devuelve
-            // el servidor. Sin este orden, un documento recién creado en el
-            // dispositivo vuelve a aparecer en `servidor.documentos` (su
-            // actualizado_en supera lastSync) con syncPendiente todavía activo, se
-            // marcaría como conflicto y nunca recibiría su `servidorId`.
             val cliente = resp.cliente
             val conflictosUuids = (cliente?.conflictos ?: emptyList())
                 .mapNotNull { (it as? JsonObject)?.get("uuid")?.asString }
@@ -98,7 +87,6 @@ object SyncEngine {
                 .filter { it !in conflictosUuids && it !in errorUuids }
                 .toSet()
 
-            // ---- Cambios del servidor ----
             val servidor = resp.servidor
             var bajados = 0
             if (servidor != null) {
@@ -109,12 +97,11 @@ object SyncEngine {
                     if (local != null && !esEcoPropio &&
                         (local.syncPendiente || local.syncStatus == SYNC_CONFLICTO)
                     ) {
-                        // No pisar un pendiente ajeno a este push: conflicto para revisión.
+
                         dao.marcarEstadosync(local.id, SYNC_CONFLICTO, System.currentTimeMillis())
                         continue
                     }
-                    // fusionar() conserva syncPendiente, así que el estado local
-                    // sobrevive a la fusión y el cierre de cola la marca al final.
+
                     val actualizado = if (local != null) local.fusionar(ent) else ent
                     dao.insert(actualizado)
                     bajados++
@@ -133,11 +120,10 @@ object SyncEngine {
                 if (servidor.serverTime > 0) {
                     TokenProvider.setLastSync(context, servidor.serverTime)
                 }
-                // PDFs locales pendientes -> subirlos con el id del servidor.
+
                 subirPdfsPendientes(context, dao, api, servidor.documentos)
             }
 
-            // ---- Resultado del push del cliente ----
             var subidos = 0
             for (doc in docsPendientes) {
                 if (doc.uuid in errorUuids) continue
@@ -163,7 +149,6 @@ object SyncEngine {
         }
     }
 
-    /** Marca el documento como pendiente y lo encola para el próximo sync. */
     suspend fun encolarAlta(context: Context, doc: Documento) {
         val db = AppDatabase.getInstance(context)
         val dao = db.documentoDao()
@@ -173,7 +158,6 @@ object SyncEngine {
         syncDao.insert(SyncQueue(documentoId = doc.id, uuid = doc.uuid, accion = "ALTA"))
     }
 
-    /** Encola una marca de eliminado lógico. */
     suspend fun encolarEliminado(context: Context, doc: Documento) {
         val db = AppDatabase.getInstance(context)
         val dao = db.documentoDao()
@@ -201,7 +185,8 @@ object SyncEngine {
         o.addProperty("clasificacion", clasificacion)
         if (fechaDocumento.isNotBlank()) o.addProperty("fecha_documento", fechaDocumento) else o.add("fecha_documento", com.google.gson.JsonNull.INSTANCE)
         if (fechaLimite.isNotBlank()) o.addProperty("fecha_limite", fechaLimite) else o.add("fecha_limite", com.google.gson.JsonNull.INSTANCE)
-        if (fechaLimiteHora.isNotBlank()) o.addProperty("fecha_limite_hora", fechaLimiteHora) else o.add("fecha_limite_hora", com.google.gson.JsonNull.INSTANCE)
+        val horaServidor = Hora.a24(fechaLimiteHora)
+        if (horaServidor.isNotBlank()) o.addProperty("fecha_limite_hora", horaServidor) else o.add("fecha_limite_hora", com.google.gson.JsonNull.INSTANCE)
         o.addProperty("fecha_recepcion", fechaRecepcion)
         o.addProperty("urgencia", urgencia)
         o.addProperty("notas", notas.orEmpty())
@@ -230,8 +215,7 @@ object SyncEngine {
             val server = porUuid[local.uuid] ?: continue
             val file = File(pdfPath)
             if (!file.exists()) continue
-            // Subir si el servidor no tiene PDF, o si el archivo local cambió
-            // (p. ej. un re-escaneo que reemplaza un PDF en blanco).
+
             if (!server.pdfNombre.isNullOrBlank()) {
                 val hashLocal = sha256DeArchivo(file)
                 if (hashLocal.isNotEmpty() && hashLocal == server.hashArchivo) continue
@@ -247,7 +231,19 @@ object SyncEngine {
                 "archivo", file.name, file.asRequestBody(mediaType)
             )
             runCatching {
-                api.subirPdf(server.id, part)
+                val respuesta = api.subirPdf(server.id, part)
+                if (!respuesta.isSuccessful) {
+                    val cuerpo = runCatching { respuesta.errorBody()?.string().orEmpty() }.getOrDefault("")
+                    Log.e(
+                        TAG,
+                        "[TX] PDF rechazado doc=${server.id} archivo=${file.name} " +
+                                "HTTP ${respuesta.code()} | $cuerpo"
+                    )
+                } else {
+                    Log.i(TAG, "[TX] PDF subido doc=${server.id} archivo=${file.name}")
+                }
+            }.onFailure {
+                Log.e(TAG, "[TX] Error subiendo PDF doc=${server.id} archivo=${file.name}", it)
             }
         }
     }

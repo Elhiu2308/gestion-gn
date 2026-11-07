@@ -1,10 +1,7 @@
 import XCTest
 @testable import GestionIOS
 
-/// Pruebas básicas del proyecto iOS (capa de utilidades y permisos).
 final class GestionIOSTests: XCTestCase {
-
-    // MARK: URL del backend
 
     func testURLBackendIncluyePrefijoAPI() {
         let url = ConfiguracionServidor.urlCon(ruta: "/documentos")
@@ -15,8 +12,6 @@ final class GestionIOSTests: XCTestCase {
         let url = ConfiguracionServidor.urlCon(ruta: "")
         XCTAssertEqual(url.absoluteString, "https://thermos-provider-populace.ngrok-free.dev/api")
     }
-
-    // MARK: Permisos efectivos
 
     func testPuedeSubirDocumentoConPermisoSubirPDF() {
         XCTAssertTrue(Permisos.puedeSubirDocumento(["DOCUMENTO_SUBIR_PDF"]))
@@ -30,14 +25,10 @@ final class GestionIOSTests: XCTestCase {
         XCTAssertFalse(Permisos.puedeSubirDocumento(["DOCUMENTO_CONSULTAR"]))
     }
 
-    // MARK: Token de sesión
-
     func testTokenAccesoSinSesionEsNulo() {
-        // Sin sesión iniciada en el entorno de pruebas, el token debe ser nil.
+
         XCTAssertNil(ServicioKeychain.tokenAcceso())
     }
-
-    // MARK: Agrupaciones del dashboard y archivo
 
     private func documento(
         estado: EstadoDocumento,

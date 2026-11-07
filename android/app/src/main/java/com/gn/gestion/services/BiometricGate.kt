@@ -12,15 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import javax.crypto.Cipher
 
-/**
- * Envoltura de BiometricPrompt para el desbloqueo del refresh token.
- *
- * El prompt usa únicamente BIOMETRIC_STRONG porque la clave del Keystore que protege el
- * token está autorizada con `AUTH_BIOMETRIC_STRONG` por cada uso: ofrecer DEVICE_CREDENTIAL
- * dejaría visible un botón que el sistema no puede autorizar, y además combinar
- * `setNegativeButtonText()` con DEVICE_CREDENTIAL es una combinación prohibida por
- * BiometricPrompt. Si el usuario no quiere usar huella o rostro, vuelve al login con contraseña.
- */
 object BiometricGate {
 
     private var contexto: Context? = null
@@ -29,28 +20,12 @@ object BiometricGate {
         contexto = ctx.applicationContext
     }
 
-    /**
-     * El acceso rápido solo se ofrece si hay biometría de verdad registrada.
-     *
-     * No basta con que exista PIN/patrón: la clave del Keystore que protege el
-     * refresh token exige autenticación biométrica *por cada uso*, y Android no
-     * permite crear esa clave si no hay ninguna huella o rostro enrolled. Con solo
-     * credencial del dispositivo, el token quedaría protegido por un PIN que el
-     * usuario puede olvidar o compartir, así que no se habilita el atajo.
-     */
     fun disponible(): Boolean {
         val ctx = contexto ?: return false
         return BiometricManager.from(ctx).canAuthenticate(BIOMETRIC_STRONG) ==
             BiometricManager.BIOMETRIC_SUCCESS
     }
 
-    /**
-     * Abre el registro de biometría del sistema, como hacen las apps bancarias.
-     *
-     * Se usa `ACTION_BIOMETRIC_ENROLL` para que el sistema ofrezca el alta de huella o
-     * rostro sin que la app tenga que implementarlo. En versiones anteriores a
-     * Android 11 no existe esa acción y se cae a la pantalla de seguridad.
-     */
     fun abrirRegistroBiometrico(activity: FragmentActivity): Boolean {
         val intentos = mutableListOf<Intent>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -68,13 +43,12 @@ object BiometricGate {
                 activity.startActivity(intento)
                 return true
             } catch (_: ActivityNotFoundException) {
-                // Se prueba con la siguiente opción.
+
             }
         }
         return false
     }
 
-    /** Motivo por el que no se puede activar, para explicarlo en la interfaz. */
     fun motivoNoDisponible(): String {
         val ctx = contexto ?: return "No se pudo consultar el estado de la biometría"
         return when (BiometricManager.from(ctx).canAuthenticate(BIOMETRIC_STRONG)) {
@@ -90,11 +64,6 @@ object BiometricGate {
         }
     }
 
-    /**
-     * Lanza el prompt con un CryptoObject: el descifrado solo se completa si la
-     * autenticación fue exitosa, de modo que el refresh token nunca queda expuesto
-     * en claro antes de validar la identidad.
-     */
     fun autenticar(
         activity: FragmentActivity,
         titulo: String,

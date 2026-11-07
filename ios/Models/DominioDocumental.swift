@@ -1,16 +1,7 @@
 import Foundation
 
-// ===========================================================================
-// Dominio documental — espejo exacto de los catálogos del backend
-// (ver `web/app/static/js/app.js`: TIPOS, ESTADOS, URGENCIAS, NIVELES,
-//  CLASIFICACIONES, ESTADOS_INDIVIDUALES, TIPOS_RELACION, ROLES, ACCIONES).
-// ===========================================================================
-
-// MARK: - Estado del documento
-
-/// Estados canónicos del ciclo documental FGN 2026 (12) más los heredados.
 enum EstadoDocumento: String, CaseIterable, Identifiable {
-    // Ciclo canónico
+
     case recibido = "RECIBIDO"
     case pendienteTurno = "PENDIENTE_TURNO"
     case turnado = "TURNADO"
@@ -23,12 +14,12 @@ enum EstadoDocumento: String, CaseIterable, Identifiable {
     case enValidacion = "EN_VALIDACION"
     case validado = "VALIDADO"
     case concluido = "CONCLUIDO"
-    // Estados de resolución
+
     case rechazado = "RECHAZADO"
     case archivado = "ARCHIVADO"
     case historico = "HISTORICO"
     case cancelado = "CANCELADO"
-    // Heredados (compatibilidad con datos previos)
+
     case registrado = "REGISTRADO"
     case pendienteAsignacion = "PENDIENTE_ASIGNACION"
     case designado = "DESIGNADO"
@@ -43,7 +34,6 @@ enum EstadoDocumento: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    /// Texto mostrado en la interfaz (etiquetas del backend).
     var etiqueta: String {
         switch self {
         case .recibido: return "Recibido"
@@ -76,7 +66,6 @@ enum EstadoDocumento: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Los estados terminales no admiten más acciones de trámite.
     var esTerminal: Bool {
         switch self {
         case .cancelado, .archivado, .historico, .concluido, .finalizado:
@@ -86,7 +75,6 @@ enum EstadoDocumento: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Estados en los que el documento sigue vivo en el flujo.
     var estaVivoEnFlujo: Bool {
         switch self {
         case .recibido, .pendienteTurno, .turnado, .enDistribucion, .enAtencion,
@@ -98,13 +86,10 @@ enum EstadoDocumento: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Normaliza el valor recibido del servidor.
     static func desde(_ valor: String) -> EstadoDocumento {
         EstadoDocumento(rawValue: valor.uppercased()) ?? .recibido
     }
 }
-
-// MARK: - Urgencia y clasificación
 
 enum UrgenciaDocumento: String, CaseIterable, Identifiable {
     case ordinario = "ORDINARIO"
@@ -121,7 +106,6 @@ enum UrgenciaDocumento: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Normaliza valores heredados (`NORMAL`, `MUY_URGENTE`, `URGENTE_MAXIMA`).
     static func desde(_ valor: String) -> UrgenciaDocumento {
         switch valor.uppercased() {
         case "URGENTE": return .urgente
@@ -151,9 +135,6 @@ enum ClasificacionDocumento: String, CaseIterable, Identifiable {
     }
 }
 
-// MARK: - Catálogos auxiliares
-
-/// Niveles del turno (`NIVELES` del backend).
 enum NivelTurnado: String, CaseIterable, Identifiable {
     case titular = "TITULAR"
     case direccion = "DIRECCION"
@@ -174,7 +155,6 @@ enum NivelTurnado: String, CaseIterable, Identifiable {
     }
 }
 
-/// Estado individual del documento respecto a un usuario.
 enum EstadoIndividual: String, CaseIterable, Identifiable {
     case noLeido = "NO_LEIDO"
     case leido = "LEIDO"
@@ -203,7 +183,6 @@ enum EstadoIndividual: String, CaseIterable, Identifiable {
     }
 }
 
-/// Tipo de vínculo entre documentos.
 enum TipoRelacion: String, CaseIterable, Identifiable {
     case relacionadoCon = "RELACIONADO_CON"
     case antecedente = "ANTECEDENTE"
@@ -220,7 +199,6 @@ enum TipoRelacion: String, CaseIterable, Identifiable {
     }
 }
 
-/// Tipo de anotación interna.
 enum TipoAnotacion: String, CaseIterable, Identifiable {
     case observacion = "OBSERVACION"
     case accion = "ACCION"
@@ -237,7 +215,6 @@ enum TipoAnotacion: String, CaseIterable, Identifiable {
     }
 }
 
-/// Acciones registradas en la línea de tiempo (`ACCIONES` del backend).
 enum AccionHistorial: String {
     case creado = "CREADO"
     case editado = "EDITADO"
@@ -314,7 +291,6 @@ enum AccionHistorial: String {
     }
 }
 
-/// Roles de usuario (`ROLES` del backend).
 enum RolUsuario: String, CaseIterable, Identifiable {
     case administrador = "ADMINISTRADOR"
     case capturista = "CAPTURISTA"
@@ -341,11 +317,6 @@ enum RolUsuario: String, CaseIterable, Identifiable {
     }
 }
 
-// ===========================================================================
-// Documento
-// ===========================================================================
-
-/// Documento documental tal como lo devuelve el backend.
 struct Documento: Identifiable, Hashable {
 
     let id: Int
@@ -357,32 +328,30 @@ struct Documento: Identifiable, Hashable {
     var urgencia: UrgenciaDocumento = .ordinario
     var clasificacion: ClasificacionDocumento = .publico
 
-    /// Remitente (lo registra el backend automáticamente desde la cuenta).
     var remitente: String = ""
-    /// Destinatario elegido en la cascada Área → Subdirección → Persona.
+
     var destinatario: String = ""
-    /// Identificador del destinatario en el catálogo de personas.
+
     var idDestinatario: Int? = nil
 
     var areaOrigen: String = ""
     var areaDestino: String = ""
     var areaActual: String = ""
     var usuarioAsignado: String = ""
-    /// Identificador del usuario que creó el documento.
+
     var creadorId: Int? = nil
-    /// Identificador del remitente (cuando se capturó desde el catálogo de personas).
+
     var idRemitente: Int? = nil
 
     var referencia: String = ""
     var numAnexos: Int = 0
 
-    /// Fecha consignada en el documento (`YYYY-MM-DD`).
     var fechaDocumento: String = ""
-    /// Fecha de creación del registro en el servidor.
+
     var creadoEn: Date? = nil
-    /// Fecha de recepción (epoch en milisegundos).
+
     var fechaRecepcion: Date? = nil
-    /// Fecha y hora límite de atención.
+
     var fechaLimite: String = ""
     var fechaLimiteHora: String = ""
 
@@ -390,19 +359,16 @@ struct Documento: Identifiable, Hashable {
     var observaciones: String = ""
     var textoOCR: String = ""
 
-    /// Nombre del PDF adjunto y su versión.
     var pdfNombre: String = ""
     var pdfVersion: Int = 0
-    /// Indica si el documento fue compartido con dos ramas (A/B).
+
     var compartido: Bool = false
-    /// Texto de la respuesta consolidada final.
+
     var respuestaConsolidada: String = ""
 
-    /// Vencimiento calculado por el backend y días restantes.
     var vencimiento: String = ""
     var diasRestantes: Int? = nil
 
-    /// Ids del organigrama (para reconstruir la cascada al editar).
     var orgDgOrigenId: Int? = nil
     var orgDirOrigenId: Int? = nil
     var orgSubOrigenId: Int? = nil
@@ -411,8 +377,6 @@ struct Documento: Identifiable, Hashable {
     var orgDirDestinoId: Int? = nil
     var orgSubDestinoId: Int? = nil
     var orgDeptDestinoId: Int? = nil
-
-    // MARK: Konstrucción desde el JSON del backend
 
     init(id: Int, json: [String: Any]) {
         self.id = id
@@ -468,7 +432,6 @@ struct Documento: Identifiable, Hashable {
         orgDeptDestinoId = json["org_dept_destino_id"] as? Int
     }
 
-    /// Inicializador de compatibilidad para las listas locales antiguas.
     init(
         id: Int,
         folio: String,
@@ -498,11 +461,8 @@ struct Documento: Identifiable, Hashable {
         self.creadoEn = creadoEn
     }
 
-    /// Indica si el documento tiene un archivo (PDF o imagen) adjunto.
     var tieneArchivo: Bool { !pdfNombre.isEmpty }
 
-    /// Días restantes para atender el documento. Usa `dias_restantes` cuando el
-    /// backend lo envía y, si no, calcula a partir de `fecha_limite`/`vencimiento`.
     var diasParaVencer: Int? {
         if let diasRestantes { return diasRestantes }
         let texto = fechaLimite.isEmpty ? vencimiento : fechaLimite
@@ -514,13 +474,10 @@ struct Documento: Identifiable, Hashable {
         ).day
     }
 
-    /// Indica si el documento ya superó su fecha límite.
     var estaVencido: Bool {
         (diasParaVencer ?? 0) < 0
     }
 
-    /// Convierte una fecha del backend (epoch en segundos/milisegundos o ISO-8601)
-    /// a `Date`. El backend entrega milisegundos en la mayoría de los campos.
     static func fecha(_ valor: Any?) -> Date? {
         if let numero = valor as? Double {
             return Date(timeIntervalSince1970: numero > 100_000_000_000 ? numero / 1000 : numero)
@@ -544,11 +501,6 @@ struct Documento: Identifiable, Hashable {
     }
 }
 
-// ===========================================================================
-// Piezas de la ficha documental
-// ===========================================================================
-
-/// Paso de la línea de tiempo del documento (`GET /documentos/<id>/historial`).
 struct PasoHistorial: Identifiable, Hashable {
     let id: Int
     var fechaHora: Date?
@@ -579,7 +531,6 @@ struct PasoHistorial: Identifiable, Hashable {
     }
 }
 
-/// Asignación del documento (`GET /documentos/<id>/asignaciones`).
 struct AsignacionDocumento: Identifiable, Hashable {
     let id: Int
     var fechaAsignacion: Date?
@@ -619,7 +570,6 @@ struct AsignacionDocumento: Identifiable, Hashable {
     }
 }
 
-/// Respuesta oficial registrada (`GET /documentos/<id>/respuestas`).
 struct RespuestaOficial: Identifiable, Hashable {
     let id: Int
     var fechaHora: Date?
@@ -656,7 +606,6 @@ struct RespuestaOficial: Identifiable, Hashable {
     }
 }
 
-/// Vínculo con otro documento (`GET /documentos/<id>/relaciones`).
 struct RelacionDocumento: Identifiable, Hashable {
     let id: Int
     var documentoRelacionadoId: Int
@@ -677,7 +626,6 @@ struct RelacionDocumento: Identifiable, Hashable {
     }
 }
 
-/// Anotación interna del documento.
 struct Anotacion: Identifiable, Hashable {
     let id: Int
     var documentoId: Int
@@ -716,11 +664,6 @@ struct Anotacion: Identifiable, Hashable {
     }
 }
 
-// ===========================================================================
-// Turnado, organigrama y bandejas
-// ===========================================================================
-
-/// Opción de destino del turno (`GET /turnado/opciones`).
 struct OpcionTurnado: Identifiable, Hashable {
     let id: Int
     var tipo: String
@@ -735,7 +678,6 @@ struct OpcionTurnado: Identifiable, Hashable {
     }
 }
 
-/// Opciones de turno del usuario, con su nivel actual y el siguiente permitido.
 struct OpcionesTurnado {
     var nivelActual: String = ""
     var nivelSiguiente: String = ""
@@ -756,7 +698,6 @@ struct OpcionesTurnado {
     }
 }
 
-/// Bandeja de trabajo (`GET /bandejas`).
 struct Bandeja: Identifiable, Hashable {
     let id: String
     var clave: String
@@ -771,12 +712,11 @@ struct Bandeja: Identifiable, Hashable {
     }
 }
 
-/// Registro del organigrama (`GET /organigrama/<nivel>`).
 struct NivelOrganizacional: Identifiable, Hashable {
     let id: Int
     var nombre: String
     var estatus: Bool
-    /// Nombre del nivel superior (sólo informativo).
+
     var padre: String
 
     init(json: [String: Any]) {
@@ -789,7 +729,6 @@ struct NivelOrganizacional: Identifiable, Hashable {
     }
 }
 
-/// Niveles del organigrama institucional.
 enum NivelOrganigrama: String, CaseIterable, Identifiable {
     case direccionGeneral = "direcciones-generales"
     case direccion = "direcciones"
@@ -807,7 +746,6 @@ enum NivelOrganigrama: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Parámetro que recibe el identificador del nivel superior.
     var parametroPadre: String? {
         switch self {
         case .direccion: return "direccion_general"
@@ -818,7 +756,6 @@ enum NivelOrganigrama: String, CaseIterable, Identifiable {
     }
 }
 
-/// Persona del catálogo (`GET /personas?direccion=|subdireccion=`).
 struct PersonaCatalogo: Identifiable, Hashable {
     let id: Int
     var nombre: String
@@ -845,11 +782,6 @@ struct PersonaCatalogo: Identifiable, Hashable {
     }
 }
 
-// ===========================================================================
-// Panel y perfil
-// ===========================================================================
-
-/// Resumen del panel institucional (`GET /panel/resumen`).
 struct ResumenPanel {
     var total: Int = 0
     var pendientesAsignacion: Int = 0
@@ -859,9 +791,9 @@ struct ResumenPanel {
     var validados: Int = 0
     var archivados: Int = 0
     var misAsignados: Int = 0
-    /// Documentos que me asignaron (`GET /documentos?bandeja=ASIGNADOS_POR_MI`).
+
     var asignadosPorMi: Int = 0
-    /// Documentos que me asignaron a mí.
+
     var asignadosAMi: Int = 0
 
     init(json: [String: Any]) {
@@ -878,7 +810,6 @@ struct ResumenPanel {
     }
 }
 
-/// Perfil del usuario tal como lo devuelve el servicio (`GET /auth/me`).
 struct PerfilServicio {
     var id: Int = 0
     var usuario: String = ""
@@ -922,7 +853,6 @@ struct PerfilServicio {
         RolUsuario.desde(rol)?.etiqueta ?? rol
     }
 
-    /// Nombre shown en la cabecera de la app.
     var nombreMostrado: String {
         let completo = nombreCompleto.trimmingCharacters(in: .whitespaces)
         if !completo.isEmpty { return completo }

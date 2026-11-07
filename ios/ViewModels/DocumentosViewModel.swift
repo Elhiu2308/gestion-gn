@@ -1,10 +1,5 @@
 import SwiftUI
 
-/// Agrupación de documentos usada por el dashboard y por el archivo.
-///
-/// Reproduce la clasificación que hace Android sobre el estado del documento:
-/// los estados terminales cuentan como finalizados, los que están en trámite
-/// como en proceso y el resto como pendientes.
 enum GrupoDocumentos: String, CaseIterable, Identifiable {
     case todos
     case pendientes
@@ -40,7 +35,6 @@ enum GrupoDocumentos: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Indica si el documento pertenece a esta agrupación.
     func incluye(_ documento: Documento) -> Bool {
         let estado = documento.estado.rawValue.uppercased()
 
@@ -87,10 +81,6 @@ enum GrupoDocumentos: String, CaseIterable, Identifiable {
     }
 }
 
-/// Bandejas disponibles en el selector de la pantalla Documentos.
-///
-/// Los títulos coinciden con la navegación solicitada en iOS y con las
-/// bandejas reales (`asignados_a_mi` y `creados_por_mi`) que ya usa Android.
 enum BandejaDocumentos: String, CaseIterable, Identifiable {
     case misDocumentos
     case pendientesTurno
@@ -120,8 +110,6 @@ enum BandejaDocumentos: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Filtro local para las bandejas que no tienen una clave propia en el
-    /// backend. Se usa el estado que ya entrega `/api/documentos`.
     func incluye(_ documento: Documento) -> Bool {
         let estado = documento.estado.rawValue.uppercased()
 
@@ -144,7 +132,6 @@ enum BandejaDocumentos: String, CaseIterable, Identifiable {
     }
 }
 
-/// ViewModel de la pantalla de listado de documentos.
 @MainActor
 final class DocumentosViewModel: ObservableObject {
 
@@ -219,10 +206,6 @@ final class DocumentosViewModel: ObservableObject {
     }
 }
 
-/// ViewModel del buscador de documentos (`GET /api/buscar`).
-///
-/// Los campos vacíos se omiten y el texto rápido solo se envía cuando tiene al
-/// menos dos caracteres, igual que el buscador de Android.
 @MainActor
 final class BuscarDocumentoViewModel: ObservableObject {
 

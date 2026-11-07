@@ -5,9 +5,6 @@ import android.content.Context
 import android.util.Log
 import com.gn.gestion.services.Notificador
 
-/**
- * Notificación recibida por Socket.IO, ya normalizada.
- */
 data class NotificacionSocket(
     val mensaje: String,
     val documentoId: Long? = null,
@@ -17,9 +14,6 @@ data class NotificacionSocket(
     val notificacionId: Long = 0L
 )
 
-/**
- * Eventos emitidos por el servidor mediante Socket.IO.
- */
 sealed interface EventoSocket {
     data class NuevaNotificacion(
         val datos: NotificacionSocket
@@ -30,28 +24,16 @@ sealed interface EventoSocket {
     ) : EventoSocket
 }
 
-/**
- * Estado de la conexión del socket en tiempo real.
- */
 sealed interface ConexionSocket {
     data object Desconectado : ConexionSocket
     data object Conectando : ConexionSocket
     data class Conectado(val id: String) : ConexionSocket
 }
 
-/**
- * Mapeador y despachador de notificaciones visuales.
- */
 object NotificationMap {
 
     private const val TAG = "NotificationMap"
 
-    /**
-     * Muestra una notificación recibida por Socket.IO.
-     *
-     * El ID se confirma únicamente cuando Android acepta
-     * la publicación de la notificación.
-     */
     fun procesarYMostrar(
         context: Context,
         notif: NotificacionSocket
@@ -68,7 +50,6 @@ object NotificationMap {
                     "notifId=$notifId"
         )
 
-        // Reservar el ID para evitar que FCM publique simultáneamente.
         val reservada = SocketManager.iniciarProcesamiento(notifId)
 
         if (!reservada) {
@@ -124,4 +105,3 @@ object NotificationMap {
         }
     }
 }
-

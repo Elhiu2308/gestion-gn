@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// ViewModel del perfil: carga los datos desde el servicio y los documentos
-/// asignados (lo que me asignan / lo que yo asigno).
 @MainActor
 final class PerfilViewModel: ObservableObject {
 
@@ -9,7 +7,7 @@ final class PerfilViewModel: ObservableObject {
     @Published private(set) var resumen: ResumenPanel?
     @Published private(set) var asignadosAMi: [Documento] = []
     @Published private(set) var asignadosPorMi: [Documento] = []
-    /// Contenido real del QR de firma emitido por el servidor.
+
     @Published private(set) var qrTexto: String?
     @Published private(set) var estaCargando = false
     @Published var errorTexto: String?
@@ -31,14 +29,12 @@ final class PerfilViewModel: ObservableObject {
             asignadosAMi = try await ami
             asignadosPorMi = try await porMi
 
-            // El QR debe ser el emitido por el backend; no se fabrica localmente.
             if perfilCargado.id > 0 {
                 qrTexto = (try? await repositorio.qrUsuario(id: perfilCargado.id))?.texto
             } else {
                 qrTexto = nil
             }
-            // Persistir en Keychain/UserDefaults para que el resto de la app
-            // (remitente automático, etc.) vea los datos actualizados.
+
             if let perfil {
                 let datos = UserDefaults.standard
                 datos.set(perfil.usuario, forKey: "usuario")

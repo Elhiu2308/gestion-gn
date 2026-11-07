@@ -1,8 +1,5 @@
 import Foundation
 
-/**
- * Servicio del archivo histórico (`/api/archivo`).
- */
 struct ServicioArchivo {
 
     enum Error: LocalizedError {

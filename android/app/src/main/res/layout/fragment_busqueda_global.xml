@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Buscador de documentos: búsqueda rápida por texto y filtros avanzados
-     combinables. El título vive en la Top App Bar; aquí no se repite. -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -8,7 +7,6 @@
     android:background="@color/fondo"
     android:orientation="vertical">
 
-    <!-- ============ Búsqueda rápida ============ -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_busqueda"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -38,7 +36,6 @@
             android:maxLength="120" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- ============ Acciones ============ -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,7 +72,6 @@
             app:cornerRadius="16dp" />
     </LinearLayout>
 
-    <!-- Resumen de los filtros activos: indica al usuario qué está acotanando -->
     <TextView
         android:id="@+id/lbl_filtros_activos"
         android:layout_width="match_parent"
@@ -89,9 +85,6 @@
         android:textSize="12sp"
         android:visibility="gone" />
 
-    <!-- ============ Filtros avanzados (plegable) ============
-         Altura acotada a propósito: los 12 filtros se desplazan dentro del panel
-         en lugar de empujar los resultados fuera de la pantalla. -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/panel_filtros"
         android:layout_width="match_parent"
@@ -128,7 +121,6 @@
                 android:textColor="@color/gris_texto"
                 android:textSize="12sp" />
 
-            <!-- Folio -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
@@ -142,7 +134,6 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Asunto -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
@@ -157,7 +148,6 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Descripción -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
@@ -172,7 +162,6 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Destinatario -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
@@ -187,7 +176,6 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Remitente -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
@@ -202,7 +190,6 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Área de origen -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
@@ -217,7 +204,6 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Área de destino -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
@@ -232,7 +218,6 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Tipo de documento -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_tipo"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -248,7 +233,6 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Estado -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_estado"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -264,7 +248,6 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Urgencia -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_urgencia"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -280,7 +263,6 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Rango de fechas -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -332,7 +314,6 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- ============ Resultados ============ -->
     <TextView
         android:id="@+id/lbl_resumen"
         android:layout_width="match_parent"

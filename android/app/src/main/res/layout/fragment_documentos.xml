@@ -8,9 +8,6 @@
     android:paddingStart="16dp"
     android:paddingEnd="16dp">
 
-    <!-- El título "Mis documentos" vive únicamente en la Top App Bar. La
-         actualización se hace deslizando hacia abajo (pull-to-refresh). -->
-
     <Spinner
         android:id="@+id/spinner_bandeja"
         android:layout_width="match_parent"

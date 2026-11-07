@@ -24,16 +24,6 @@ import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 
-/**
- * Pantalla de acceso de GestióN.
- *
- * Si la biometría está activada y disponible, se muestran inicialmente
- * dos opciones: acceso biométrico o usuario y contraseña.
- *
- * Cuando el usuario elige usuario y contraseña, la opción biométrica
- * permanece oculta durante la vista actual. Esto no desactiva la biometría
- * ni elimina las credenciales biométricas guardadas.
- */
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private val vm: GestionViewModel by activityViewModels()
@@ -45,16 +35,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private lateinit var switchActivarBiometria: MaterialSwitch
     private lateinit var tvEstadoBiometriaLogin: TextView
 
-    /**
-     * Indica que el usuario seleccionó iniciar sesión con credenciales.
-     * Evita que onResume vuelva a mostrar las opciones biométricas.
-     */
     private var eligioCredencialesEnEstaVista = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Cada nueva creación de la pantalla inicia con una selección limpia.
         eligioCredencialesEnEstaVista = false
 
         if (vm.syncActivo && TokenProvider.sessionActiva(requireContext())) {
@@ -94,7 +79,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val separador =
             view.findViewById<TextView>(R.id.lbl_separador)
 
-        // Acceso a la configuración del servidor.
         view.findViewById<View>(R.id.lbl_config_servidor)
             .setOnClickListener {
                 if (findNavController().currentDestination?.id == R.id.login) {
@@ -104,7 +88,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 }
             }
 
-        // Determinar si la biometría puede utilizarse.
         val biometriaActiva =
             vm.biometriaUtilizable() && BiometricGate.disponible()
 
@@ -112,41 +95,28 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         btnUsuarioContrasena.isVisible = biometriaActiva
         separador.isVisible = biometriaActiva
 
-        // Si la biometría está disponible, el formulario inicia oculto.
-        // Si no está disponible, el formulario se muestra directamente.
         formulario.isVisible = !biometriaActiva
 
         configurarSwitchBiometria()
 
-        // ---------------------------------------------------------
-        // ACCESO BIOMÉTRICO
-        // ---------------------------------------------------------
         btnBiometria.setOnClickListener {
             iniciarConBiometria(btnBiometria)
         }
 
-        // ---------------------------------------------------------
-        // ACCESO CON USUARIO Y CONTRASEÑA
-        // ---------------------------------------------------------
         btnUsuarioContrasena.setOnClickListener {
-            // Guardar la elección para que onResume la respete.
+
             eligioCredencialesEnEstaVista = true
 
-            // Ocultar ambas opciones y el separador.
             btnBiometria.isVisible = false
             btnUsuarioContrasena.isVisible = false
             separador.isVisible = false
 
-            // Mostrar únicamente el formulario de credenciales.
             formulario.isVisible = true
             lblError.isVisible = false
 
             inputUser.requestFocus()
         }
 
-        // ---------------------------------------------------------
-        // INICIAR SESIÓN CON CREDENCIALES
-        // ---------------------------------------------------------
         btnIngresar.setOnClickListener {
             val usuario = inputUser.text
                 ?.toString()
@@ -186,20 +156,14 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
                     btnIngresar.isEnabled = true
 
-                    // No conservar la contraseña en el campo.
                     inputPass.setText("")
 
-                    // Mantener el flujo original de activación biométrica.
                     solicitarActivacionBiometrica()
                 }
             )
         }
     }
 
-    /**
-     * Al regresar a la pantalla, recalcula la disponibilidad biométrica,
-     * salvo que el usuario ya haya elegido entrar con credenciales.
-     */
     override fun onResume() {
         super.onResume()
 
@@ -210,8 +174,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val separador =
             view?.findViewById<View>(R.id.lbl_separador)
 
-        // IMPORTANTE:
-        // No volver a mostrar la biometría si el usuario eligió credenciales.
         if (eligioCredencialesEnEstaVista) {
             btnBiometria.isVisible = false
             btnUsuarioContrasena.isVisible = false
@@ -220,7 +182,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             return
         }
 
-        // Comportamiento normal al entrar por primera vez.
         val biometriaDisponible =
             vm.biometriaUtilizable() && BiometricGate.disponible()
 
@@ -239,12 +200,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         )
     }
 
-    /**
-     * Inicia la autenticación biométrica.
-     *
-     * El refresh token permanece cifrado y solamente se descifra
-     * después de validar la identidad mediante el sistema biométrico.
-     */
     private fun iniciarConBiometria(btn: MaterialButton) {
         val ctx = requireContext()
 
@@ -332,7 +287,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             onFallo = { mensaje ->
                 btn.isEnabled = true
 
-                // Evitar mostrar mensajes alarmantes cuando se cancela.
                 if (!mensaje.contains("cancel", ignoreCase = true)) {
                     mostrarError(mensaje)
                 }
@@ -340,10 +294,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         )
     }
 
-    /**
-     * Configura el switch informativo/de solicitud de activación biométrica.
-     * Conserva el comportamiento original del proyecto.
-     */
     private fun configurarSwitchBiometria() {
         BiometricGate.registrar(requireContext())
 
@@ -441,10 +391,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
     }
 
-    /**
-     * Pregunta si se desea activar la biometría después del acceso
-     * con credenciales, siempre que se cumplan las condiciones.
-     */
     private fun solicitarActivacionBiometrica() {
         BiometricGate.registrar(requireContext())
 
@@ -505,9 +451,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             .show()
     }
 
-    /**
-     * Activa la biometría después de obtener el consentimiento del usuario.
-     */
     private fun activarBiometriaDesdeLogin() {
         BiometricGate.registrar(requireContext())
 
@@ -580,9 +523,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         lblError.text = mensaje
     }
 
-    /**
-     * Inicia el servicio de notificaciones por WebSocket y continúa al dashboard.
-     */
     private fun trasLogin() {
         SocketIOBackground.iniciar(requireContext())
         FcmRegistrador.registrar(requireContext())

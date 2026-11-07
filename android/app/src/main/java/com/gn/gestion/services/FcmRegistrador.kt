@@ -12,17 +12,6 @@ import org.json.JSONObject
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-/**
- * Registra el token FCM del dispositivo en el servidor (`/api/fcm/token`).
- *
- * - [registrar]: obtiene el token de Firebase y lo envía al servidor con el JWT de la sesión.
- * - [registrarToken]: lo usa GestionMessagingService.onNewToken cuando Firebase rota el token.
- * - [eliminar]: da de baja el token del dispositivo al cerrar sesión. Debe llamarse ANTES de
- *   TokenProvider.cerrarSesion, porque necesita el JWT; el token y el JWT se leen en el
- *   momento de la llamada y la petición sigue en segundo plano.
- *
- * Requiere google-services.json en app/ y el plugin com.google.gms.google-services.
- */
 object FcmRegistrador {
 
     private const val TAG = "FcmRegistrador"
@@ -61,6 +50,10 @@ object FcmRegistrador {
         val app = context.applicationContext
         if (token.isBlank()) return
         prefs(app).edit().putString(K_TOKEN, token).apply()
+        Log.i(
+            TAG,
+            "Token FCM listo | huella=${token.take(8)}… | longitud=${token.length}"
+        )
         val jwt = TokenProvider.token(app)
         if (jwt.isNullOrBlank()) {
             Log.i(TAG, "Token FCM guardado; se registrará al iniciar sesión")
@@ -69,7 +62,6 @@ object FcmRegistrador {
         enviar(app, metodo = "POST", token = token, jwt = jwt)
     }
 
-    /** Da de baja el token del dispositivo, por ejemplo al cerrar sesión. */
     fun eliminar(context: Context) {
         val app = context.applicationContext
         val token = prefs(app).getString(K_TOKEN, null)
@@ -108,7 +100,12 @@ object FcmRegistrador {
                         Log.i(TAG, "$metodo /api/fcm/token OK (HTTP ${r.code}) token=$huella")
                         if (metodo == "DELETE") prefs(app).edit().remove(K_TOKEN).apply()
                     } else {
-                        Log.e(TAG, "$metodo /api/fcm/token FALLÓ (HTTP ${r.code}) token=$huella")
+                        val detalle = runCatching { r.body?.string().orEmpty() }.getOrDefault("")
+                        Log.e(
+                            TAG,
+                            "$metodo /api/fcm/token falló (HTTP ${r.code}) " +
+                                    "token=$huella | $detalle"
+                        )
                     }
                 }
             } catch (e: Exception) {

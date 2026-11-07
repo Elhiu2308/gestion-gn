@@ -1,8 +1,5 @@
 import Foundation
 
-/**
- * Servicio de expedientes (`/api/expedientes/ *`).
- */
 struct ServicioExpedientes {
 
     enum Error: LocalizedError {
@@ -19,7 +16,6 @@ struct ServicioExpedientes {
         try await repositorio.obtener(id: id)
     }
 
-    /// Detalle completo del expediente con sus documentos vinculados.
     func detalle(id: Int) async throws -> (Expediente?, [Documento]) {
         try await repositorio.detalle(id: id)
     }

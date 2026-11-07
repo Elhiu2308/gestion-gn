@@ -16,7 +16,6 @@
         android:paddingEnd="20dp"
         android:paddingBottom="28dp">
 
-        <!-- ENCABEZADO INSTITUCIONAL -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -29,7 +28,6 @@
             android:letterSpacing="0.08"
             android:gravity="center_vertical" />
 
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,8 +36,6 @@
             android:textColor="@color/texto_principal"
             android:textSize="28sp"
             android:textStyle="bold" />
-
-
 
         <TextView
             android:layout_width="match_parent"
@@ -50,7 +46,6 @@
             android:textColor="@color/gris_texto"
             android:textSize="13sp" />
 
-        <!-- OPCIÓN 1: CÁMARA -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -145,7 +140,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- OPCIÓN 2: GALERÍA -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -240,7 +234,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- OPCIÓN 3: ARCHIVO -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -335,7 +328,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- PROCESAMIENTO -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_procesando"
             android:layout_width="match_parent"
@@ -375,7 +367,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- PIE INSTITUCIONAL -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

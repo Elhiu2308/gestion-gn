@@ -1,16 +1,15 @@
 import Foundation
 
-/// Errores unificados de la capa de red.
 enum ErrorRed: LocalizedError {
-    /// No hay conexión con el servidor (o el túnel no está disponible).
+
     case sinConexion(String)
-    /// El token expiró: la app debe volver al inicio de sesión.
+
     case sesionExpirada
-    /// El usuario no tiene permiso para la operación.
+
     case permisoDenegado(String)
-    /// El servidor respondió con un error HTTP.
+
     case servidor(String, Int)
-    /// La respuesta no es JSON válido.
+
     case respuestaInvalida
 
     var errorDescription: String? {
@@ -29,22 +28,10 @@ enum ErrorRed: LocalizedError {
     }
 }
 
-/// Cliente HTTP centralizado de GestióN.
-///
-/// - Habla con el backend Flask (`/api/...`) del mismo modo que la app Android.
-/// - Adjunta el JWT en `Authorization: Bearer` de forma automática.
-/// - Envía un `User-Agent` propio: los túneles de **ngrok** interceptan las
-///   peticiones de navegador con una página de aviso, pero dejan pasar las
-///   peticiones de API que no se identifican como navegador.
-/// - Centraliza el manejo de errores (401 → sesión expirada, 403 → permiso).
 enum RedCentral {
 
-    /// Identificador de la app ante el servidor (evita la página de aviso de ngrok).
     static let agente = "GestioN-iOS/1.0"
 
-    // MARK: - URLs
-
-    /// URL absoluta de una ruta de la API (`"/documentos"` → `<servidor>/api/documentos`).
     static func url(_ ruta: String, consulta: [URLQueryItem] = []) -> URL {
         let base = ConfiguracionServidor.urlCon(ruta: ruta)
         guard !consulta.isEmpty, var componentes = URLComponents(url: base, resolvingAgainstBaseURL: false) else {
@@ -54,9 +41,6 @@ enum RedCentral {
         return componentes.url ?? base
     }
 
-    // MARK: - Peticiones
-
-    /// Ejecuta una petición y devuelve el JSON como diccionario.
     @discardableResult
     static func enviar(
         _ metodo: String,
@@ -78,7 +62,6 @@ enum RedCentral {
         return objeto
     }
 
-    /// Ejecuta una petición y devuelve el JSON como arreglo de objetos.
     static func enviarArreglo(
         _ metodo: String,
         _ ruta: String,
@@ -89,7 +72,7 @@ enum RedCentral {
         if let arreglo = try? JSONSerialization.jsonObject(with: datos) as? [[String: Any]] {
             return arreglo
         }
-        // Algunos endpoints envuelven el arreglo: {"documentos": [...]} / {"data": [...]}
+
         if let objeto = try? JSONSerialization.jsonObject(with: datos) as? [String: Any] {
             for clave in ["documentos", "data", "items", "resultados", "filas"] {
                 if let arreglo = objeto[clave] as? [[String: Any]] { return arreglo }
@@ -98,7 +81,6 @@ enum RedCentral {
         return []
     }
 
-    /// Descarga un recurso binario (PDF, imagen) con sus encabezados.
     static func descargar(
         _ ruta: String,
         consulta: [URLQueryItem] = []
@@ -108,7 +90,6 @@ enum RedCentral {
         return try await enviar(solicitud, decodificaJSON: false)
     }
 
-    /// Sube un archivo (PDF/imagen) con `multipart/form-data`.
     @discardableResult
     static func subirArchivo(
         _ ruta: String,
@@ -121,7 +102,6 @@ enum RedCentral {
         let limite = "----GestioNFormBoundary\(UUID().uuidString)"
         var cuerpo = Data()
 
-        // Encabezado de la parte del archivo.
         cuerpo.append("--\(limite)\r\n".data(using: .utf8)!)
         cuerpo.append(
             "Content-Disposition: form-data; name=\"\(campo)\"; filename=\"\(nombre)\"\r\n"
@@ -144,9 +124,6 @@ enum RedCentral {
         return (try? JSONSerialization.jsonObject(with: datos) as? [String: Any]) ?? [:]
     }
 
-    // MARK: - Interno
-
-    /// Construye la solicitud base con los encabezados comunes.
     private static func construir(
         _ ruta: String,
         consulta: [URLQueryItem] = [],
@@ -162,7 +139,6 @@ enum RedCentral {
         return solicitud
     }
 
-    /// Ejecuta la solicitud y valida el código HTTP.
     private static func enviar(
         _ solicitud: URLRequest,
         decodificaJSON: Bool
@@ -191,7 +167,6 @@ enum RedCentral {
         return (datos, http)
     }
 
-    /// Ejecuta la solicitud y devuelve el JSON ya convertido.
     private static func ejecutar(
         _ metodo: String,
         _ ruta: String,
@@ -211,7 +186,6 @@ enum RedCentral {
         return try await enviar(solicitud, decodificaJSON: true)
     }
 
-    /// Extrae el mensaje de error del cuerpo JSON de una respuesta fallida.
     private static func mensajeDeError(_ datos: Data) -> String {
         guard let objeto = try? JSONSerialization.jsonObject(with: datos) as? [String: Any] else {
             return ""

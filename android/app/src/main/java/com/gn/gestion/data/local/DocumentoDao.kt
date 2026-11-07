@@ -57,7 +57,6 @@ interface DocumentoDao {
     @Query("SELECT * FROM documentos WHERE servidor_id = :id LIMIT 1")
     suspend fun getByServidorId(id: Long): Documento?
 
-    /** Documentos ya subidos al servidor cuyo ID de backend aún no se conoce. */
     @Query(
         "SELECT COUNT(*) FROM documentos " +
             "WHERE servidor_id IS NULL AND syncPendiente = 0 AND eliminadoEn IS NULL"

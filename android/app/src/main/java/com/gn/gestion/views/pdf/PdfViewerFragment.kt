@@ -19,10 +19,6 @@ import com.gn.gestion.util.c
 import com.gn.gestion.util.dp
 import java.io.File
 
-/**
- * Muestra una vista previa del PDF que ya está guardado en el dispositivo.
- * Usa la API nativa [PdfRenderer], sin dependencias externas.
- */
 class PdfViewerFragment : Fragment(R.layout.fragment_pdf_viewer) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -73,7 +69,7 @@ class PdfViewerFragment : Fragment(R.layout.fragment_pdf_viewer) {
             val displayWidth = ctx.resources.displayMetrics.widthPixels
             repeat(renderer.pageCount) { index ->
                 renderer.openPage(index).use { page ->
-                    // Escala para que la página quepa al ancho de la pantalla.
+
                     val scale = displayWidth / (page.width * density)
                     val w = (page.width * density * scale).toInt()
                     val h = (page.height * density * scale).toInt()

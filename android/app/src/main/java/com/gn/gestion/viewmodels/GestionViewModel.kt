@@ -1,11 +1,13 @@
 package com.gn.gestion.viewmodels;
 
-import android.app.Application
+import android.app.Application;
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.gn.gestion.data.local.AppDatabase;
 import com.gn.gestion.models.Documento;
 import com.gn.gestion.services.DocumentoRepository;
+import com.gn.gestion.services.FlujoRepository;
 import com.gn.gestion.models.Movimiento;
 import com.gn.gestion.models.TipoDocumento;
 import com.gn.gestion.services.TokenProvider;
@@ -85,8 +87,6 @@ class GestionViewModel(app: Application) : AndroidViewModel(app) {
     val syncActivo: Boolean
         get() = ApiConfig.SYNC_ENABLED
 
-    // ---------------- Autenticación ----------------
-
     fun iniciarSesion(
         usuario: String,
         contrasena: String,
@@ -106,7 +106,6 @@ class GestionViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Login biométrico: renueva la sesión con el refresh token ya descifrado. */
     fun iniciarSesionBiometrica(
         refreshToken: String,
         onError: (String) -> Unit,
@@ -134,10 +133,6 @@ class GestionViewModel(app: Application) : AndroidViewModel(app) {
 
     fun ultimoRefreshDisponible(): Boolean = auth.hayRefreshPendiente()
 
-    /**
-     * Cifra el refresh token con el cipher ya autorizado por el BiometricPrompt.
-     * Devuelve null si quedó activa.
-     */
     suspend fun activarBiometria(cipher: Cipher): String? = auth.activarBiometria(cipher)?.message
 
     suspend fun desactivarBiometria() {
@@ -150,8 +145,6 @@ class GestionViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    // ---------------- Sincronización ----------------
-
     fun sincronizar() {
         _syncEstado.value = "sync"
         viewModelScope.launch {
@@ -160,8 +153,6 @@ class GestionViewModel(app: Application) : AndroidViewModel(app) {
             _syncEstado.value = if (res.ok) "ok" else "error"
         }
     }
-
-    // ---------------- CRUD local ----------------
 
     suspend fun guardar(doc: Documento?): Long {
         val id = if (doc != null && doc.id != 0L) {
@@ -179,6 +170,64 @@ class GestionViewModel(app: Application) : AndroidViewModel(app) {
         return id
     }
 
+    fun turnarAlGuardar(
+        localId: Long,
+        opcionTipo: String,
+        opcionId: Long,
+        usuarioDestinoId: Long?,
+        comentario: String = "Turnado al registrar el documento"
+    ) {
+        viewModelScope.launch {
+            runCatching {
+                val sync = SyncEngine.sincronizar(getApplication())
+                if (!sync.ok) {
+                    Log.w("GN_GUARDAR", "Turnado al guardar omitido: sync=${sync.detalle}")
+                    return@runCatching
+                }
+                val local = documentoPorId(localId) ?: return@runCatching
+                val sid = local.servidorId ?: 0L
+                if (sid <= 0L) {
+                    Log.w("GN_GUARDAR", "Turnado al guardar omitido: sin servidorId para localId=$localId")
+                    return@runCatching
+                }
+
+                val flujo = FlujoRepository(ApiFactory.api(getApplication()))
+                val opciones = flujo.turnadoOpciones()
+                val valida = opciones.opciones.firstOrNull {
+                    it.id == opcionId && it.tipo.equals(opcionTipo, ignoreCase = true)
+                } ?: usuarioDestinoId?.let { uid ->
+                    opciones.opciones.firstOrNull {
+                        it.id == uid && it.tipo.equals("usuario", ignoreCase = true)
+                    }
+                }
+                if (valida == null) {
+                    Log.w(
+                        "GN_GUARDAR",
+                        "Turnado al guardar omitido: $opcionTipo/$opcionId no está en " +
+                                opciones.opciones.joinToString { "${it.tipo}/${it.id}" }
+                    )
+                    return@runCatching
+                }
+
+                val resp = flujo.turnar(
+                    sid,
+                    valida.tipo,
+                    valida.id,
+                    usuarioDestinoId = usuarioDestinoId,
+                    comentario = comentario
+                )
+                Log.i(
+                    "GN_GUARDAR",
+                    "Turnado al guardar OK doc=$sid tipo=${valida.tipo} id=${valida.id} " +
+                            "usuario=$usuarioDestinoId ok=${resp.ok}"
+                )
+                sincronizar()
+            }.onFailure {
+                Log.e("GN_GUARDAR", "Turnado al guardar falló (se ignora para no perder el alta)", it)
+            }
+        }
+    }
+
     fun eliminar(doc: Documento) {
         viewModelScope.launch {
             repository.actualizar(
@@ -189,37 +238,21 @@ class GestionViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    // ---------------- Trazabilidad ----------------
-
     suspend fun documentoPorId(id: Long): Documento? = repository.porIdOnce(id)
 
     fun movimientosDe(uuid: String): Flow<List<Movimiento>> = repository.movimientosDe(uuid)
 
-    /**
-     * Persiste resultados llegados del servidor y devuelve las filas locales.
-     *
-     * Necesario porque un DTO remoto no tiene PK de Room: sin guardarlo, el
-     * documento se navegaría con id = 0 y el detalle no sabría abrirlo.
-     */
     suspend fun guardarDesdeServidor(docs: List<Documento>): List<Documento> {
         for (d in docs) repository.guardarRemote(d)
         return docs.mapNotNull { repository.porUuid(it.uuid) }
     }
 
-    /**
-     * Id local (Room) de un documento a partir de su uuid o de su id de servidor.
-     * Es el que necesita [com.gn.gestion.ui.fragments.DetalleFragment] para abrirse.
-     */
     suspend fun resolverIdLocal(uuid: String, servidorId: Long): Long? {
         if (uuid.isNotBlank()) repository.porUuid(uuid)?.let { return it.id }
         if (servidorId > 0) repository.porServidorId(servidorId)?.let { return it.id }
         return null
     }
 
-    /**
-     * Resuelve o descarga el documento del servidor, lo persiste en Room y devuelve su id local.
-     * Se usa al abrir una notificación de un documento asignado o recibido.
-     */
     suspend fun descargarYObtenerId(uuid: String = "", servidorId: Long = 0L): Long? {
         val existente = resolverIdLocal(uuid, servidorId)
         if (existente != null && existente > 0L) return existente
@@ -258,8 +291,6 @@ class GestionViewModel(app: Application) : AndroidViewModel(app) {
 
         return null
     }
-
-    // ---------------- Filtros ----------------
 
     fun setFiltro(block: (Filtros) -> Unit) {
         val f = _filtros.value

@@ -32,14 +32,12 @@ data class LoginResponse(
     @SerializedName("expira_en") val expiraEn: Long = 0
 )
 
-/** Respuesta de POST /api/auth/refresh: solo renueva el access token. */
 data class RefreshResponse(
     @SerializedName("access_token") val accessToken: String? = null,
     @SerializedName("token") val token: String? = null,
     @SerializedName("expira_en") val expiraEn: Long? = null
 )
 
-/** Representación de un documento tal como la sirve la API web (snake_case). */
 data class DocumentoDto(
     @SerializedName("id") val id: Long = 0,
     @SerializedName("uuid") val uuid: String = "",
@@ -78,7 +76,6 @@ data class DocumentoDto(
     @SerializedName("eliminado_en") val eliminadoEn: Long? = null
 )
 
-/** Movimiento tal como lo sirve la API (incluye el nombre resuelto del usuario). */
 data class MovimientoDto(
     @SerializedName("uuid") val uuid: String = "",
     @SerializedName("documento_uuid") val documentoUuid: String = "",
@@ -117,7 +114,6 @@ data class SyncResponse(
     @SerializedName("serverTime") val serverTime: Long = 0
 )
 
-/** Asignación / compartición de un documento en el flujo institucional. */
 data class AsignacionDto(
     @SerializedName("id") val id: Long = 0,
     @SerializedName("documento_id") val documentoId: Long = 0,
@@ -133,7 +129,6 @@ data class AsignacionDto(
     @SerializedName("creado_en") val creadoEn: Long = 0
 )
 
-/** Anotación / observación sobre un documento. */
 data class AnotacionDto(
     @SerializedName("id") val id: Long = 0,
     @SerializedName("usuario_nombre") val usuarioNombre: String = "",
@@ -143,7 +138,6 @@ data class AnotacionDto(
     @SerializedName("creado_en") val creadoEn: Long = 0
 )
 
-/** Respuesta oficial emitida por una área (rama 0, 1 o 2). */
 data class RespuestaDto(
     @SerializedName("id") val id: Long = 0,
     @SerializedName("usuario_nombre") val usuarioNombre: String = "",
@@ -156,7 +150,6 @@ data class RespuestaDto(
     @SerializedName("fecha_hora") val fechaHora: Long = 0
 )
 
-/** Expediente documental / DCAI. */
 data class ExpedienteDto(
     @SerializedName("id") val id: Long = 0,
     @SerializedName("numero") val numero: String = "",
@@ -166,13 +159,11 @@ data class ExpedienteDto(
     @SerializedName("creado_en") val creadoEn: Long = 0
 )
 
-/** Respuesta de bandejas del servidor. */
 data class BandejaDto(
     @SerializedName("clave") val clave: String = "",
     @SerializedName("titulo") val titulo: String = ""
 )
 
-/** Respuesta del panel de indicadores. */
 data class PanelResumenDto(
     @SerializedName("total") val total: Int = 0,
     @SerializedName("en_tramite") val enTramite: Int = 0,
@@ -184,14 +175,12 @@ data class PanelResumenDto(
     @SerializedName("mis_asignados") val misAsignados: Int = 0
 )
 
-/** Wrapper genérico para respuestas de éxito de acción de flujo. */
 data class AccionFlujoResponse(
     @SerializedName("ok") val ok: Boolean = false,
     @SerializedName("estado") val estado: String = "",
     @SerializedName("error") val error: String = ""
 )
 
-/** Notificación del centro de notificaciones del servidor. */
 data class NotificacionDto(
     @SerializedName("id") val id: Long = 0,
     @SerializedName("uuid") val uuid: String = "",
@@ -203,19 +192,16 @@ data class NotificacionDto(
     @SerializedName("creado_en") val creadoEn: Long = 0
 )
 
-/** Contador de notificaciones no leídas. */
 data class ContadorNotificacionesDto(
     @SerializedName("total") val total: Int = 0,
     @SerializedName("no_leidas") val noLeidas: Int = 0
 )
 
-/** Expediente de referencia para un documento del archivo. */
 data class ExpReferenciaDto(
     @SerializedName("id") val id: Long = 0,
     @SerializedName("numero") val numero: String = ""
 )
 
-/** Documento administrativo del archivo, con sus expedientes asociados. */
 data class DocumentoArchivoDto(
     @SerializedName("id") val id: Long = 0,
     @SerializedName("uuid") val uuid: String = "",
@@ -228,7 +214,6 @@ data class DocumentoArchivoDto(
     @SerializedName("expedientes") val expedientes: List<ExpReferenciaDto> = emptyList()
 )
 
-/** Respuesta del archivo virtual (documentos archivados/ histórico y expedientes). */
 data class ArchivoDto(
     @SerializedName("total") val total: Int = 0,
     @SerializedName("documentos") val documentos: List<DocumentoArchivoDto> = emptyList(),
@@ -238,7 +223,6 @@ data class ArchivoDto(
     @SerializedName("por_estado") val porEstado: Map<String, Int> = emptyMap()
 )
 
-/** Resultado de la búsqueda global. */
 data class BusquedaDto(
     @SerializedName("q") val q: String = "",
     @SerializedName("total_documentos") val totalDocumentos: Int = 0,
@@ -247,13 +231,6 @@ data class BusquedaDto(
     @SerializedName("expedientes") val expedientes: List<ExpedienteDto> = emptyList()
 )
 
-/**
- * Nodo de la estructura organizacional tal como lo sirve
- * `GET /api/organigrama/<nivel>`.
- *
- * `id` es la clave genérica que usan los spinners de la web; `id_direccion`,
- * `id_subdireccion`… son las claves específicas del nivel.
- */
 data class NivelOrgDto(
     @SerializedName("id") val id: Long = 0,
     @SerializedName("nombre") val nombre: String = "",
@@ -265,12 +242,6 @@ data class NivelOrgDto(
     @SerializedName("id_subdireccion") val idSubdireccion: Long? = null
 )
 
-/**
- * Fila del catálogo institucional `GET /api/personas`.
- *
- * Es la única fuente de Remitente/Destinatario: el documento guarda
- * `id_persona` y, como copia histórica, el texto del nombre.
- */
 data class PersonaDto(
     @SerializedName("id_persona") val idPersona: Long? = null,
     @SerializedName("id") val id: Long? = null,
@@ -284,22 +255,17 @@ data class PersonaDto(
     @SerializedName("id_subdireccion") val idSubdireccion: Long? = null,
     @SerializedName("id_departamento") val idDepartamento: Long? = null
 ) {
-    /** Clave estable del catálogo (el servidor siempre envía una de las dos). */
+
     val clave: Long?
         get() = idPersona ?: id
 }
 
-/** Opción concreta de turno (Dirección/Subdirección/Departamento/Usuario). */
 data class TurnadoOpcionDto(
     @SerializedName("id") val id: Long = 0,
     @SerializedName("nombre") val nombre: String = "",
     @SerializedName("tipo") val tipo: String = ""
 )
 
-/**
- * Respuesta de `GET /api/turnado/opciones`: solo se puede turnar al nivel
- * INMEDIATAMENTE INFERIOR de la ubicación del usuario (sin saltos).
- */
 data class TurnadoOpcionesDto(
     @SerializedName("nivel_actual") val nivelActual: String = "",
     @SerializedName("etiqueta_actual") val etiquetaActual: String = "",
@@ -308,7 +274,6 @@ data class TurnadoOpcionesDto(
     @SerializedName("opciones") val opciones: List<TurnadoOpcionDto> = emptyList()
 )
 
-/** Documento relacionado (Vincular). `otroDocumentoId` es el documento enlazado. */
 data class RelacionDto(
     @SerializedName("id") val id: Long = 0,
     @SerializedName("uuid") val uuid: String = "",

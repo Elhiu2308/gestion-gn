@@ -26,6 +26,7 @@ import com.gn.gestion.R
 import com.gn.gestion.models.Documento
 import com.gn.gestion.models.servidorIdRequerido
 import com.gn.gestion.services.FlujoRepository
+import com.gn.gestion.util.mensajeServidor
 import com.gn.gestion.viewmodels.GestionViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -208,8 +209,7 @@ class RecepcionFragment : Fragment(R.layout.fragment_recepcion) {
     }
 
     private fun procesarCodigoQrDetectado(contenidoQr: String) {
-        // Extraer UUID o Folio del contenido del QR.
-        // Formatos soportados: "GESTIONN::<uuid>", URL con uuid, o uuid puro.
+
         val uuidExtraido = parsearUuidODatos(contenidoQr)
         Log.i("RecepcionFragment", "QR detectado: $contenidoQr -> UUID: $uuidExtraido")
 
@@ -326,7 +326,7 @@ class RecepcionFragment : Fragment(R.layout.fragment_recepcion) {
                 mostrarCargando(false)
                 MaterialAlertDialogBuilder(requireContext(), R.style.GestioN_Dialog_Base)
                     .setTitle("Error de recepción")
-                    .setMessage(e.message ?: "No se pudo registrar la recepción en el servidor.")
+                    .setMessage(e.mensajeServidor())
                     .setPositiveButton("OK", null)
                     .show()
             }

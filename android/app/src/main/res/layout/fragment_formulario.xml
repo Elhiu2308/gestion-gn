@@ -13,7 +13,6 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- ENCABEZADO -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,7 +47,6 @@
 
         </LinearLayout>
 
-        <!-- VISTA PREVIA DEL DOCUMENTO PDF -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_preview"
             android:layout_width="match_parent"
@@ -76,7 +74,6 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <!-- CONTENEDOR DE MINIATURAS DINÁMICAS (PÁGINA 1, PÁGINA 2, ETC.) -->
                 <LinearLayout
                     android:id="@+id/container_paginas_preview"
                     android:layout_width="match_parent"
@@ -84,7 +81,6 @@
                     android:layout_marginTop="8dp"
                     android:orientation="vertical" />
 
-                <!-- BOTÓN PARA VER EL PDF COMPLETO (UBICADO DEBAJO DEL PREVIO DEL PDF) -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_ver_pdf_completo"
                     style="@style/Widget.Material3.Button.UnelevatedButton"
@@ -107,7 +103,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- DATOS GENERALES -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -141,7 +136,6 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <!-- MARCO ESTILIZADO PARA SPINNER TIPO -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
@@ -213,7 +207,6 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- FECHA DEL DOCUMENTO -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/fecha_card"
                     android:layout_width="match_parent"
@@ -274,7 +267,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- TURNADO / DESTINATARIO -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -307,7 +299,6 @@
                     android:textColor="@color/gris_texto"
                     android:textSize="13sp" />
 
-                <!-- 1. ÁREA -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -337,7 +328,6 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- 2. SUBDIRECCIÓN -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -367,7 +357,6 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- 3. DEPARTAMENTO (DINÁMICO: VISIBLE SOLO SI TIENE DEPARTAMENTOS) -->
                 <TextView
                     android:id="@+id/lbl_dest_dept"
                     android:layout_width="match_parent"
@@ -401,7 +390,6 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- 4. PERSONA -->
                 <TextView
                     android:id="@+id/lbl_dest_per"
                     android:layout_width="match_parent"
@@ -525,7 +513,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- REFERENCIAS Y ANEXOS -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -627,7 +614,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- PLAZO DE ATENCIÓN (HORIZONTAL: FECHA LÍMITE Y HORA LÍMITE LADO A LADO) -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -654,7 +640,6 @@
                 android:orientation="horizontal"
                 android:padding="16dp">
 
-                <!-- IZQUIERDA: TARJETA FECHA LÍMITE -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/limite_fecha_card"
                     android:layout_width="0dp"
@@ -714,7 +699,6 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- DERECHA: HORA LÍMITE (SELECTORES EN HORIZONTAL) -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -746,7 +730,6 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
-                            <!-- HORA (1..12) -->
                             <Spinner
                                 android:id="@+id/sp_hora_limite"
                                 android:layout_width="0dp"
@@ -762,7 +745,6 @@
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
 
-                            <!-- MINUTO (00..55) -->
                             <Spinner
                                 android:id="@+id/sp_minuto_limite"
                                 android:layout_width="0dp"
@@ -770,7 +752,6 @@
                                 android:layout_weight="1"
                                 android:backgroundTint="@color/g_verde" />
 
-                            <!-- PERIODO (AM/PM) -->
                             <Spinner
                                 android:id="@+id/sp_ampm_limite"
                                 android:layout_width="0dp"
@@ -784,7 +765,6 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- CAMPO INVISIBLE DE RESPALDO PARA COMPATIBILIDAD CON HORA_LIMITE TEXT -->
                 <EditText
                     android:id="@+id/input_hora_limite"
                     android:layout_width="wrap_content"
@@ -795,7 +775,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- URGENCIA Y NOTAS -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -864,7 +843,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- MENSAJE DE PERMISOS -->
         <TextView
             android:id="@+id/lbl_sin_permiso"
             android:layout_width="match_parent"
@@ -877,7 +855,6 @@
             android:textSize="13sp"
             android:visibility="gone" />
 
-        <!-- ACCIÓN PRINCIPAL -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_guardar"
             android:layout_width="match_parent"
