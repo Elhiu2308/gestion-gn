@@ -148,10 +148,16 @@ class GestionViewModel(app: Application) : AndroidViewModel(app) {
     fun sincronizar() {
         _syncEstado.value = "sync"
         viewModelScope.launch {
-            val res = SyncEngine.sincronizar(getApplication())
-            _ultimoSync.value = res
-            _syncEstado.value = if (res.ok) "ok" else "error"
+            sincronizarAhora()
         }
+    }
+
+    suspend fun sincronizarAhora(): SyncResultado {
+        _syncEstado.value = "sync"
+        val res = SyncEngine.sincronizar(getApplication())
+        _ultimoSync.value = res
+        _syncEstado.value = if (res.ok) "ok" else "error"
+        return res
     }
 
     suspend fun guardar(doc: Documento?): Long {

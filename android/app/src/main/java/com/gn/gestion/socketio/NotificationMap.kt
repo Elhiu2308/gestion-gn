@@ -3,6 +3,8 @@ package com.gn.gestion.socketio
 
 import android.content.Context
 import android.util.Log
+import com.gn.gestion.services.FcmRegistrador
+import com.gn.gestion.services.NotificacionForeground
 import com.gn.gestion.services.Notificador
 
 data class NotificacionSocket(
@@ -58,6 +60,18 @@ object NotificationMap {
                 "[RX] Notificación duplicada o en proceso | id=$notifId"
             )
             return false
+        }
+
+        if (!NotificacionForeground.visible &&
+            notifId > 0L &&
+            FcmRegistrador.tieneToken(context)
+        ) {
+            Log.i(
+                TAG,
+                "[RX] App en segundo plano; FCM publicará la notificación | id=$notifId"
+            )
+            SocketManager.cancelarProcesamiento(notifId)
+            return true
         }
 
         return try {

@@ -62,6 +62,9 @@ object FcmRegistrador {
         enviar(app, metodo = "POST", token = token, jwt = jwt)
     }
 
+    fun tieneToken(context: Context): Boolean =
+        !prefs(context.applicationContext).getString(K_TOKEN, null).isNullOrBlank()
+
     fun eliminar(context: Context) {
         val app = context.applicationContext
         val token = prefs(app).getString(K_TOKEN, null)

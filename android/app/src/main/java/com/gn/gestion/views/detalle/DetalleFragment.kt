@@ -14,6 +14,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
 import android.text.InputType
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -639,7 +640,10 @@ class DetalleFragment : Fragment(R.layout.fragment_detalle) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 run()
-                vm.sincronizar()
+                val sync = vm.sincronizarAhora()
+                if (!sync.ok) {
+                    Log.w("GN_DETALLE", "Sincronización tras acción no completó: ${sync.detalle}")
+                }
                 val actualizado = vm.documentoPorId(doc.id) ?: doc
                 render(view, actualizado)
                 cargarTramite(view, actualizado)
